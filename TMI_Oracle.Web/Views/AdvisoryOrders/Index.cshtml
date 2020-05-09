@@ -1,0 +1,941 @@
+﻿@model IEnumerable<TMI.Web.Models.AdvisoryOrder>
+@{
+    ViewBag.Title = "咨询单信息";
+}
+<div id="app" v-cloak>
+    <el-row style="background-color: #eee; padding:10px 0px 0px 10px">
+        <el-col>
+            <el-form v-bind:inline="true" v-bind:model="filters.filterRules" size="mini" ref="tb_search">
+                <el-form-item v-for="field in ArrSearchField"
+                              v-if="!field.IsKey && field.SearchShow"
+                              v-bind:label-width="formLabelWidth"
+                              v-bind:label="field.DisplayName"
+                              v-bind:prop="field.Name"
+                              v-bind:rules="el_FormFieldRules(field,true)">
+                    <component v-if="!field.IsForeignKey" v-model="filters.filterRules[field.Name]"
+                               v-bind:is="el_inputType(field)"
+                               v-bind:prop="field.Name"
+                               v-bind:type="el_inputProtoType(field,true)"
+                               v-bind:precision="field.Precision"
+                               value-value-format="yyyy-MM-dd"
+                               range-separator="至"
+                               start-placeholder="日期起"
+                               end-placeholder="日期讫">
+                        <i slot="suffix" class="el-input__icon fa"
+                           v-show="field.Name.toLowerCase().indexOf('password')>=0"
+                           v-on:click="pswView(field)"
+                           v-bind:class="el_inputClass(field)"></i>
+                    </component>
+                    <el-select v-else v-model="filters.filterRules[field.Name]"
+                               reserve-keyword clearable
+                               v-bind:remote-method="q=>el_remoteMethod(q,field,'search')"
+                               v-bind:loading="el_selt.el_selt_loading">
+                        <template v-if="el_selt[field.Name+'_search']">
+                            <el-option v-for="item in el_selt[field.Name+'_search'].ArrOption"
+                                       v-bind:key="item.ID"
+                                       v-bind:label="item.TEXT"
+                                       v-bind:value="item.ID">
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
+                <br>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button type="primary" icon="el-icon-search" v-on:click="search" v-bind:loading="tbLoading">查询</el-button>
+                </el-form-item>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button icon="el-icon-refresh" v-on:click="resetFilter('tb_search')" v-bind:disabled="tbLoading">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row><!--搜索条件-->
+    <templete>
+        <el-row style="padding: 3px 10px 3px 10px;">
+            <el-col>
+                <el-button-group>
+                    <el-button type="primary" icon="el-icon-plus" size="small" v-bind:disabled="!UserRoles.Create" v-on:click="handleAddRow">新增</el-button>
+                    <el-button icon="el-icon-download" size="small" v-bind:disabled="!UserRoles.Export" v-on:click="ExportXls(tableData,'Excel导出')">导出</el-button>
+                    <el-button icon="el-icon-upload" size="small" v-bind:disabled="!UserRoles.Import" v-on:click="ImportXls">导入</el-button>
+                </el-button-group>
+            </el-col>
+        </el-row><!--列表按钮组-->
+        <el-row>
+            <el-col>
+                <el-table ref="Mytb" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                          v-bind:default-sort="{prop:'Id',order:'descending'}"
+                          v-bind:data="tableData"
+                          v-loading="tbLoading"
+                          v-on:row-dblclick="handledblclick"
+                          v-on:selection-change="handleSelectionChange"
+                          v-on:sort-change="tbSortChange">
+                    <el-table-column fixed type="selection" width="36"></el-table-column>
+                    <template>
+                        <el-table-column show-overflow-tooltip prop="OrderNo" label="咨询单号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'OrderNo'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravleType" label="旅游类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'TravleType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravleOrdType" label="订单类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'TravleOrdType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravlePersonNum" label="出游人数" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'TravlePersonNum'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="UnitPrice" label="单价" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'UnitPrice'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TotalPrice" label="总价" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'TotalPrice'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RouteNo" label="线路编号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'RouteNo'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RouteName" label="线路名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'RouteName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RoutePhoto" label="线路图" v-bind:formatter="formatter({Type: 'string', Name: 'RoutePhoto'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.RoutePhoto)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.RoutePhoto}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">线路图</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerRequire" label="客户诉求" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustomerRequire'})" width="200px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Status" label="使用状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'Status', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerName" label="客户名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustomerName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ContactType" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ContactType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Contact" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Contact'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ActiveStatus" label="活跃状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ActiveStatus', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerSource" label="客户来源" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerSource', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerLevel" label="等级" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerLevel', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerType" label="客户类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ComponyName" label="公司名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ComponyName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="OP" label="客服" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'OP'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Saller" label="销售" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Saller'})" width="150px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="OrderStatus" label="订单状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'OrderStatus', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                        @*<el-table-column show-overflow-tooltip prop="OperatingPoint" label="操作点" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'OperatingPoint'})" width="120px"></el-table-column>
+                            <el-table-column show-overflow-tooltip prop="ADDID" label="新增人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDID'})" width="120px"></el-table-column>*@
+                        <el-table-column show-overflow-tooltip prop="ADDWHO" label="新增人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDWHO'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ADDTS" label="新增时间" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'ADDTS'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="EDITWHO" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITWHO'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="EDITTS" label="修改时间" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'EDITTS'})" width="120px"></el-table-column>
+                        @*<el-table-column show-overflow-tooltip prop="EDITID" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITID'})" width="120px"></el-table-column>*@
+                    </template>
+                </el-table><!--Table列表-->
+                <el-row style="padding-top: 10px;">
+                    <el-col v-bind:span="8">
+                        <el-button type="danger" size="small" v-on:click="handledelSeltRow" v-bind:disabled="(UserRoles.Delete ? selctRows.length===0 : true)">批量删除</el-button>
+                    </el-col>
+                    <el-col v-bind:span="16">
+                        <el-pagination v-model="pagiNation" style="float:right;"
+                                       v-on:size-change="pageSizeChange"
+                                       v-on:current-change="pageCurrentChange"
+                                       v-on:prev-click="PrevPage"
+                                       v-on:next-click="NextPage"
+                                       v-bind:current-page="pagiNation.currentPage"
+                                       v-bind:page-sizes="pagiNation.pageSizes"
+                                       v-bind:page-size="pagiNation.pageSize"
+                                       v-bind:layout="pagiNation.layout"
+                                       v-bind:total="pagiNation.total">
+                        </el-pagination>
+                    </el-col>
+                </el-row><!--列表底部 按钮+翻页-->
+            </el-col>
+        </el-row>
+    </templete>
+    <!--弹出框-->
+    <el-dialog v-bind:title="dgTitle" ref="MyDialog" width="60%" center
+               v-bind:visible.sync="centerDialogVisible"
+               v-loading="dlgLoading"
+               v-on:close="dlgClose"
+               v-bind:fullscreen="dlgfullscreen"
+               v-bind:show-close="false">
+        <div slot="title" v-on:dblclick="dlgfullscreen = !dlgfullscreen" class="el-dialog__title" style="">
+            <el-row>
+                <el-col v-bind:span="8" style="cursor:move;">&nbsp;</el-col>
+                <el-col v-bind:span="8" style="cursor:move;">{{dgTitle}}</el-col>
+                <el-col v-bind:span="8" style="text-align:right;">
+                    <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit" title="确 定" circle></el-button>
+                    <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="centerDialogVisible = false" title="取 消" circle></el-button>
+                </el-col>
+            </el-row>
+        </div>
+        @*:label-position="left/right/top"*@
+        <el-form ref="MyForm" v-bind:model="curr_rowdata" label-position="right" inline size="small">
+            基本信息<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" prop="OrderNo" label="咨询单号"
+                          v-bind:rules="el_FormFieldRules({Name: 'OrderNo', DisplayName: '咨询单号', Required: false, Editable: true, MinLength: 0, MaxLength: 100})">
+                <el-input v-model="curr_rowdata['OrderNo']" v-bind:clearable="true" v-bind:style="{width:'178px'}" readonly="readonly" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="TravleType" label="旅游类型"
+                          v-bind:rules="el_FormFieldRules({Name: 'TravleType', DisplayName: '旅游类型', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['TravleType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.TravleType_form">
+                        <el-option v-for="item in el_selt.TravleType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="TravleType" label="订单类型"
+                          v-bind:rules="el_FormFieldRules({Name: 'TravleOrdType', DisplayName: '订单类型', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['TravleOrdType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.TravleOrdType_form">
+                        <el-option v-for="item in el_selt.TravleOrdType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="TravlePersonNum" label="出游人数"
+                          v-bind:rules="el_FormFieldRules({Name: 'TravlePersonNum', DisplayName: '出游人数', Required: false, Editable: true, Precision: 0, MinLength: 0, MaxLength: 0})">
+                <el-input-number v-model="curr_rowdata['TravlePersonNum']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="UnitPrice" label="单价"
+                          v-bind:rules="el_FormFieldRules({Name: 'UnitPrice', DisplayName: '单价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-input-number v-model="curr_rowdata['UnitPrice']" v-bind:precision="2" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            @*<el-form-item v-bind:label-width="formLabelWidth" prop="TotalPrice" label="总价"
+                              v-bind:rules="el_FormFieldRules({Name: 'TotalPrice', DisplayName: '总价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                    <el-input-number v-model="curr_rowdata['TotalPrice']" v-bind:precision="2" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>*@
+            <el-form-item v-bind:label-width="formLabelWidth" prop="Status" label="使用状态"
+                          v-bind:rules="el_FormFieldRules({Name: 'Status', DisplayName: '使用状态', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['Status']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.Status_form">
+                        <el-option v-for="item in el_selt.Status_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RouteNo" label="线路编号"
+                          v-bind:rules="el_FormFieldRules({Name: 'RouteNo', DisplayName: '线路编号', Required: false, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-input v-model="curr_rowdata['RouteNo']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RouteName" label="线路名称"
+                          v-bind:rules="el_FormFieldRules({Name: 'RouteName', DisplayName: '线路名称', Required: false, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-input v-model="curr_rowdata['RouteName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" prop="CustomerRequire" label="客户诉求"
+                          v-bind:rules="el_FormFieldRules({Name: 'CustomerRequire', DisplayName: '客户诉求', Required: false, Editable: true, MinLength: 0, MaxLength: 2000})">
+                <el-input v-model="curr_rowdata['CustomerRequire']" type="textarea" v-bind:autosize="{ minRows: 2, maxRows: 4}" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="Remark" label="备注"
+                          v-bind:rules="el_FormFieldRules({Name: 'Remark', DisplayName: '备注', Required: false, Editable: true, MinLength: 0, MaxLength: 1000})">
+                <el-input v-model="curr_rowdata['Remark']" type="textarea" v-bind:autosize="{ minRows: 2, maxRows: 4}" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RoutePhoto" label="线路图"
+                          v-bind:rules="el_FormFieldRules({Name: 'RoutePhoto', DisplayName: '线路图', Required: false, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('RoutePhoto',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('RoutePhoto',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('RoutePhoto','线路图')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">图片文件，大小不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <br />客户信息<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户姓名" prop="CustomerName"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerName',DisplayName:'客户姓名',Required:true,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['CustomerName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="联系方式" prop="ContactType"
+                          v-bind:rules="el_FormFieldRules({Name:'ContactType',DisplayName:'联系方式',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ContactType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.ContactType_form">
+                        <el-option v-for="item in el_selt.ContactType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="联系方式" prop="Contact"
+                          v-bind:rules="el_FormFieldRules({Name:'Contact',DisplayName:'联系方式',Required:true,Editable:true,MinLength:0,MaxLength:100})">
+                <el-input v-model="curr_rowdata['Contact']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="客服" prop="OP"
+                          v-bind:rules="el_FormFieldRules({Name:'OP',DisplayName:'客服',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['OP']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户类型" prop="CustomerType"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerType',DisplayName:'客户类型',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-on:change="CustomerTypeChange"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerType_form">
+                        <el-option v-for="item in el_selt.CustomerType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-show="curr_rowdata['CustomerType']==2" v-bind:label-width="formLabelWidth" label="公司名称" prop="ComponyName"
+                          v-bind:rules="el_FormFieldRules({Name:'ComponyName',DisplayName:'公司名称',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['ComponyName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-show="curr_rowdata['CustomerType']==2" v-bind:label-width="formLabelWidth" label="公司" prop="ComponyId"
+                          v-bind:rules="el_FormFieldRules({Name:'ComponyId',DisplayName:'公司',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ComponyId']"
+                           reserve-keyword clearable filterable remote
+                           v-bind:remote-method="q=>el_remoteMethod(q,{Name: 'ComponyId',ForeignKeyGetListUrl: '/Companies/GetData'},'form')"
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}"
+                           v-on:change="ComponyIdChange">
+                    <template v-if="el_selt.ComponyId_form">
+                        <el-option v-for="item in el_selt.ComponyId_form.ArrOption"
+                                   v-bind:key="item.Id"
+                                   v-bind:label="item.Name"
+                                   v-bind:value="item.Id">
+                            <div class="row">
+                                <div class="col-md-6">{{ item.CIQID }}</div>
+                                <div class="col-md-6" style="float: right; color: #8492a6; font-size: 13px;">{{ item.Name }}</div>
+                            </div>
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="活跃状态" prop="ActiveStatus"
+                          v-bind:rules="el_FormFieldRules({Name:'ActiveStatus',DisplayName:'活跃状态',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ActiveStatus']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.ActiveStatus_form">
+                        <el-option v-for="item in el_selt.ActiveStatus_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="销售" prop="Saller"
+                          v-bind:rules="el_FormFieldRules({Name:'Saller',DisplayName:'销售',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['Saller']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="等级" prop="CustomerLevel"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerLevel',DisplayName:'等级',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerLevel']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerLevel_form">
+                        <el-option v-for="item in el_selt.CustomerLevel_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户来源" prop="CustomerSource"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerSource',DisplayName:'客户来源',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerSource']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerSource_form">
+                        <el-option v-for="item in el_selt.CustomerSource_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-tabs type="border-card">
+                <el-tab-pane label="供应商询价">
+                    <el-row style="padding-bottom: 3px;">
+                        <el-col>
+                            <el-button-group>
+                                <el-button type="primary" icon="el-icon-plus" size="mini" v-bind:disabled="!UserRoles.Create" v-on:click="AddSpyAskPrcRow">新增</el-button>
+                            </el-button-group>
+                        </el-col>
+                    </el-row>
+                    <el-table ref="tbSupplyerAskPrice" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                              v-bind:default-sort="{prop:'Id',order:'descending'}"
+                              v-bind:data="curr_rowdata.ArrSupplyierAskPrice"
+                              v-loading="tbSperAskPrcLoading"
+                              v-on:row-dblclick="SpyAskPrcdblclick">
+                        <el-table-column type="index" prop="Id" label="序号" sortable width="50px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="SupplierName" label="供应商" sortable width="120px">
+                            <templete slot="header" slot-scope="scope">
+                                <el-input v-model="SupplierName_S" size="mini" placeholder="供应商-搜索" />
+                            </templete>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RouteName" label="线路名称" sortable width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ServiceProject" label="服务项目" sortable width="120px" v-bind:formatter="formatter({Type: 'enum', Name: 'ServiceProject', ForeignKeyGetListUrl: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT_FromCache?DOCCODE=ServiceProject'})"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Price" label="单价" sortable min-width="80px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Target" label="标记" sortable width="120px" v-bind:formatter="formatter({Type: 'boolean', Name: 'Target'})"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" min-width="200px"></el-table-column>
+                        <el-table-column fixed="right" label="操作" width="47" v-if="UserRoles.Delete">
+                            <template slot-scope="sp">
+                                <el-tooltip content="删除" placement="top" effect="light">
+                                    <el-button type="danger" size="mini" icon="el-icon-delete" circle v-bind:disabled="sp.row.Id>0&&!UserRoles.Delete" v-on:click.native.prevent="deleteSpyAskPrcRow(sp.$index, sp.row)"></el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+            </el-tabs><!--供应商询价-->
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="centerDialogVisible = false" plain>取 消</el-button>
+            <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit" plain>确 定</el-button>
+        </span>
+    </el-dialog>
+    <!--弹出框 供应商询价 -->
+    <el-dialog title="供应商询价" ref="SpyAskPrcDialog" width="60%" center
+               v-bind:visible.sync="SpyAskPrcDialogVisible"
+               v-loading="tbSperAskPrcLoading"
+               v-on:row-dblclick="handledblclick">
+        <el-form ref="MyForm" v-bind:model="SpyAskPrcData" label-position="right" inline size="small">
+            <el-form-item v-bind:label-width="formLabelWidth" prop="SupplierName" label="供应商名称"
+                          v-bind:rules="el_FormFieldRules({Name: 'SupplierName', DisplayName: '供应商名称', Required: true, Editable: true, MinLength: 0, MaxLength: 50})">
+                @*<el-input v-model="SpyAskPrcData['SupplierName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />*@
+                <el-select v-model="SpyAskPrcData['SupplierName']" style="width:178px" reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading" v-on:change="SupplierNameChange">
+                    <template v-if="el_selt.SupplierName_form">
+                        <el-option v-for="item in el_selt.SupplierName_form.ArrOption"
+                                   v-bind:key="item.ID"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RouteName" label="线路名称"
+                          v-bind:rules="el_FormFieldRules({Name: 'RouteName', DisplayName: '线路名称', Required: true, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-input v-model="SpyAskPrcData['RouteName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="服务项目" prop="ServiceProject"
+                          v-bind:rules="el_FormFieldRules({Name:'ServiceProject',DisplayName:'服务项目',Required:true,Editable:true,MinLength:0,MaxLength:50})">
+                <el-select v-model="SpyAskPrcData['ServiceProject']" style="width:178px" reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading" v-on:change="ServiceProjectChange">
+                    <template v-if="el_selt.ServiceProject_form">
+                        <el-option v-for="item in el_selt.ServiceProject_form.ArrOption"
+                                   v-bind:key="item.ID"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="单价" prop="Price"
+                          v-bind:rules="el_FormFieldRules({Name:'Price',DisplayName:'单价',Required:true,Editable:false,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="SpyAskPrcData['Price']" v-bind:precision="2" style="width:178px;" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="Target" label="标记"
+                          v-bind:rules="el_FormFieldRules({Name: 'Target', DisplayName: '标记', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-checkbox v-model="SpyAskPrcData['Target']" border v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-row>
+                <el-col>
+                    <el-form-item v-bind:label-width="formLabelWidth" label="备注" prop="Remark"
+                                  v-bind:rules="el_FormFieldRules({Name:'Remark',DisplayName:'备注',Required:false,Editable:true,MinLength:0,MaxLength:1000})">
+                        <el-input type="textarea" v-model="SpyAskPrcData['Remark']" v-bind:style="{width:'278px'}" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <span slot="footer" class="dialog-footer" slot-scope="sp">
+            <el-button type="default" icon="el-icon-close" v-on:click="SpyAskPrcDialogVisible = false">取 消</el-button>
+            <el-button type="primary" icon="el-icon-check" v-bind:disabled="sp.row.Id>0&&!UserRoles.Edit" v-on:click="dlgSpyAskPrcOK">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+
+@section Scripts {
+    <!--
+        import是异步加载的，<script>-type 必须是modual
+        import commonFiltes from "/Scripts/Vue/VueFilters.js
+
+        已通过requireJs 异步加载 Vue-ElementUI+Vue自定义扩展
+
+        dialogDrag:el-dialog拖动全屏扩展
+        formatter:字段格式化Vue.$formmatter
+        validtors:el-input 自定义验证Vue.$Validtors
+        VueFilters:vue全局filter v-bind:id="rawId | formatId" |前面字段后面过滤器 注：v-bind有效，v-Model 无效
+    -->
+    <script type="text/javascript">
+        const Edit = @Html.IsAuthorize("Edit").ToString().ToLower(),//编辑权限
+            Create = @Html.IsAuthorize("Create").ToString().ToLower(), //新增权限
+            Delete = @Html.IsAuthorize("Delete").ToString().ToLower(),//删除权限
+            Import = @Html.IsAuthorize("Import").ToString().ToLower(),//导入权限
+            Export = @Html.IsAuthorize("Export").ToString().ToLower();//导出权限
+        //自定义列数据
+        var CustomerFields = {
+            //"Currency":{
+            //    DisplayName: "授权币制",//显示名称
+            //    Editable: true, //可编辑
+            //    ForeignKeyGetListUrl: '/PARA_CURRs/GetPagerPARA_CURR_FromCache', //获取外键数据Url
+            //    FormOrder: 0, //Form排序
+            //    FormShow: true, //Form中展示
+            //    IsForeignKey: true, //外键
+            //    IsKey: false, //主键
+            //    ListOrder: 0, //列表排序
+            //    ListShow: true, //列表展示
+            //    MaxLength: 50, //最大长度
+            //    MinLength: 0, //最小长度
+            //    Name: "Currency", //名称
+            //    //Type为number时，可设置小数位
+            //    Required: false, //必填
+            //    SearchOrder: 0, //搜索排序
+            //    SearchShow: true, //搜索中展示
+            //    Sortable: true, //是否可排序
+            //    Type: "string", //"datetime/number/string/boolean";//类型
+            //    Width_List: "120", //列表-列宽度 <=0 默认*，>0 此宽度为准
+            //    Width_input: "178", //Form-input宽度 <=0 默认*，>0 此宽度为准
+            //    inputType: "text", //"password/datetime/text";//form中的input类型
+            //}
+        };
+        var BaseArrField = @Html.Raw(Html.RenderVue_ModelJson());
+        //设置自定义列
+        Object.keys(CustomerFields).forEach(function(item,index){
+            let OField= BaseArrField.ArrField.filter(function(val){
+                return val.Name == item;
+            });
+            if(OField.length>0){
+                OField = OField[0];
+                let CusField = CustomerFields[item];
+                Object.assign(OField,CusField);
+            }
+        });
+        if(BaseArrField.IsListOrder){
+            var ArrField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.ListOrder==b.ListOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.ListOrder-b.ListOrder;
+            });
+        }else
+            var ArrField =BaseArrField.ArrField;
+        if(BaseArrField.IsSearchOrder){
+            var ArrSearchField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.SearchOrder==b.SearchOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.SearchOrder-b.SearchOrder;
+            });
+        }else
+            var ArrSearchField =BaseArrField.ArrField;
+        if(BaseArrField.IsFormOrder){
+            var ArrFormField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.FormOrder==b.FormOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.FormOrder-b.FormOrder;
+            });
+        }else
+            var ArrFormField =BaseArrField.ArrField;
+        /*
+        自定义列数据 table-searchForm-editForm 通过此配置渲染；说明：
+        Name //名称
+        DisplayName //显示名称
+        Editable //可编辑
+        FormShow //Form中展示
+
+        Sortable //是否可排序
+        Width_List //列表-列宽度 <=0 默认*，>0 此宽度为准
+        Width_input //Form-input宽度 <=0 默认*，>0 此宽度为准
+        Type  //"datetime/number/string/boolean";//类型
+        Precision //Type为number时，可设置小数位
+        inputType  //"password/datetime/text";//form中的input类型
+        Required //必填
+        IsKey //主键
+        MaxLength //最大长度
+        MinLength //最小长度
+        SearchShow //搜索中展示
+        ListShow //列表展示
+        ListOrder //列表排序
+        SearchOrder //搜索排序
+        FormOrder //Form排序
+        IsForeignKey //外键
+        ForeignKeyGetListUrl //获取外键数据Url
+        */
+
+        //requireJs 按需加载 js
+        require(['vue', '_vue_resource','ELEMENT','IndexBaseMixin'],function(Vue,Vue_Resource,ELEMENT,myMixin){
+            Vue.use(ELEMENT);
+            Vue.use(Vue_Resource);
+            var vue_tb = new Vue({
+                el: '#app',
+                directives:{},// 注册局部指令
+                filters: {//v-bind可以使用，v-model 无效
+                    filterInt:function(value){
+                        try{
+                            var i_val = parseInt(value);
+                            if(isNaN(i_val))
+                                return 0;
+                            else
+                                return i_val;
+                        }catch(e){
+                            return value;
+                        }
+                    },
+                },//数据过滤器
+                mixins: [myMixin],//混入相当于extend
+                computed: {//计算属性
+                    FileAttach:function(){
+                        return function(field,lable){
+                            var t_curr_rowdata =this.curr_rowdata;
+                            if(ObjectIsEmpty(t_curr_rowdata) || JSON.stringify(t_curr_rowdata)=='{}')
+                                return [];
+                            if(ObjectIsEmpty(t_curr_rowdata[field]))
+                            {
+                                return [];
+                            }else{
+                                return [{name:lable,url:'/FileUpload/GetImgMinByte?FileGuid='+t_curr_rowdata[field],response:{FileGuid:t_curr_rowdata[field]}}];
+                            }
+                        }
+                    }
+                },//计算属性
+                watch:{
+                    "curr_rowdata.TravlePersonNum": {
+                        handler :function(newValue, oldValue)
+                        {
+                            var UnitPrice = parseFloat(this.curr_rowdata.UnitPrice);
+                            if(!isNaN(UnitPrice))
+                                this.curr_rowdata.TotalPrice = UnitPrice*newValue;
+                            //console.log('watch-TravlePersonNum',this.curr_rowdata.TotalPrice);
+                        }
+                    },
+                    "curr_rowdata.UnitPrice": {
+                        handler :function(newValue, oldValue)
+                        {
+                            var TravlePersonNum = parseFloat(this.curr_rowdata.TravlePersonNum);
+                            if(!isNaN(TravlePersonNum))
+                                this.curr_rowdata.TotalPrice = TravlePersonNum*newValue;
+                            //console.log('watch-TravlePersonNum',this.curr_rowdata.TotalPrice);
+                        }
+                    },
+                },//监听属性变化
+                created: function () {
+                },//数据初始化，还未渲染dom,在此处设置的数据 不受响应
+                data:function(){//混入的data 会与此data 合并，相同名字会被此data覆盖
+                    return {
+                        tbUrl: {
+                            controller: '/AdvisoryOrders/',
+                            getdata: 'GetData',//获取数据 action
+                            batchSave: 'SaveData',//批量操作 action
+                            exportExcel: 'ExportExcel',//导出Excel action
+                            importExcel: '/FileUpload/Upload?modelType=AdvisoryOrder',//导入Excel action
+                            AddFileAttach:'/FileUpload/AddAttach',//新增附件 返回：FileGuid，FileAttachID
+                            DelFileAttach:'/FileUpload/DeleteAttach',//删除附件 参数：FileGuid，FileAttachID
+                            GetSplyAskPrc:'GetSplyAskPrcById',//获取供应商报价
+                        },
+                        dlgfullscreen:true,//弹出框全屏
+                        fileList:{},//文件上传列表
+                        //ArrSupplyierAskPrice:[],//供应商询价 列表数据
+                        SpyAskPrcData:{},//供应商询价 新增/编辑 数据
+                        SpyAskPrcDialogVisible:false,//供应商询价 弹出状态
+                        tbSperAskPrcLoading:false,//供应商询价 加载中
+                        SupplierName_S:"",//供应商搜索
+                    }
+                },
+                methods:{
+                    handledblclick:function(row){
+                        this.centerDialogVisible = true;
+                        this.curr_rowdata_Original = row;//原始行数据
+                        this.curr_rowdata = Object.assign({}, row);
+                        let curr_rowdata = this.curr_rowdata;
+                        let ArrEnumField = this.ArrEnumField;//所有select/枚举
+                        let thisVue = this;
+                        Object.keys(this.curr_rowdata).forEach(function(item,index){
+                            let val = curr_rowdata[item]+'';
+                            if(!ObjectIsEmpty(val)){
+                                if(val.indexOf('/Date(')>=0){
+                                    var d = new moment(val);
+                                    if (d.isValid())
+                                        curr_rowdata[item] = d.toDate();
+                                }
+                                var ArrFilter = ArrEnumField.filter(function(field){return field.Name === item;});
+                                if(ArrFilter.length>0){
+                                    let OFilter = ArrFilter[0];
+                                    let url = OFilter.ForeignKeyGetListUrl;//'/MenuItems/GetData';
+                                    if(!ObjectIsEmpty(url) && url.indexOf('GetPagerEnum')<0)
+                                        thisVue.el_remoteMethod(val,OFilter,'form',false);
+                                }
+                            }
+                        });
+                        //获取供应商询价 列表数据
+                        this.GetSplyAskPrc();
+                    },//双击行
+                    //自定义方法会覆盖 混入的 methods
+                    handleRemove:function(field,file, fileList) {
+                        //console.log(file, fileList);
+                        if(file.response){
+                            let url = this.tbUrl.DelFileAttach;//'/FileUpload/DeleteAttach';
+                            let paramData = {FileGuid:file.response.FileGuid,FileAttachID:file.response.FileAttachID};
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function(success){//成功
+                                try{
+                                    var data = success.body;
+                                    var Success=true;
+                                    if(!ObjectIsEmpty(data.Success)){
+                                        Success = data.Success;
+                                    }else if(!ObjectIsEmpty(data.success)){
+                                        Success = data.success;
+                                    }
+                                    if(!Success){
+                                        var ErrMsg =data.ErrMsg;
+                                        if(ObjectIsEmpty(data.ErrMsg))
+                                            ErrMsg =data.errMsg;
+                                        if(ObjectIsEmpty(data.errMsg))
+                                            ErrMsg =data.errmsg;
+                                        if(ObjectIsEmpty(data.errmsg))
+                                            ErrMsg =data.err;
+                                        if(ObjectIsEmpty(data.err))
+                                            ErrMsg ='';
+                                        this.$message({
+                                            duration:0,//不自动关闭
+                                            showClose: true,
+                                            message: '删除附件，出现错误：'+ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }else{
+                                        this.curr_rowdata[field] = '';//清空值
+                                        this.$message({
+                                            showClose: true,
+                                            message: '删除附件，成功：',
+                                            type: 'success'
+                                        });
+                                    }
+                                } catch (e) {
+                                    this.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '删除附件，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                            },function(error){//错误
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '获取数据出现错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//删除
+                    handlePreview:function(file) {
+                        //console.log(file);
+                    },//预览
+                    handleOnSuccess:function(field,res,file, fileList){
+                        this.$set(this.curr_rowdata,field,res.FileGuid);
+                        //console.log(this.curr_rowdata);
+                    },//上传成功
+                    getFieldRules: function (filed,isSearchForm)
+                    {
+                        let Ofiled = Object.assign({},filed);
+                        //是否搜索form
+                        var t_isSearchForm = typeof(isSearchForm)
+                        if(t_isSearchForm==='undefined'||isSearchForm==null ||t_isSearchForm!=='boolean')
+                            isSearchForm=false;
+                        var fieldSufix = Ofiled.Name.substr(-7);
+                        let fieldId = Ofiled.Name.substr(0,Ofiled.Name.length-7);
+                        let val = this.curr_rowdata[fieldId];
+                        if(!ObjectIsEmpty(val)){
+                            switch(fieldSufix){
+                                case "Limit_S":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Limit_E":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Photo_A":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Photo_B":
+                                    Ofiled.Required = true;
+                                    break;
+                            };
+                        }
+                        var ArrRules = this.el_FormFieldRules(Ofiled,isSearchForm);//默认验证规则
+                        return ArrRules;
+                    },//获取数据
+                    CustomerTypeChange:function(value){
+                        if(value==1){
+                            this.curr_rowdata.ComponyName='';
+                            this.curr_rowdata.ComponyId=null;
+                        }else if(value==2){
+                            this.curr_rowdata.ComponyName=this.curr_rowdata_Original.ComponyName;
+                            this.curr_rowdata.ComponyId=this.curr_rowdata_Original.ComponyId;
+                        }
+                    },//客户类型变更
+                    ComponyIdChange:function(value){
+                        if(!ObjectIsEmpty(value)){
+                            var ArrOptionData = this.el_selt["ComponyId_form"];
+                            if(!(ObjectIsEmpty(ArrOptionData)||JSON.stringify(ArrOptionData)=="{}")){
+                                var ArrOption = ArrOptionData.ArrOption;
+                                if(!ObjectIsEmpty(ArrOption)){
+                                    var QOption= ArrOption.filter(function(item){return item.Id == value});
+                                    if(QOption.length>0){
+                                        var OOption = QOption[0];
+                                        this.$set(this.curr_rowdata,'ComponyName',OOption.Name);
+                                    }
+                                }
+                            }
+                        }else{
+                            this.$set(this.curr_rowdata,'ComponyName','');
+                        }
+                    },//公司变更
+                    GetSplyAskPrc:function(){
+                        let row = this.curr_rowdata;
+                        if(row.Id>0){
+                            this.tbSperAskPrcLoading = true;//加载中
+                            var paramData = { Id:row.Id };
+                            let url = this.tbUrl.controller+this.tbUrl.GetSplyAskPrc;
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function(success){//成功
+                                try{
+                                    if(!ObjectIsEmpty(success.body.Success)){
+                                        if(!success.body.Success){
+                                            this.$message({
+                                                duration:0,//不自动关闭
+                                                showClose: true,
+                                                message: '供应商询价数据错误：'+success.body.ErrMsg,
+                                                type: 'error'
+                                            });
+                                        }
+                                    }
+                                    var rows =[];
+                                    if(!ObjectIsEmpty(success.body.rows))
+                                        rows = success.body.rows;
+                                    this.$set(row,'ArrSupplyierAskPrice',rows);
+                                } catch (e) {
+                                    this.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '供应商询价数据处理，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                                this.tbSperAskPrcLoading = false;//加载完毕
+                            },function(error){//错误
+                                this.tbSperAskPrcLoading = false;//加载完毕
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '获取供应商询价数据出现错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//获取供应商询价 数据 ArrSupplyierAskPrice
+                    AddSpyAskPrcRow:function(){
+                        if(ObjectIsEmpty(this.curr_rowdata)||JSON.stringify(this.curr_rowdata)=='{}'){
+                            this.$message({
+                                duration:0,//不自动关闭
+                                showClose: true,
+                                message: '数据错误，未找到当前新增/编辑行',
+                                type: 'error'
+                            });
+                        }else{
+                            var data = {Id:0};
+                            if(ObjectIsEmpty(this.curr_rowdata.ArrSupplyierAskPrice)){
+                                this.$set(this.curr_rowdata,'ArrSupplyierAskPrice',[]);
+                            }
+                            this.curr_rowdata.ArrSupplyierAskPrice.push(data);
+                            this.SpyAskPrcData=data;
+                            this.SpyAskPrcDialogVisible = true;//显示弹窗
+                            this.initSpyAskPrcdbSelt();//初始化select
+                        }
+                    },//新增供应商询价
+                    SpyAskPrcdblclick:function(row){
+                        this.SpyAskPrcData = row;//行数据
+                        this.SpyAskPrcDialogVisible = true;//显示弹窗
+                        this.initSpyAskPrcdbSelt();//初始化select
+                    },//编辑供应商报价
+                    initSpyAskPrcdbSelt:function(){
+                        if(ObjectIsEmpty(this.el_selt.SpyAskPrcData_form)){
+                            //强制获取Select数据
+                            this.el_remoteMethod('',{Name:'SupplierName',ForeignKeyGetListUrl:'/SupplierS/GetPagerSupplier_FromCache'},'form',true);
+                            this.el_remoteMethod('',{Name:'ServiceProject',ForeignKeyGetListUrl:'/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT_FromCache?DOCCODE=ServiceProject'},'form',true);
+                        }
+                    },//初始化select
+                    deleteSpyAskPrcRow: function (index, row)
+                    {
+                        let ArrIdx=-1;
+                        this.curr_rowdata.ArrSupplyierAskPrice.forEach(function(item,i){
+                            if(item===row){
+                                ArrIdx = i;
+                                return;
+                            }
+                        });
+                        if(ArrIdx>=0)
+                            this.curr_rowdata.ArrSupplyierAskPrice.splice(ArrIdx,1);
+                    },//供应商询价-删除行搜索条件
+                    dlgSpyAskPrcOK:function(){
+
+                    },//供应商询价-确定
+                    SupplierNameChange: function (value)
+                    {
+                        if (!ObjectIsEmpty(value)) {
+                            var ArrOptionData = this.el_selt["SupplierName_form"];
+                            if (!(ObjectIsEmpty(ArrOptionData) || JSON.stringify(ArrOptionData) == "{}")) {
+                                var ArrOption = ArrOptionData.ArrOption;
+                                if (!ObjectIsEmpty(ArrOption)) {
+                                    var QOption = ArrOption.filter(function (item) { return item.ID == value });
+                                    if (QOption.length > 0) {
+                                        var OOption = QOption[0];
+                                        this.$set(this.SpyAskPrcData, 'SupplierNameNAME', OOption.TEXT);
+                                    }
+                                }
+                            }
+                        } else {
+                            this.$set(this.SpyAskPrcData, 'SupplierNameNAME', '');
+                        }
+                    },//供应商变更
+                    ServiceProjectChange: function (value)
+                    {
+                        if (!ObjectIsEmpty(value)) {
+                            var ArrOptionData = this.el_selt["ServiceProject_form"];
+                            if (!(ObjectIsEmpty(ArrOptionData) || JSON.stringify(ArrOptionData) == "{}")) {
+                                var ArrOption = ArrOptionData.ArrOption;
+                                if (!ObjectIsEmpty(ArrOption)) {
+                                    var QOption = ArrOption.filter(function (item) { return item.ID == value });
+                                    if (QOption.length > 0) {
+                                        var OOption = QOption[0];
+                                        this.$set(this.SpyAskPrcData, 'ServiceProjectNAME', OOption.TEXT);
+                                    }
+                                }
+                            }
+                        } else {
+                            this.$set(this.SpyAskPrcData, 'ServiceProjectNAME', '');
+                        }
+                    },//服务项目变更
+                },
+            });
+        });
+    </script>
+}

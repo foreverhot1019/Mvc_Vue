@@ -1,0 +1,14 @@
+﻿@model AirOut.Web.Models.QuotedPrice
+@{
+    int Num = 1;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="div_QPFormView" class="easyui-dialog" title="查看费用"
+     data-options="modal:true,collapsible:false,maximizable:true,toolbar:'',buttons: '#div_btn'"
+     style="overflow:hidden; width:830px; height:453px; background-color:rgb(243,243,244);">
+        @Html.Partial("EditForm", Model)
+</div>
+<div id="div_btn" style="text-align:right">
+    <button id="CloseQP" type="button" class="btn btn-secondary btn-sm" onclick="$('#div_QPFormView').dialog('close');"><i class="fa fa-check">确定</i></button>
+</div>

@@ -1,0 +1,548 @@
+﻿@model IEnumerable<TMI.Web.Models.OperatePoint>
+
+@{
+    ViewBag.Title = "操作点";
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script type="text/javascript" src="~/Scripts/EasyUIDataGrid_ControlNext.js"></script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">系统管理</a>
+            </li>
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>@ViewBag.Title</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <!--
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="table_data_tables.html#">Config option 1</a>
+                            </li>
+                            <li>
+                                <a href="table_data_tables.html#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        -->
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="operatepoint_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto; min-height:300px; max-height:500px;"
+                            data-options="
+                            rownumbers:true,
+                            checkOnSelect:true,
+                            selectOnCheck:true,
+                            idField:'ID',
+                            sortName:'ID',
+                            sortOrder:'desc',
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#operatepoint_toolbar',
+                            url: '/OperatePoints/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            onSelect:onSelect,
+                            pagination: 'true',
+                            onBeginEdit:onBeginEdit">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    @*<th data-options="field:'ID',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ID)</th>*@
+
+                                    <th data-options="field:'OperatePointCode',width:140,editor:{type:'textbox',options:{required:true ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.OperatePointCode)</th>
+
+                                    <th data-options="field:'OperatePointName',width:140,editor:{type:'textbox',options:{required:true ,validType:'length[0,100]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.OperatePointName)</th>
+
+                                    <th data-options="field:'Description',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,100]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Description)</th>
+
+                                    <th data-options="field:'IsEnabled',width:120,
+                                    editor: {
+                                        type:'checkbox',
+                                        options:{
+                                            required:true ,
+                                            on:'true',off:'false'
+                                        }
+                                    }">@Html.DisplayNameFor(model => model.IsEnabled)</th>
+
+                                    <th data-options="field:'OperatePointListNum',width:80,sortable:true,resizable:true,formatter:OperatePointListNumformatter ">@Html.DisplayNameFor(model => model.OperatePointLists)</th>
+
+                                    @*<th data-options="field:'ADDID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDID)</th>*@
+
+                                    <th data-options="field:'ADDWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+
+                                    <th data-options="field:'ADDTS',width:160,align:'right',editor:{type:'datebox',options:{required:false    }  },sortable:true,resizable:true  ,formatter:datetimeformatter">@Html.DisplayNameFor(model => model.ADDTS)</th>
+
+                                    @*<th data-options="field:'EDITID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITID)</th>*@
+
+                                    <th data-options="field:'EDITWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+
+                                    <th data-options="field:'EDITTS',width:160,align:'right',editor:{type:'datebox',options:{required:false    }  },sortable:true,resizable:true  ,formatter:datetimeformatter">@Html.DisplayNameFor(model => model.EDITTS)</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="operatepoint_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            @*@if (Html.IsAuthorize("Import"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                            }
+                            @if (Html.IsAuthorize("Export"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                            }*@
+                            @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>*@
+                        </div>
+                    </div>
+
+                    <!-- end ibox-content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'OperatePoint' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    //console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+                }
+            });
+        });
+
+        function OperatePointListNumformatter(value, row, index) {
+            try {
+                if (typeof value === 'undefined')
+                    return "";
+                if (value == null)
+                    return "";
+                else {
+                    if (isNaN(value)) {
+                        return value;
+                    }
+                    else {
+                        var intval = parseInt(value);
+                        return [
+                            '<a target="_blank" href="/OperatePointLists/Index?OperaPotId=' + row.ID + '&OperaPotCode=' + row.OperatePointCode + '">',
+                            value,
+                            '</a>'
+                        ].join('');
+                    }
+                }
+            }
+            catch (e) {
+                return value;
+            }
+        }
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        function exportexcel() {
+            var filterRules = JSON.stringify($dg.datagrid('options').filterRules);
+            //console.log(filterRules);
+            $.messager.progress({ title: '正在执行导出！' });
+            var formData = new FormData();
+            formData.append('filterRules', filterRules);
+            formData.append('sort', 'ID');
+            formData.append('order', 'asc');
+            $.postDownload('/OperatePoints/ExportExcel', formData, function (fileName) {
+                $.messager.progress('close');
+                //console.log(fileName);
+            });
+        }
+
+        var $dg = $('#operatepoint_datagrid');
+        var editIndex = undefined;
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            //combogrid 设置信息
+            var combogrid_Settings = {
+                //'HSCODE': {
+                //    required: true,
+                //    url: '/PARA_HSCODES/GetPagerPARA_HSCODE',
+                //    method: 'get',
+                //    multiple: false,
+                //    panelHeight: 'auto',
+                //    panelWidth: 205,
+                //    idField: 'HS_CODE',
+                //    valueField: 'HS_CODE',
+                //    textField: 'HS_CODE',
+                //    pageSize: 10,//每页显示的记录条数，默认为10
+                //    pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                //    pagination: true,//是否分页
+                //    columns: [[
+                //        { field: 'HS_CODE', title: '账册编号', width: 101 },
+                //        { field: 'G_NAME', title: '商品品名', width: 101 }
+                //    ]],
+                //    onChange: HSCODE_OnChange,
+                //    keyHandler: {
+                //        up: function (e) {
+                //            combogrid_upKey(this, e);
+                //        },
+                //        down: function (e) {
+                //            combogrid_downKey(this, e);
+                //        },
+                //        enter: function (e) {
+                //            combogrid_enterKey(this, e, $dg, 'HSCODE', rowIndex);
+                //        },
+                //        query: function (q) {
+                //            var opts = $(this).combogrid('options');
+                //            var url = opts.url;
+                //            //设置查询参数
+                //            var queryParams = {
+                //                page: 1,
+                //                rows: opts.pageSize,
+                //                q: q
+                //            };
+                //            //设置值,不加搜完后 就清空了
+                //            if (q == '')
+                //                $(this).combogrid('setValue', '');
+                //            else {
+                //                $(this).combogrid('setValue', q);
+                //            }
+                //            //动态搜索
+                //            $(this).combogrid('grid').datagrid('load', queryParams);
+                //        }
+                //    }
+                //}
+            };
+            var num = 0;
+            for (var i in rowData) {
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (OldVal != null) {
+                                if (typeof (OldVal) != 'undefined') {
+                                    if (OldVal != '') {
+                                        if (rowData[targetEditor.field]) {
+                                            OldVal = rowData[targetEditor.field];
+                                        }
+                                        $(targetEditor.target).combogrid('setValue', OldVal);
+
+                                        var opts = $(targetEditor.target).combogrid('options');
+                                        var url = opts.url;
+                                        //设置查询参数
+                                        var queryParams = {
+                                            page: 1,
+                                            rows: opts.pageSize,
+                                            q: OldVal
+                                        };
+                                        $(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                                    }
+                                }
+                            }
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "numberbox":
+                            $(targetEditor.target).numberbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "datebox":
+                            $(targetEditor.target).datebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "datetimebox":
+                            $(targetEditor.target).datetimebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "checkbox":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "radio":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                    }
+                }
+            }
+        }
+        function reload() {
+            $dg.datagrid('reload');
+        }
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                        @Html.Raw("return;\r\n");
+                    }
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        function append() {
+            if (endEditing()) {
+                var dataColumn = $dg.datagrid('getColumnFields', false);
+                var newrow = { Status: 0 };
+                for (var i in dataColumn) {
+                    newrow[dataColumn[i]] = '';
+                }
+                newrow['IsEnabled'] = 'true';
+                $dg.datagrid('insertRow', { index: 0, row: newrow });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            }
+        }
+        function removeit() {
+            if (editIndex == undefined) { return }
+            $dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/OperatePoints/SaveData", effectRow, function (response) {
+                        //console.log(response);
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dg.datagrid('acceptChanges');
+                            $dg.datagrid('reload');
+                        }
+                        else{
+                            $.messager.alert("错误", response.ErrMsg, 'error');
+                        }
+                    }, "JSON").error(function (response) {
+                        //console.log(response);
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                        //$dg.datagrid('reload');
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'ADDTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'ADDTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'ADDTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                },
+                {
+                    field: 'EDITTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'EDITTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'EDITTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                }
+            ]);
+        })
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+        }
+
+    </script>
+}
+

@@ -1,0 +1,58 @@
+﻿﻿@model TMI.Web.Models.TestMVC_CRUD
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.Dzbh, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Dzbh, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Dzbh,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TestColumn1, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TestColumn1, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TestColumn1,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TestColumn2, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TestColumn2, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TestColumn2,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TestColumn3, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TestColumn3, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TestColumn3,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TestColumn4, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TestColumn4, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TestColumn4,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TestColumn5, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TestColumn5, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TestColumn5,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+		<!-- output all Scaffold = false Hiden field -->
+	@Html.HiddenFor(model => model.OperatingPoint)
+	@Html.HiddenFor(model => model.ADDID)
+	@Html.HiddenFor(model => model.ADDWHO)
+	@Html.HiddenFor(model => model.ADDTS)
+	@Html.HiddenFor(model => model.EDITWHO)
+	@Html.HiddenFor(model => model.EDITTS)
+	@Html.HiddenFor(model => model.EDITID)
+		<!--end output all Scaffold = false Hiden field -->
+

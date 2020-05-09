@@ -1,0 +1,640 @@
+﻿@using AirOut.Web.Models
+@model IEnumerable<ApplicationUser>
+
+@{
+    ViewBag.Title = "用户管理";
+}
+<script src="~/Scripts/jsext.js?date=2019013001"></script>
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script async defer type="text/javascript" src="~/Scripts/EasyUIDataGrid_ControlNext.js"></script>
+
+<div class="row wrapper border-bottom white-bg">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a>系统管理</a>
+            </li>
+            <li class="active">
+                <strong>外部用户管理</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>外部用户管理</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        @*<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 1</a>
+                                </li>
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>*@
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">                       
+                        <table id="users_datagrid" class="easyui-datagrid" title="" style="width:auto; height:auto; max-height:300px; max-height:500px;"
+                               data-options="
+                            rownumbers:true,
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#users_toolbar',
+                            url: '/CusAccountManage/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            pagination: 'true',
+                            onBeginEdit:onBeginEdit">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    @*<th data-options="field:'Id',width:80">@Html.DisplayNameFor(model => model.Id)</th>*@
+                                    @*<th data-options="field:'PortalID',width:80">PortalID</th>*@
+
+                                    <th data-options="field:'UserName',width:140,editor:{type:'textbox',options:{required:true,validType:'length[0,50]'} } ">@Html.DisplayNameFor(model => model.UserName)</th>
+
+                                    <th data-options="field:'UserNameDesc',width:140,editor:{type:'textbox',options:{required:true,validType:'length[0,50]'} } ">@Html.DisplayNameFor(model => model.UserNameDesc)</th>
+
+                                    <th data-options="field:'Email',width:140,editor:{type:'textbox',options:{required:true,validType:'email'} } ">@Html.DisplayNameFor(model => model.Email)</th>
+
+                                    <th data-options="field:'Password',width:160,editor:{type:'textbox',options:{required:false,validType:'length[6,20]'} } ">@Html.DisplayNameFor(model => model.PasswordHash)</th>
+
+                                    @*<th data-options="field:'PhoneNumber',width:140,editor:{type:'textbox',options:{required:false} } ">@Html.DisplayNameFor(model => model.PhoneNumber)</th>*@
+
+                                    @*<th data-options="field:'IsJDServ',width:140,editor:{type:'checkbox',options:{required:false,on:'true',off:'false'} },formatter:boolformatter ">@Html.DisplayNameFor(model => model.IsJDServ)</th>*@
+
+                                    <th data-options="field:'LockoutEnabled',width:160,editor:{type:'checkbox',options:{required:false,on:'true',off:'false'} },formatter:boolformatter ">@Html.DisplayNameFor(model => model.LockoutEnabled)</th>
+
+                                    @*<th data-options="field:'AccessFailedCount',width:160  ">@Html.DisplayNameFor(model => model.AccessFailedCount)</th>*@
+
+                                    @*<th data-options="field:'LockoutEndDateUtc',width:160,formatter:datetimeformatter  ">@Html.DisplayNameFor(model => model.LockoutEndDateUtc)</th>*@
+
+                                    <th data-options="field:'DepartMent',width:250,editor: {type:'combogrid',options:{required:true}}">部门</th>
+
+                                    <th data-options="field:'EntryID',width:250,editor: {type:'textbox',options:{required:true} }">进仓编号</th>
+
+                                    <th data-options="field:'OperaPoint',width:160,formatter:OperaPointformatter  ">操作点设置</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="users_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                                @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="appendcus()">客户新增</a>*@
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            @*@if (Html.IsAuthorize("Import"))
+                                {
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                }*@
+                            @if (Html.IsAuthorize("Export"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="SeltCZD_dialog" class="easyui-dialog" title="选择操作点" style="width:700px;height:500px;padding:10px"
+     data-options="
+        closed:true,
+        modal:true,
+        iconCls: 'icon-ok-sign',
+        toolbar: [{
+            text:'全选',
+            iconCls:'icon-check',
+            handler:function(){
+                $('#SeltCZD_dialog').find('input[type=checkbox]').prop('checked',true);
+            }
+        },'-',{
+            text:'取消全选',
+            iconCls:'icon-check-empty',
+            handler:function(){
+                $('#SeltCZD_dialog').find('input[type=checkbox]').prop('checked',false);
+            }
+        }],
+        buttons: [{
+            text:'确定',
+            iconCls:'icon-ok',
+            handler:function(){
+                SaveOperatePoint();
+            }
+        },{
+            text:'取消',
+            handler:function(){
+                var $dialog = $('#SeltCZD_dialog');
+                $dialog.dialog('close');
+                //清除数据
+                $dialog.find('.easyui-layout:eq(0)').children('span').remove();
+                //清除当前用户
+                $dialog.data('UserId',null);
+         }
+     }]
+     ">
+    <div class=" easyui-layout" style="width:auto;height:auto; text-align:center; margin:auto; ">
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="1" />111111111111111111111111111111111111
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="2" />2222222222222
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="3" />3333333333333333333333333
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="4" />4
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="5" />555
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="6" />66666666666666666666666666666666666666666666666666666666666666666
+        </span>
+        <span style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;">
+            <input type="checkbox" class="easyui-checkbox" value="7" />777777777777777
+        </span>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        //导出
+        function exportexcel() {
+            return;
+            var filterRules = $dg.datagrid('options').filterRules;
+            //console.log(filterRules);
+            $.messager.progress({ title: '正在执行导出！' });
+            var formData = new FormData();
+            formData.append('filterRules', filterRules);
+            formData.append('sort', 'ID');
+            formData.append('order', 'asc');
+            $.postDownload('/AccountManage/ExportExcel', formData, function (fileName) {
+                $.messager.progress('close');
+                //console.log(fileName);
+            });
+        }
+
+        var combogrid_Settings = {
+            'DepartMent': {
+                panelHeight: 'auto',
+                url: '/CusBusInfos/GetPagerCusBusInfos_FromCache',
+                delay: 100,
+                multiple: false,
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,//每页显示的记录条数，默认为10
+                pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                pagination: true,//是否分页
+                columns: [[
+                      { field: 'ID', title: '代码', width: 70 },
+                      { field: 'TEXT', title: '名称', width: 180 }
+                ]],
+                keyHandler: {
+                    up: function (e) {
+                        combogrid_upKey(this, e);
+                    },
+                    down: function (e) {
+                        combogrid_downKey(this, e);
+                    },
+                    enter: function (e) {
+                        combogrid_enterKey(this, e, $dg, '', editIndex);
+                    },
+                    query: function (q) {
+                        var opts = $(this).combogrid('options');
+                        var url = opts.url;
+                        //设置查询参数
+                        var queryParams = {
+                            page: 1,
+                            rows: opts.pageSize,
+                            q: q,
+                        };
+
+                        if (q == '')
+                            $(this).combogrid('setValue', '');
+                        else {
+                            $(this).combogrid('setValue', q);
+                        }
+                        //动态搜索
+                        $(this).combogrid('grid').datagrid('load', queryParams);
+                    }
+                }
+            }
+
+        };
+
+        function onBeforeEdit(rowIndex, rowData)
+        {
+            $.messager.alert("提示", rowIndex);
+        }
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            var num = 0;
+            var regx = /^\/Date\([0-9]+(\)\/)$/g;
+            for (var i in rowData) {
+                if (regx.test(rowData[i])) {
+                    rowData[i] = datetimeformatter(rowData[i]);
+                }
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (!(typeof(OldVal) === 'undefined'|| OldVal == null || OldVal == '')) {
+                                if (rowData[targetEditor.field]) {
+                                    OldVal = rowData[targetEditor.field];
+                                }
+                                $(targetEditor.target).combogrid('setValue', OldVal);
+                                var opts = $(targetEditor.target).combogrid('options');
+                                var url = opts.url;
+                                //设置查询参数
+                                //var queryParams = {
+                                //    page: 1,
+                                //    rows: opts.pageSize,
+                                //    q: OldVal
+                                //};
+                                //$(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        function showCZDDialog(rowIndex) {
+            //对话框
+            var $dialog = $("#SeltCZD_dialog");
+            $dialog.data('UserId',null);
+
+            if (typeof rowIndex === 'undefined' || rowIndex == null) {
+                $.messager.alert("错误", "用户数据不明确！");
+                return;
+            } else if (isNaN(rowIndex)) {
+                $.messager.alert("错误", "用户数据类型不正确！");
+                return;
+            }
+
+            var rowData = $dg.datagrid('getData').rows[rowIndex];
+            if (typeof rowData.length ==='object') {
+                $.messager.alert("错误", "用户数据不存在！");
+                return;
+            }
+            //增加数据当前用户Id
+            $dialog.data('UserId',rowData.Id);
+            //打开对话框
+            $dialog.dialog('open');
+            //清除数据
+            $dialog.find(".easyui-layout:eq(0)").children('span').remove();
+            $.ajax({
+                type: 'get',
+                url: '/OperatePoints/GetOperatePoints',//获取数据的函数
+                async: false,//true 异步，false 同步
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: { UserId: rowData.Id},//查询条件JSON.stringify()
+                beforeSend: function () {
+                    $.messager.progress({
+                        title: '获取数据',
+                        msg: '正在获取数据，请等待...'
+                    });
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    $.messager.progress('close');
+                    if (data.Success) {
+                        if (data.UserOperatePoints) {
+                            $.each(data.UserOperatePoints, function (i, item) {
+                                var $span = $([
+                                    '<span title="' + item.OperatePointCode + '" style="float:left; padding:10px 10px; border:0px solid #000000; text-align:center;"> \r\n',
+                                    '<input type="checkbox" class="easyui-checkbox" value="' + item.ID + '" ' + (item.UserChecked ? "checked" : "") + ' />' + item.OperatePointName + ' \r\n',
+                                    '</span> \r\n'
+                                ].join(''));
+                                $dialog.find(".easyui-layout:eq(0)").append($span);
+                            });
+                        } else {
+                            $.messager.alert("错误", "数据不存在", 'error');
+                            $("#SeltCZD_dialog").dialog('close');
+                        }
+                    }
+                    else {
+                        $.messager.alert("错误", data.ErrMsg, 'error');
+                    }
+                },
+                error: function (response) {
+                    $.messager.progress('close');
+                    $.messager.alert("错误", "获取数据发生错误了！", 'error');
+                }
+            });
+        }
+        //保存操作点
+        function SaveOperatePoint() {
+            //对话框
+            var $dialog = $("#SeltCZD_dialog");
+            $dialog.dialog('close');
+            var OperatePointIDs = [];
+            $dialog.parent().find('input[type=checkbox]:checked').each(function (i, item) {
+                OperatePointIDs.push(parseInt($(item).val()));
+            });
+            console.log(OperatePointIDs, OperatePointIDs);
+            if (typeof OperatePointIDs==='undefined' ||OperatePointIDs==null|| OperatePointIDs.length <= 0) {
+                $.messager.alert("错误", '请至少选择 一个操作点');
+                return;
+            }
+            //清除数据
+            $dialog.find(".easyui-layout:eq(0)").children('span').remove();
+            $.ajax({
+                type: 'POST',
+                url: '/UserOperatePointLinks/SaveUserOperatePoints',//获取数据的函数
+                async: false,//true 异步，false 同步
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ UserId: $dialog.data('UserId'), OperatePointIDs: OperatePointIDs }),//查询条件JSON.stringify()
+                beforeSend: function () {
+                    $.messager.progress({
+                        title: '获取数据',
+                        msg: '正在获取数据，请等待...'
+                    });
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    $.messager.progress('close');
+                    if (data.Success) {
+                    }
+                    else {
+                        $.messager.alert("错误", data.ErrMsg, 'error');
+                    }
+                },
+                error: function (response) {
+                    $.messager.progress('close');
+                    $.messager.alert("错误", "获取数据发生错误了！", 'error');
+                }
+            });
+            $dialog.data('UserId', null);
+        }
+        //操作点 转换显示
+        function OperaPointformatter(value, row, rowindex) {
+            try {
+                return [
+                    '<a href="javascript:void(0)" ' + ((typeof row.Id === 'undefined' || row.Id == null || row.Id == '' || row.Id == '0') ? 'disabled' : '') + ' class="easyui-linkbutton" data-options="iconCls:\'icon-plus\',plain:true" onclick="if($(this).attr(\'disabled\')){return;}else{showCZDDialog(' + rowindex + ');}">',
+                    '操作点',
+                    '</a>'
+                ].join('');
+            }
+            catch (e) {
+                return value;
+            }
+        }
+
+        var $dg = $('#users_datagrid');
+        var editIndex = undefined;
+        //结束编辑
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        var dgEditor = {};
+        var IsGetAlled = false;
+        //单击单元格
+        function onClickCell(index, field) {
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');\r\n");
+                        @Html.Raw("return;\r\n");
+                    }
+                    var seltrow = $dg.datagrid('getData').rows[index];
+                    if (seltrow) {
+                        for (var i in seltrow) {
+                            var targeted = $dg.datagrid('getColumnOption', i);
+                            if (targeted) {
+                                if (!IsGetAlled)
+                                    dgEditor[i] = targeted.editor;
+                                //console.log(dgEditor);
+                                if (i != 'Password' && seltrow.UserName == "admin")
+                                    targeted.editor = {};
+                                else
+                                    targeted.editor = dgEditor[i];
+                            }
+                        }
+                        IsGetAlled = true;
+                    }
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    if (seltrow) {
+                        if (seltrow.UserName != "admin") {
+                            var LockoutEnableded = $dg.datagrid('getEditor', { index: index, field: 'LockoutEnabled' });
+                            if (LockoutEnableded) {
+                                if (seltrow.LockoutEnabled) {
+                                    LockoutEnableded.target.prop("checked", true);
+                                }
+                            }
+                            var IsJDServ = $dg.datagrid('getEditor', { index: index, field: 'IsJDServ' });
+                            if (IsJDServ) {
+                                if (seltrow.IsJDServ) {
+                                    IsJDServ.target.prop("checked", true);
+                                }
+                            }
+                        }
+                    }
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        //新增
+        function append() {
+            if (endEditing()) {
+                var dataColumn = $dg.datagrid('getColumnFields', false);
+                var newrow = {};
+                for (var i in dataColumn) {
+                    newrow[dataColumn[i]] = '';
+                }
+                $dg.datagrid('insertRow', { index: 0, row: newrow });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            }
+        }
+        //删除
+        function appendcus() {
+            $(location).attr('href', "/AccountManage/Create");
+        }
+        function removeit() {
+            if (editIndex == undefined) { return }
+            var datarow = $dg.datagrid('getData');
+            if (datarow) {
+                var deltrow = datarow.rows[editIndex];
+                if (deltrow) {
+                    if (deltrow.UserName == "admin") {
+                        $.messager.alert("提醒", "超级管理员不能删除", 'info');
+                        return;
+                    }
+                }
+            }
+            $dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+        //提交变更集
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    };
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/CusAccountManage/SaveData", effectRow, function (rsp) {
+                        //console.log(rsp);
+                        if (rsp.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dg.datagrid('reload');
+                        } else {
+                            $.messager.alert("提示", rsp.ErrMsg);
+                            $dg.datagrid('reload');
+                        }
+                    }, "JSON").error(function () {
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                    });
+                }
+                $dg.datagrid('acceptChanges');
+            }
+        }
+        //刷新
+        function reload() {
+            $dg.datagrid('reload');
+        }
+        //回滚变更集
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        //获取变更集
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+        //界面初始化时，触发
+        //$(function () {
+        //    $dg.datagrid('enableFilter');
+        //})
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'DepartMent',
+                    type: 'combogrid',
+                    options: {
+                        url: '/CusBusInfos/GetPagerCusBusInfos_FromCache',
+                        method: 'get',
+                        multiple: false,
+                        panelHeight: 'auto',
+                        panelWidth: 205,
+                        idField: 'ID',
+                        valueField: 'ID',
+                        textField: 'IDTEXT',
+                        pageSize: 10,//每页显示的记录条数，默认为10
+                        pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                        pagination: true,//是否分页
+                        columns: [[
+                             { field: 'ID', title: '代码', width: 70 },
+                             { field: 'TEXT', title: '名称', width: 150 }
+                        ]],
+                        keyHandler: {
+                            up: function (e) {
+                                combogrid_upKey(this, e);
+                            },
+                            down: function (e) {
+                               combogrid_downKey(this, e);
+                            },
+                            enter: function (e) {
+                                combogrid_enterKey(this, e, $dg, '', editIndex);
+                            },
+                            query: function (q) {
+                                combogrid_query(this, q, editIndex, {});
+                            }
+                        },
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'DepartMent');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'DepartMent',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            //自动添加 textbox 或 text的值
+                            //AutoAddFilterRule($dg);
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                },
+            ]);
+        });
+
+    </script>
+}
+
+

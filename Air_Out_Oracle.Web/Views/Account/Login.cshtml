@@ -1,0 +1,149 @@
+﻿@using AirOut.Web.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "登录";
+    Layout = null;
+    System.Net.IPHostEntry OIPHost;
+    string WebHostStr = "";
+    int WebHostIndex = -1;
+    string WebSiteName = "MVC网站";
+    try
+    {
+        //加锁 防止 多人同时 登录时引发 Cache 对象已具有相同键值
+        lock (AirOut.Web.Extensions.Common.lockCacheNoQxValid)
+        {
+            if (HttpContext.Current.Cache == null || HttpContext.Current.Cache["WebHostStr"] == null)
+            {
+                string hostname = System.Net.Dns.GetHostName();//得到本机名
+                System.Net.IPHostEntry localhost = System.Net.Dns.GetHostByName(hostname);//方法已过期，只得到IPv4的地址
+                //System.Net.IPHostEntry localhost = System.Net.Dns.GetHostEntry(hostname);//得到IPv4和IPv6的
+                //System.Net.IPAddress localaddr = localhost.AddressList[0];
+                HttpContext.Current.Cache["WebHostStr"] = localhost;
+            }
+            WebSiteName = System.Configuration.ConfigurationManager.AppSettings["WebSiteName"] ?? "MVC网站";
+        }
+    }
+    catch (Exception ex)
+    {
+    }
+    
+    OIPHost = HttpContext.Current.Cache["WebHostStr"] == null ? null : (System.Net.IPHostEntry)Cache["WebHostStr"];
+    WebHostStr = OIPHost == null ? "" : (OIPHost.AddressList.Any() ? OIPHost.AddressList.Select(x=>x.ToString()).OrderBy(x => x).FirstOrDefault(): "");
+    WebHostIndex = WebHostStr.LastIndexOf('.');
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1,initial-scale=1,user-scalable=1" />
+    <title>@(WebHostIndex > 0 ? WebHostStr.Substring(WebHostIndex + 1) + "-" : "")登录</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="~/Content/Login/style.css" />
+    <!-- Google Font -->
+    @*<link href="http://fonts.googleapis.com/css?family=Lato:100italic,100,300italic,300,400italic,400,700italic,700,900italic,900" rel="stylesheet" type="text/css">*@
+    <!-- Bootstrap Core CSS -->
+    <link type="text/css" rel="stylesheet" href="~/Content/bootstrap.min.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="~/Scripts/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="~/Scripts/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- jQuery Library -->
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Bootstrap Core JS -->
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <section class="container">
+        <section class="login-form">
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "login" }))
+            {
+                @Html.AntiForgeryToken()
+                <div>
+                    <h3>@WebSiteName</h3>
+                    <h4>@(WebHostIndex > 0 ? WebHostStr.Substring(WebHostIndex + 1) + "-" : "")登录</h4>
+                </div>
+
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control input-lg", placeholder = "用户名" })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control input-lg", placeholder = "密码" })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+                @Html.DropDownListFor(m => m.OP, new SelectList(ViewBag.OpList, "Id", "Name"), new { @class = "form-control input-lg", placeholder = "操作点选择" });
+                @Html.ValidationMessageFor(model => model.OP, "", new { @class = "text-danger" })
+
+                <button type="submit" name="go" class="btn btn-lg btn-block btn-info">登  录</button>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            }
+        </section>
+    </section>
+</body>
+</html>
+<script>
+    var LastUserName = '';//最后一次登录名
+    var MaxSameNum = 3;//最大相同次数后 重新 获取
+    var SameNum = 1;//记录相同次数
+    //
+    $(document).ready(function () {
+        var $UserName = $("#UserName");
+        $("select[id='OP'] option:first").attr('selected', 'selected');
+        $("#OP").css({ "display": "none" });
+        //setTimeout(function () {
+        //    $("#UserName").on("blur", function () {
+        //        var valstr = $UserName.val();
+        //        if (LastUserName != valstr || SameNum > MaxSameNum) {
+        //            changeOp();
+        //            LastUserName = valstr;
+        //            SameNum = 1;
+        //        }
+        //        else {
+        //            SameNum++;
+        //        }
+        //    });
+        //    changeOp();
+        //}, 500);
+    });
+    //
+    $('form').submit(function () {
+        if (!$('form').valid())
+            return false;
+    });
+    //
+    function changeOp() {
+        var userName = $("#UserName").val();
+        if (userName == null || userName == '') {
+            $("#OP").empty();
+        } else {
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/Account/changeOp',
+                data: { userName: $("#UserName").val() },
+                success: function (data) {
+                    //console.log(data);
+                    if (data.success) {
+                        $("#OP").empty();
+                        for (var i = 0 ; i < data.rows.length ; i++) {
+                            var value = data.rows[i]["ID"];
+                            var text = data.rows[i]["OperatePointName"];
+                            $("#OP").append("<option value='" + value + "'>" + text + "</option>");
+                        }
+                    } else {
+                        $("#OP").empty();
+                    }
+                }
+            });
+        }
+    }
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

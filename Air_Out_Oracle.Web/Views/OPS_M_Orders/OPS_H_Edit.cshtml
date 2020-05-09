@@ -1,0 +1,255 @@
+﻿@model AirOut.Web.Models.OPS_M_Order
+@{
+    //控件排序
+    var Num = ViewData["tabindex"].ToInt32();
+    //var oPS_H_Orders = ViewData["OPS_H_Orders"];
+    var i = ViewData["i"].ToInt32();
+    var list = Model.OPS_H_Orders.ToList();
+    var AirTime = "";// ViewBag.AirTime;
+    var hbl_picture = ViewBag.hbl_picture;
+}
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div id="div_HBL" style="padding-top:5px; padding-bottom:3px; width:100%" class="easyui-panel" title="" data-options="collapsible:true">
+        @for (int k = 0; k < list.Count; k++)
+        {
+            if (k == i - 1)
+            {
+                var item = list[k];
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <input type="hidden" value="@item.Id" id="Id" />
+                        @*<input type="checkbox" id="BL" style="width:8%" />*@
+                        @Html.LabelFor(model => model.MBL, "总单号", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.MBL, new { htmlAttributes = new { @class = "textbox easyui-fluid easyui-textbox1", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @Html.LabelFor(model => model.Airways_Code, "航空公司", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.Airways_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @Html.LabelFor(model => model.FWD_Code, "国外代理", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.FWD_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">分单号</label>
+                        <input id="HBL" name="HBL" tabindex=@(Num++) value="@item.HBL" data-options="prompt1:'分单号'" style="width:50%" class="easyui-textbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                        <hr />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                        <a href="javascript:void(0)" onclick="openContacts('H','发货人','#fdxx_@i', 'Shipper_H')">发货人:</a>
+                        <input class="easyui-textbox" data-options="multiline:true,value:'@Html.Raw(string.IsNullOrEmpty(item.Shipper_H) ? "" : item.Shipper_H.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\&#34;"))'" id="Shipper_H" name="Shipper_H" tabindex=@(Num++) value="" style="width:100%;height:60px;">
+                    </div>
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                        <a href="javascript:void(0)" onclick="openContacts('H','收货人','#fdxx_@i', 'Consignee_H')">收货人:</a>
+                        <input class="easyui-textbox" data-options="multiline:true,value:'@Html.Raw(string.IsNullOrEmpty(item.Consignee_H) ? "" : item.Consignee_H.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\&#34;"))'" id="Consignee_H" name="Consignee_H" tabindex=@(Num++) value="" style="width:100%;height:60px;">
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                        <a href="javascript:void(0)" onclick="openContacts('H','通知人','#fdxx_@i', 'Notify_Part_H')">分单通知人:</a>
+                        <input class="easyui-textbox" data-options="multiline:true,value:'@Html.Raw(string.IsNullOrEmpty(item.Notify_Part_H) ? "" : item.Notify_Part_H.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\&#34;"))'" id="Notify_Part_H" name="Notify_Part_H" tabindex=@(Num++) value="" style="width:100%;height:60px;">
+                    </div>
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <hr />
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @*<input type="checkbox" id="is_Depart" style="width:18px;" />*@
+                        @Html.LabelFor(model => model.Depart_Port, "启运港", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.Depart_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @Html.LabelFor(model => model.End_Port, "目的港", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.End_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @Html.LabelFor(model => model.Flight_No, "航班号/EDT", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.Flight_No, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:30%" } })
+                        <input id="Flight_No1" name="Flight_No1" disabled="disabled" value="@AirTime" tabindex=Num++ class="easyui-textbox" type="text" style="width:20%">
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        @Html.LabelFor(model => model.Flight_Date_Want, "航班日期", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @*@Html.EditorFor(model => model.Flight_Date_Want, new { htmlAttributes = new { @class = "easyui-datebox", data_options = "onSelect:onChangeDate", tabindex = Num++, style = "width:50%" } })*@
+                        @Html.EditorFor(model => model.Flight_Date_Want, new { htmlAttributes = new { @class = "easyui-datebox", @Value = ((Model == null || Model.Flight_Date_Want == null) ? "" : ((DateTime)Model.Flight_Date_Want).ToString("yyyy-MM-dd")), tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">币种</label>
+                        <input id="Currency_H" name="Currency_H" value="@item.Currency_H" data-options="prompt1:'币种'" tabindex=@(Num++) style="width:50%" class="easyui-combogrid" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">成交条款</label>
+                        <input id="Bragainon_Article_H" name="Bragainon_Article_H" value="@item.Bragainon_Article_H" tabindex=@(Num++) data-options="prompt1:'成交条款'" style="width:50%" class="easyui-combogrid" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">付款方式</label>
+                        <input id="Pay_Mode_H" name="Pay_Mode_H" value="@item.Pay_Mode_H" tabindex=@(Num++) disabled="disabled" data-options="prompt1:'付款方式'" style="width:50%" class="easyui-combogrid" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">运费P/C</label>
+                        <input id="Carriage_H" name="Carriage_H" value="@item.Carriage_H" tabindex=@(Num++) data-options="prompt1:'运费P/C'" style="width:9%" class="easyui-textbox" type="text" />
+                        <input id="Carriage_H2" name="Carriage_H2" disabled="disabled" data-options="prompt1:'运费P/C'" style="width:40%" class="easyui-textbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">杂费/C</label>
+                        <input id="Incidental_Expenses_H" name="Incidental_Expenses_H" tabindex=@(Num++) value="@item.Incidental_Expenses_H" data-options="prompt1:'杂费/C'" style="width:9%" class="easyui-textbox" type="text" />
+                        <input id="Incidental_Expenses_H2" name="Incidental_Expenses_H2" disabled="disabled" data-options="prompt1:'杂费P/C'" style="width:40%" class="easyui-textbox" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">申明价值（运输）</label>
+                        <input id="Declare_Value_Trans_H" name="Declare_Value_Trans_H" tabindex=@(Num++) value="@item.Declare_Value_Trans_H" data-options="prompt1:'申明价值（运输）'" style="width:50%" class="easyui-textbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">申明价值（海关）</label>
+                        <input id="Declare_Value_Ciq_H" name="Declare_Value_Ciq_H" tabindex=@(Num++) value="@item.Declare_Value_Ciq_H" data-options="prompt1:'申明价值（海关）'" style="width:50%" class="easyui-textbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">保险额度</label>
+                        <input id="Risk_H" name="Risk_H" value="@item.Risk_H" tabindex=@(Num++) data-options="prompt1:'保险额度'" style="width:50%" class="easyui-textbox" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <hr />
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                        <label for="name" style="width:100px;">唛头</label>
+                        <input class="easyui-textbox" data-options="multiline:true,value:'@Html.Raw(string.IsNullOrEmpty(item.Marks_H) ? "" : item.Marks_H.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\&#34;"))'" id="Marks_H" name="Marks_H" tabindex=@(Num++) value="" style="width:100%;height:70px;" type="text" />
+                    </div>
+                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                        <label for="name" style="width:100px;">英文货名</label>
+                        <input class="easyui-textbox" data-options="multiline:true,value:'@Html.Raw(string.IsNullOrEmpty(item.EN_Name_H) ? "" : item.EN_Name_H.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\&#34;"))'" id="EN_Name_H" name="EN_Name_H" tabindex=@(Num++) value="" style="width:100%;height:70px;" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <hr />
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">件数</label>
+                        <input id="Pieces_H" name="Pieces_H" value="@item.Pieces_H" data-options="prompt1:'件数'" tabindex=@(Num++) style="width:50%" class="easyui-numberbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">毛重</label>
+                        <input id="Weight_H" name="Weight_H" value="@item.Weight_H" data-options="prompt1:'毛重'" tabindex=@(Num++) style="width:50%" class="easyui-numberbox" type="text" />
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">体积</label>
+                        <input id="Volume_H" name="Volume_H" value="@item.Volume_H" data-options="precision:3" tabindex=@(Num++) style="width:50%" class="easyui-numberbox" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label for="name" style="width:100px;">计费重量</label>
+                        <input id="Charge_Weight_H" name="Charge_Weight_H" value="@item.Charge_Weight_H" tabindex=@(Num++) data-options="prompt1:'计费重量'" disabled="disabled" style="width:50%" class="easyui-numberbox" type="text" />
+                    </div>
+                    <div class="form-group col-md-1">
+                        <label for="CusUpload_GUID">文件上传：</label>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <input class="easyui-validatebox" type="hidden" id="CusUpload_GUID" name="CusUpload_GUID" />
+                        <input id="file_upload_@i" name="file_upload" type="file" multiple="multiple">
+                        <div id="fileQueue_@i" class="fileQueue"></div>
+                        <div id="div_files_@i"></div>
+                    </div>
+                    <div id="div_fileupload_h_@i" class="form-groupcol-md-5">
+                        @{
+                            var rowi = 0;
+                            if (hbl_picture != null)
+                            {
+                                foreach (var h_item in hbl_picture)
+                                {
+                                    rowi = rowi + 1;
+                                    <a href="@h_item.Address" class="delPic" id="Fileuploadh_@h_item.Id" target="view_frame" onmouseout="return displeyImg('Img_@h_item.Id','#fdxx_@i');" onmousemove="return imgblur('Img_@h_item.Id','#fdxx_@i')">@h_item.Remark </a>
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" id="Img_@h_item.Id" data-options="iconCls:'icon-remove',plain:true" style="visibility:hidden" onclick="deletepicture('@h_item.Id','#fdxx_@i')" onmouseout="return displeyImg('Img_@h_item.Id','#fdxx_@i');" onmousemove="return imgblur('Img_@h_item.Id','#fdxx_@i');"></a>
+
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+<script>
+    $(function () {
+        var h_urlpic = '/Pictures/Upload?ID=' + $("#Id", "#fdxx_@i").val();
+        $("#file_upload_@i").uploadifive({//uploadifive
+            'height': 30,
+            'fileTypeDesc': 'Image Files',
+            'fileTypeExts': '*.gif; *.jpg; *.png; *.bmp;*.tif;*.doc;*.xls;*.zip',
+            'uploadScript': h_urlpic + "&Talbe=OPS_H_Order&type=Fileupload_MBL",
+            'buttonText': '上传',
+            'multi': true,
+            'displayData': 'speed',
+            'formData': { 'modelType': 'Picture' },
+            'width': 120,
+            'successTimeout': 100000,
+            'onFallback': function () {
+                $.messager.alert('上传错误', '上传错误，请重试！<br>', 'error');
+                $('#file_upload').uploadifive('clearQueue')
+            },
+            'onSelect': function (queue) {
+                $.messager.progress({
+                    title: '执行上传',
+                    msg: '请等待...'
+                });
+            },
+            'onUpload': function (file) {
+                console.log("file:", file);
+            },
+            'onUploadComplete': function (file, data) {
+                $.messager.progress('close');
+                var data = $.parseJSON(data);
+                if (data.Success === false) {
+                    $.messager.alert('上传错误', '上传错误，请修改后再上传！<br>' + data.ErrMsg, 'error');
+                    $("#file_upload").uploadifive('clearQueue')
+                } else {
+                    window.location.reload();//刷新当前页面
+                }
+                return true;
+            }
+        });
+
+        var intervalfd = setInterval(function () {
+            try {
+                var $ArrTxt = $("input[name='Charge_Weight_H'].textbox-value", "#fdxx_@i");
+                $.each($ArrTxt, function () {
+                    let $txt = $(this);
+                    var FromDataFDXX = {
+                        "Airways_Code": "@Model.Airways_Code",
+                        "FWD_Code": "@Model.FWD_Code",
+                        "Depart_Port": "@Model.Depart_Port",
+                        "End_Port": "@Model.End_Port",
+                        "Currency_H": "@list[i-1].Currency_H",//币种
+                        "Flight_No": "@(Model.Flight_No==""?" ":Model.Flight_No)",
+                        "Bragainon_Article_H": "@list[i - 1].Bragainon_Article_H",//成交条款
+                        lenght: 14
+                    }
+                    FromDataFDXX = $.extend(FromDataFDXX, FormNAMEData);
+                    initbindcombogriddata_H("#fdxx_@i", FromDataFDXX);
+                    clearInterval(intervalfd);
+                });
+            } catch (e) {
+                clearInterval(intervalfd);
+                console.log(e);
+            }
+        }, 500);
+    });
+</script>

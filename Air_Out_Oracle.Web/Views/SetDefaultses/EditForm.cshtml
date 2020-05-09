@@ -1,0 +1,135 @@
+﻿@model AirOut.Web.Models.SetDefaults
+
+<div id="div_SetDefaults" class="row">
+    <div class="col-md-12 col-lg-12 col-sm-12">
+        <div class="row">
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.TableName, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @if (string.IsNullOrEmpty(Model.TableName))
+                    {
+                        @Html.DropDownListFor(model => model.TableName, ViewBag.DefaultTables as List<SelectListItem>, new { @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(model => model.TableName, ViewBag.DefaultTables as List<SelectListItem>, new { @class = "form-control", @disabled = "disabled" })
+                    }
+
+                    @Html.ValidationMessageFor(model => model.TableName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.ColumnName, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @if (string.IsNullOrEmpty(Model.ColumnName))
+                    {
+                        @Html.DropDownListFor(model => model.ColumnName, ViewBag.TableColumns as List<SelectListItem>, new { @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(model => model.ColumnName, ViewBag.TableColumns as List<SelectListItem>, new { @class = "form-control", @disabled = "disabled" })
+                    }
+                    @Html.ValidationMessageFor(model => model.ColumnName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.DefaultValue, htmlAttributes: new { @class = "control-label" })
+                <div class="">
+                    @Html.EditorFor(model => model.DefaultValue, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DefaultValue, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @Html.HiddenFor(m => m.TableNameChs)
+    @Html.HiddenFor(m => m.ColumnNameChs)
+    @Html.HiddenFor(m => m.DataType)
+    @*@Html.EditorFor(m => m.TableNameChs)
+    @Html.EditorFor(m => m.ColumnNameChs)
+    @Html.EditorFor(m => m.DataType)*@
+</div>
+<script>
+    $(function () {
+        $("#TableName", "#div_SetDefaults").change(function () {
+            if ($(this).val() != "") {
+                $("#TableNameChs", "#div_SetDefaults").val($(this).children("option:selected", "#div_SetDefaults").text());
+                $.ajax({
+                    type: 'GET',
+                    url: "/SetDefaultses/GetTableColumnByTableName",//获取数据的函数
+                    async: true,//使用同步的方式,true为异步方式
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: { TableName: $("#TableName", "#div_SetDefaults").val() },//查询条件JSON.stringify()
+                    beforeSend: function () {//回发前
+                        //console.log('beforeSend_SetDefaults_EditForm');
+                    },
+                    error: function () {//查询失败
+                        //console.log('error_SetDefaults_EditForm');
+                    },
+                    success: function (data) {//查询成功,data为返回的数据
+                        if (data.Success) {
+                            $("#ColumnName", "#div_SetDefaults").children("option").remove();
+                            $.each(data.rows, function (i, item) {
+                                $("#ColumnName", "#div_SetDefaults").append("<option value=\"" + item.Value + "\">" + item.Text + "</option>");
+                            });
+                            $("#ColumnName", "#div_SetDefaults").trigger("chosen:updated");
+                        } else {
+                        }
+                    },
+                    complete: function () {//执行以后
+                        //console.log('complete_SetDefaults_EditForm');
+                    }
+                });
+            } else
+                $("#TableNameChs", "#div_SetDefaults").val("");
+        });
+        $("#ColumnName", "#div_SetDefaults").change(function () {
+            if ($(this).val() != "") {
+                $("#ColumnNameChs", "#div_SetDefaults").val($(this).children("option:selected", "#div_SetDefaults").text());
+                $.ajax({
+                    type: 'GET',
+                    url: "/SetDefaultses/GetDataType_Table_Column",//获取数据的函数
+                    async: true,//使用同步的方式,true为异步方式
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: { TableName: $("#TableName", "#div_SetDefaults").val(), ColumnName: $(this).val() },//查询条件JSON.stringify()
+                    beforeSend: function () {//回发前
+                        //console.log('beforeSend_SetDefaults_EditForm');
+                    },
+                    error: function () {//查询失败
+                        //console.log('error_SetDefaults_EditForm');
+                    },
+                    success: function (data) {//查询成功,data为返回的数据
+                        if (data.Success) {
+                            $("#DataType", "#div_SetDefaults").val(data.DataTypeStr);
+                        } else {
+                        }
+                    },
+                    complete: function () {//执行以后
+                        //console.log('complete_SetDefaults_EditForm');
+                    }
+                });
+
+            } else {
+                $("#ColumnNameChs", "#div_SetDefaults").val("");
+                $("#DataType", "#div_SetDefaults").val("");
+            }
+        });
+
+        $("#TableName", "#div_SetDefaults").chosen({
+            search_contains: true,
+            width: "100%"
+        });
+        $("#ColumnName", "#div_SetDefaults").chosen({
+            search_contains: true,
+            width: "100%"
+        });
+    });
+</script>
+
+
+
+
+
+

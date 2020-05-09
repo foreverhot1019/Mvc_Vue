@@ -1,0 +1,271 @@
+﻿﻿@model AirOut.Web.Models.Warehouse_receipt
+@{
+    ViewBag.Title = "WarehouseSize";
+    var model = ViewBag.h_order;
+    //控件排序
+    var Num = 1;
+}
+    <div class="table-responsive">
+        <table id="warehouse_cargo_size_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+               data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: true,
+							toolbar: '#warehouse_cargo_size_toolbar',
+							method: 'get',
+							pagination: 'true',
+							onClickCell: onClickCell,
+                            onLoadSuccess:totalCount">
+            <thead>
+                <tr>
+                    <th data-options="field:'ck',checkbox:true"></th>
+                    @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+                    <th data-options="field:'CM_Length',width:300,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            onChange:function(){
+                                                 totalCount()
+                                            }
+										}
+								}">长</th>
+                    <th data-options="field:'CM_Width',width:300,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            onChange:function(){
+                                                 totalCount()
+                                            }
+										}
+								}">宽</th>
+                    <th data-options="field:'CM_Height',width:300,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            onChange:function(){
+                                                 totalCount()
+                                            }
+										}
+								}">高</th>
+                    <th data-options="field:'CM_Piece',width:300,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            onChange:function(){
+                                                 totalCount()
+                                            }
+										}
+								}">件</th>
+                </tr>
+            </thead>
+        </table>
+
+
+    <div id="warehouse_cargo_size_toolbar" style="height:auto">
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新建</a>
+
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>*@
+        <label id="totalCount" onclick="totalCount()"></label>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        //var url = '/Warehouse_Cargo_Sizes/GetData';
+        searchf();
+    });
+    var $dg = $('#warehouse_cargo_size_datagrid');
+    var editIndex = undefined;
+    //统计总体积和总件数
+    function totalCount() {
+        var data = $dg.datagrid("getRows");
+        var totalvolume = 0;
+        var totalnum = 0;
+        console.log("data:", data);
+        $.each(data, function (index, item) {
+            totalvolume += (item.CM_Length * item.CM_Width * item.CM_Height * item.CM_Piece);
+            totalnum += (item.CM_Piece * 1);
+            console.log("totalvolume:", totalvolume, item.CM_Length , item.CM_Width ,item.CM_Heigh , item.CM_Piece);
+        });
+        $("#Volume_CK", "#div_Warehouse_receipts").numberbox("setValue", totalvolume);
+        $("#totalCount").text("总体积： " + totalvolume + "   件数:" + totalnum);
+    }
+
+    //点击查询按钮时，触发
+    function searchf() {
+        setfilteropts();//设置查询条件
+        if (!(typeof (Entry_Id) === 'undefined' || Entry_Id == null || Entry_Id == "")) {
+            var opts = $dg.datagrid('options');
+            opts.url = '/Warehouse_Cargo_Sizes/GetData';
+            opts.pageNumber = 1;
+            var pager = $dg.datagrid('getPager');
+            pager.pagination('refresh', {
+                pageNumber: 1
+            });
+            $dg.datagrid('reload');
+        }
+
+        totalCount();
+    }
+    var Entry_Id = "";
+    //设置查询条件
+    function setfilteropts() {
+        Entry_Id = $("#Entry_Id").val();
+
+        console.log("Entry_Id", Entry_Id);
+
+        var params = [];
+        var opts = $dg.datagrid('options');
+
+        if (!(typeof (Entry_Id) === 'undefined' || Entry_Id == null || Entry_Id == "")) {
+            params.push({ "field": "Entry_Id", "op": "equal", "value": Entry_Id });
+        }
+
+        opts.queryParams = {
+            'filterRules': JSON.stringify(params)
+        };
+
+    }
+    function getwarehousesize() {
+        if ($dg.datagrid('getChanges').length) {
+            var inserted = $dg.datagrid('getChanges', "inserted");
+            var deleted = $dg.datagrid('getChanges', "deleted");
+            var updated = $dg.datagrid('getChanges', "updated");
+            var effectRow = new Object();
+
+            if (inserted.length) {
+                effectRow.inserted = inserted;
+            }
+            if (deleted.length) {
+                effectRow.deleted = deleted;
+            }
+            if (updated.length) {
+                effectRow.updated = updated;
+            }
+            return effectRow;
+        }
+        return null;
+        //var list = $dg.datagrid("getChanges");
+        //return list;
+    }
+    function removeit() {
+        var Seltdata = $dg.datagrid('getSelections');
+        if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+            $dg.datagrid('cancelEdit', editIndex);
+            editIndex = undefined;
+        }
+        for (var i = Seltdata.length; i > 0; i--) {
+            var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+            $dg.datagrid('deleteRow', rowindex);
+        }
+    }
+
+
+    var $dg = $('#warehouse_cargo_size_datagrid');
+    var editIndex = undefined;
+
+    function endEditing() {
+        if (editIndex == undefined)
+            return true;
+        if ($dg.datagrid('validateRow', editIndex)) {
+            $dg.datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function append() {
+        if (endEditing()) {
+            var NewRow = {};
+            var Columns = $dg.datagrid('getColumnFields');
+            for (var column in Columns) {
+                NewRow[Columns[column]] = null;
+            }
+        	//动态设置 编辑样式
+            var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+        	if(!(typeof(byteColumn)==='undefined'||byteColumn==null||byteColumn=='')){
+        		byteColumn.editor = {
+        		    type: 'textbox',
+        		    options: {
+        		        required: false,
+        		        validType: 'length[0,20]'
+        		    }
+        		};
+        		byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+        		byteColumn.editor = {
+        		    type: 'datebox',
+        		    options: {
+        		        required: false
+        		    }
+        		};
+        		byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+        		byteColumn.editor = {};
+        		byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+        		byteColumn.editor = {};
+        	}
+        	$dg.datagrid('insertRow', { index: 0, row: NewRow });
+        	editIndex = 0 ;
+            $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+        }
+    }
+
+    function onClickCell(index, field) {
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndex != index) {
+            if (endEditing()) {
+                @if (!Html.IsAuthorize("WarehouseSize", "Index", "Edit"))
+                {
+                    @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                    @Html.Raw("return;\r\n");
+                }
+                //动态设置 编辑样式
+                var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+                if(!(typeof(byteColumn)==='undefined'||byteColumn==null||byteColumn=='')){
+                    byteColumn.editor = {};
+                    byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+                    byteColumn.editor = {};
+                    var byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+                    byteColumn.editor = {
+                        type: 'textbox',
+                        options: {
+                            required: false,
+                            validType: 'length[0,20]'
+                        }
+                    };
+                    byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+                    byteColumn.editor = {
+                        type: 'datebox',
+                        options: {
+                            required: false
+                        }
+                    };
+                }
+
+                $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                $dg.datagrid('selectRow', editIndex);
+            }
+        }
+    }
+</script>

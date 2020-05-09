@@ -1,0 +1,358 @@
+﻿﻿@model TMI.Web.Models.Customer
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.NameChs, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.NameChs, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:true,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.NameChs,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.NamePinYin, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.NamePinYin, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:true,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.NamePinYin,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.NameEng, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.NameEng, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:true,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.NameEng,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Sex, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.CheckBoxFor(model => model.Sex, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+        @*@Html.ValidationMessageFor(model => model.Sex,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Birthday, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.Birthday, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Birthday,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.AirLineMember, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.AirLineMember, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.AirLineMember,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ContactType, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ContactType, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ContactType,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Contact, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Contact, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Contact,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ActiveStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ActiveStatus, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ActiveStatus,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Saller, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Saller, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Saller,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.OP, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.OP, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.OP,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.CustomerLevel, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.CustomerLevel, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.CustomerLevel,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.CustomerSource, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.CustomerSource, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.CustomerSource,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.CustomerType, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.CustomerType, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.CustomerType,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ComponyName, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ComponyName, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ComponyName,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ComponyId, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+	    @Html.DropDownListFor(model => model.ComponyId, ViewBag.ComponyId as List<SelectListItem>,"---Select---", htmlAttributes: new { @class = "easyui-combogrid",data_options="required:false",tabindex = Num++, style = "width:100%" }) 
+        @*@Html.ValidationMessageFor(model => model.ComponyId,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.IdCard, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.IdCard, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.IdCard,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.IdCardLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.IdCardLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.IdCardLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.IdCardLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.IdCardLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.IdCardLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.IdCardPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.IdCardPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.IdCardPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.IdCardPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.IdCardPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.IdCardPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Passpord, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Passpord, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Passpord,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.PasspordLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.PasspordLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.PasspordLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.PasspordLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.PasspordLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.PasspordLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.PasspordPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.PasspordPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.PasspordPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.PasspordPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.PasspordPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.PasspordPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HK_MacauPass, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HK_MacauPass, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HK_MacauPass,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HK_MacauPassLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.HK_MacauPassLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HK_MacauPassLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HK_MacauPassLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.HK_MacauPassLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HK_MacauPassLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HK_MacauPassPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HK_MacauPassPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HK_MacauPassPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HK_MacauPassPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HK_MacauPassPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HK_MacauPassPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TaiwanPass, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TaiwanPass, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TaiwanPass,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TaiwanPassLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.TaiwanPassLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TaiwanPassLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TaiwanPassLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.TaiwanPassLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TaiwanPassLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TaiwanPassPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TaiwanPassPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TaiwanPassPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TaiwanPassPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TaiwanPassPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TaiwanPassPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TWIdCard, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TWIdCard, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TWIdCard,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TWIdCardLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.TWIdCardLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TWIdCardLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TWIdCardLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.TWIdCardLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TWIdCardLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TWIdCardPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TWIdCardPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TWIdCardPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TWIdCardPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TWIdCardPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TWIdCardPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HometownPass, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HometownPass, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HometownPass,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HometownPassLimit_S, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.HometownPassLimit_S, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HometownPassLimit_S,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HometownPassLimit_E, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.HometownPassLimit_E, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HometownPassLimit_E,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HometownPassPhoto_A, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HometownPassPhoto_A, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HometownPassPhoto_A,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.HometownPassPhoto_B, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.HometownPassPhoto_B, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,100]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.HometownPassPhoto_B,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,1000]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Remark,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.OperatingPoint, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:0",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+		<!-- output all Scaffold = false Hiden field -->
+	@Html.HiddenFor(model => model.ADDID)
+	@Html.HiddenFor(model => model.ADDWHO)
+	@Html.HiddenFor(model => model.ADDTS)
+	@Html.HiddenFor(model => model.EDITWHO)
+	@Html.HiddenFor(model => model.EDITTS)
+	@Html.HiddenFor(model => model.EDITID)
+		<!--end output all Scaffold = false Hiden field -->
+

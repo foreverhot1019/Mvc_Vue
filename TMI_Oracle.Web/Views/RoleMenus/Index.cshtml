@@ -1,0 +1,528 @@
+﻿@using TMI.Web.Models
+@model IEnumerable<RoleMenu>
+@{
+    ViewBag.Title = "菜单授权";
+    List<MenuAction> MenuActions = null;
+    if (HttpContext.Current.Cache[TMI.Web.Extensions.Common.GeCacheEnumByName("MenuAction").ToString()] != null)
+    {
+        MenuActions = HttpContext.Current.Cache[TMI.Web.Extensions.Common.GeCacheEnumByName("MenuAction").ToString()] as List<MenuAction>;
+    }
+}
+<style>
+    .elements-list .list-group-item:hover {
+        background: #f3f3f4;
+        color: inherit;
+        border-color: #e7eaec;
+        /*border-bottom: 1px solid #e7eaec;*/
+        /*border-top: 1px solid #e7eaec;*/
+        border-radius: 0;
+    }
+    .M-container-header {
+        background-color: #b3c0d1;
+        color: #333;
+        line-height: 20px;
+        height: 40px !important;
+    }
+    .M-container-header > span {
+        float: left;
+        padding-top: 10px;
+    }
+    .M-container-header > button {
+        float: right;
+        margin-top: 6px;
+    }
+    .M_child {
+        display: none;
+    }
+    .M-fade-in {
+        animation: Mfade-in 0.5s;
+    }
+    .M-fade-out {
+        display: block;
+        animation: Mfade-out 0.5s;
+    }
+    @Html.Raw("@")keyframes Mfade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @Html.Raw("@")keyframes Mfade-out {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+<div id="app" v-cloak>
+    <el-row v-bind:gutter="10">
+        <el-col v-bind:span="4" v-bind:xs="10" v-bind:sm="10" v-bind:md="4" v-bind:lg="4" v-bind:xl="1">
+            <el-container>
+                <el-header class="M-container-header">
+                    <span>角色</span>
+                    <el-button size="mini" type="success" icon="el-icon-refresh" v-on:click="getRoles">刷新</el-button>
+                </el-header>
+                <el-main style="background-color: #e9eef3; color: #333; text-align: center; line-height: 20px;">
+                    <ul class="list-group elements-list ">
+                        <li class="list-group-item" v-for="(role,index) in ArrRole" v-bind:class="CurrentRoleId==role.RoleId?'active':''">
+                            <el-badge v-bind:value="role.Count" max="99" class="item">
+                                <el-button size="small" 
+                                           v-on:click.prevent.stop="tb_GetData(role.RoleId)" 
+                                           v-bind:class="ObjectIsEmpty(CurrentRoleId)?'':'active'">
+                                {{role.RoleName}}</el-button>
+                            </el-badge>
+                        </li>
+                    </ul>
+                </el-main>
+            </el-container>
+        </el-col><!--角色-->
+        <el-col v-bind:span="20" v-bind:xs="14" v-bind:sm="14" v-bind:md="20" v-bind:lg="20" v-bind:xl="23">
+            <el-container>
+                <el-header class="M-container-header">
+                    <span>菜单授权</span>
+                    <el-button size="mini" type="success" icon="el-icon-success"
+                               v-bind:loading="saveLoading"
+                               v-on:click="saveMenuAction"
+                               v-bind:disabled="!Edit || this.ArrSelection.length<=0">保存</el-button>
+                </el-header>
+                <el-main style="background-color: #e9eef3; color: #333; text-align: center; line-height: 20px;">
+                    <el-table ref="Mytb" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                              v-bind:data="tableData"
+                              v-loading="tbLoading"
+                              v-on:row-click="rowclick"
+                              v-on:select="selectChk"
+                              v-on:select-all="selectAll"
+                              v-on:selection-change="selctedChange"
+                              @*v-bind:row-style="toggleDisplayTr"*@
+                              v-bind:row-class-name="toggleDisplayTr">
+                        <el-table-column fixed type="selection" v-bind:width="36" @*v-bind:selectable="(row, index)=>{return Delete}"*@></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Title" label="菜单" v-bind:width="200">
+                            <templete slot-scope="scope">
+                                <div class="el-tree-node__content" v-bind:style="`padding-left: ${(scope.row.Level-1) * 20}px;`">
+                                    <span class="el-tree-node__expand-icon el-icon-caret-right"
+                                          v-on:click.prevent.stop="toggleFoldingStatus(scope.row)"
+                                          v-bind:class="toggleFoldingClass(scope.row)"></span>
+                                    <span class="el-tree-node__label">{{scope.row.Title}}</span>
+                                </div>
+                            </templete>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip
+                                         v-for="(action,index) in ArrAction"
+                                         v-bind:prop="action.Name"
+                                         v-bind:label="action.Name" v-bind:width="50">
+                            <template slot-scope="scope">
+                                <!--{ row, column, $index }-->
+                                <el-checkbox v-if="!scope.row.Children" v-model="scope.row[action.Code]"
+                                             v-bind:disabled="(scope.row[action.Code] && !Delete) || !scope.row.IsEnabled"
+                                             v-on:change="(val)=>chkChange(val,scope.row,action.Code)"></el-checkbox>
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Code" label="代码">
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Url" label="链接">
+                        </el-table-column>
+                    </el-table>
+                </el-main>
+            </el-container>
+        </el-col><!--菜单授权-->
+    </el-row>
+</div>
+@section Scripts {
+    <!--
+        import是异步加载的，<script>-type 必须是modual
+        import commonFiltes from "/Scripts/Vue/VueFilters.js
+
+        已通过requireJs 异步加载 Vue-ElementUI+Vue自定义扩展
+
+        dialogDrag:el-dialog拖动全屏扩展
+        formatter:字段格式化Vue.$formmatter
+        validtors:el-input 自定义验证Vue.$Validtors
+        VueFilters:vue全局filter v-bind:id="rawId | formatId" |前面字段后面过滤器 注：v-bind有效，v-Model 无效
+    -->
+    <script type="text/javascript">
+        const ArrAction = @Html.Raw((MenuActions == null || !MenuActions.Any()) ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(MenuActions));//所有菜单动作
+        const Edit = @Html.IsAuthorize("Edit").ToString().ToLower(),//编辑权限
+        Create = @Html.IsAuthorize("Create").ToString().ToLower(), //新增权限
+        Delete = @Html.IsAuthorize("Delete").ToString().ToLower(),//删除权限
+        Import = @Html.IsAuthorize("Import").ToString().ToLower(),//导入权限
+        Export = @Html.IsAuthorize("Export").ToString().ToLower();//导出权限
+
+        /*
+        自定义列数据 table-searchForm-editForm 通过此配置渲染；说明：
+        Name //名称
+        DisplayName //显示名称
+        Sortable //是否可排序
+        Width_List //列表-列宽度 <=0 默认*，>0 此宽度为准
+        Width_input //Form-input宽度 <=0 默认*，>0 此宽度为准
+        Type  "datetime/number/string/boolean";//类型
+        Precision //Type为number时，可设置小数位
+        inputType  "password/datetime/text";//form中的input类型
+        Required //必填
+        IsKey //主键
+        Editable //可编辑
+        MaxLength //最大长度
+        MinLength //最小长度
+        SearchShow //搜索中展示
+        FormShow //Form中展示
+        ListShow //列表展示
+        ListOrder //列表排序
+        SearchOrder //搜索排序
+        FormOrder //Form排序
+        IsForeignKey //外键
+        ForeignKeyGetListUrl //获取外键数据Url
+        */
+
+        //requireJs 按需加载 js
+        require(['vue', '_vue_resource','ELEMENT'],function(Vue,Vue_Resource,ELEMENT){
+            Vue.use(ELEMENT);
+            Vue.use(Vue_Resource);
+            var vue_TreeGrid = new Vue({
+                el: '#app',
+                directives:{},// 注册局部指令
+                mounted: function () {
+                    document.querySelector('#div_Loading').hidden = true;//必须得有，不然一直显示加载中。。。
+                    this.tb_GetData();//获取菜单数据
+                    this.getRoles();//获取角色及其配置数量数据
+                    //let Prop_description = {
+                    //    configurable:false,//对象的属性是否可以被删除，以及除value和writable特性外的其他特性是否可以被修改。
+                    //    writable:false,//是否可写
+                    //    enumerable:false,//定义了对象的属性是否可以在 for...in 循环和 Object.keys() 中被枚举
+                    //    value:null,//要设置的值 不能与 get/set 同时使用
+                    //    //get:function(){return Edit; },
+                    //    //set : function(newVal) {
+                    //    //    return false;
+                    //    //}
+                    //};
+                    //注：如果property已存在，则所有忽略的属性值维持原样不变。
+                    Object.defineProperty(this, 'Edit', {value:Edit});
+                    Object.defineProperty(this, 'Create', {value:Create});
+                    Object.defineProperty(this, 'Delete', {value:Delete});
+                    Object.defineProperty(this, 'Import', {value:Import});
+                    Object.defineProperty(this, 'Export', {value:Export});
+                },
+                data:function(){//混入的data 会与此data 合并，相同名字会被此data覆盖
+                    return {
+                        tbUrl: {
+                            controller: '/RoleMenus/',
+                            GetRoles:'GetRolesVue',//获取角色及其权限数量
+                            GetMenuList: 'GetMenuListVue',//获取所有菜单数据 action
+                            GetMenus: 'GetMenusVue',//获取权限选择的菜单数据 action
+                            batchSave: 'SubmitVue',//批量操作 action
+                            exportExcel: 'ExportExcel',//导出Excel action
+                            importExcel: '/FileUpload/Upload?modelType=RoleMenus',//导入Excel action
+                        },
+                        tbLoading: false,//加载中
+                        saveLoading:false,//保存时 加载状态
+                        tableData: [],//tb 展示的数据
+                        OriginTbData:[],//原始数据没有选中任何项
+                        ArrRole:[],//角色 数据
+                        ArrAction:ArrAction,//所有权限动作
+                        ArrSelection:[],//选中行
+                        CurrentRoleId:'',//当前操作角色
+                        Edit   : null ,//编辑
+                        Create : null ,//创建
+                        Delete : null ,//删除
+                        Import : null ,//导入
+                        Export : null ,//导出
+                    }
+                },
+                methods:{
+                    //自定义方法会覆盖 混入的 methods
+                    getRoles: function ()//获取角色及其配置数量数据
+                    {
+                        var paramData = {};
+                        var action = this.tbUrl.GetRoles;
+                        this.tbLoading = true;//加载中
+                        let url = this.tbUrl.controller + action;
+                        this.$http.get(url, {
+                            params: paramData,
+                            headers: {//指示为 ajax请求
+                                "X-Requested-With": "XMLHttpRequest"
+                            }
+                        }).then(function(success){//成功
+                            try{
+                                var data = success.body;
+                                this.ArrRole = data;
+                            } catch (e) {
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '数据处理，出现错误',
+                                    type: 'error'
+                                });
+                            }
+                            this.tbLoading = false;//加载完毕
+                        },function(error){//错误
+                            this.tbLoading = false;//加载完毕
+                            this.$message({
+                                duration:0,//不自动关闭
+                                showClose: true,
+                                message: '获取数据出现错误',
+                                type: 'error'
+                            });
+                        });
+                    },//获取角色及其配置数量数据
+                    tb_GetData: function (RoleId)//获取数据
+                    {
+                        var paramData = {};
+                        var action = this.tbUrl.GetMenus;
+                        if(typeof RoleId ==='undefined'||RoleId ==null ||RoleId == '')
+                            action = this.tbUrl.GetMenuList;
+                        else
+                            paramData.RoleId = RoleId;
+
+                        this.tbLoading = true;//加载中
+                        let url = this.tbUrl.controller + action;
+                        this.$http.get(url, {
+                            params: paramData,
+                            headers: {//指示为 ajax请求
+                                "X-Requested-With": "XMLHttpRequest"
+                            }
+                        }).then(function(success){//成功
+                            try{
+                                let total = success.body.total;
+                                let data = success.body.rows;
+                                this.CurrentRoleId = RoleId;//赋值当前操作角色
+                                let thisVue = this;
+                                if(typeof RoleId ==='undefined'||RoleId ==null ||RoleId == ''){
+                                    data.forEach(function(item,index){
+                                        thisVue.ArrAction.forEach(function(val,index){
+                                            thisVue.$set(item, val.Code, false);
+                                        });
+                                    });//初始化 RoleMenuAction
+                                    this.tableData = data;
+                                    if(this.OriginTbData.length<=0)
+                                        this.OriginTbData = JSON.parse(JSON.stringify(data));//Array.from(data);//[...data] //data.concat('')
+                                }
+                                else{
+                                    //菜单权限数据 初始化
+                                    thisVue.tableData= JSON.parse(JSON.stringify(thisVue.OriginTbData));
+                                    //thisVue.ArrRole.forEach(function(item,index){
+                                    //    if(item.RoleId == RoleId)
+                                    //    {
+                                    //        item.Count=total;
+                                    //    }
+                                    //});//更新 角色权限数据
+                                    thisVue.tableData.forEach(function(item,index){
+                                        thisVue.$set(item,'RoleId',RoleId);
+                                        thisVue.$set(item,'MenuId',item.Id);
+                                        let RoleMenus = data.find(function(value, index, arr){return value.MenuId == item.Id});
+                                        if(!ObjectIsEmpty(RoleMenus)){
+                                            let RoleMenu = Array.isArray(RoleMenus)?RoleMenus[0].Menu:RoleMenus.Menu;
+                                            let selcted = false;
+                                            thisVue.ArrAction.forEach(function(val,index){
+                                                if(!ObjectIsEmpty(RoleMenu[val.Code])){
+                                                    thisVue.$set(item, val.Code, RoleMenu[val.Code]>0);//选中权限
+                                                    if(!selcted)
+                                                        selcted = true;
+                                                }
+                                            });
+                                            if(selcted){
+                                                //下次Dom更新完成后，调用callback,callback在Vue内部形成 队列执行
+                                                thisVue.$nextTick(function(){thisVue.$refs.Mytb.toggleRowSelection(item,true);});
+                                            }
+                                        }
+                                    });
+                                }
+                                this.$nextTick(function(){
+                                    if(this.$refs.Mytb)
+                                        this.$refs.Mytb.doLayout();
+                                });
+                            } catch (e) {
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '数据处理，出现错误',
+                                    type: 'error'
+                                });
+                            }
+                            this.tbLoading = false;//加载完毕
+                        },function(error){//错误
+                            this.tbLoading = false;//加载完毕
+                            this.$message({
+                                duration:0,//不自动关闭
+                                showClose: true,
+                                message: '获取数据出现错误',
+                                type: 'error'
+                            });
+                        });
+                    },//获取数据
+                    selctedChange:function(selection){
+                        this.ArrSelection=selection;
+                        console.log('selctedChange',this.ArrSelection);
+                    },//选中行修改
+                    saveMenuAction:function(){
+                        this.saveLoading = true;//加载中
+                        let url = this.tbUrl.controller + this.tbUrl.batchSave;
+                        this.ArrSelection.forEach(function(item,index,arr){
+                            item.MenuId = item.Id;
+                        });
+                        let paramData={JsonStrSeltMenu:JSON.stringify(this.ArrSelection)};//数据
+                        this.$http.post(url,paramData, {
+                            headers: {//指示为 ajax请求
+                                "X-Requested-With": "XMLHttpRequest"
+                            }
+                        }).then(function(success){//成功
+                            try{
+                                let ret = success.body.Success;
+                                let ErrMsg = success.body.ErrMsg;
+                                if(!ret){
+                                    this.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '提交错误：'+ErrMsg,
+                                        type: 'error'
+                                    });
+                                }else{
+                                    this.$message({
+                                        showClose: true,
+                                        message: '提交成功',
+                                        type: 'success'
+                                    });
+                                    this.getRoles();//更新角色数据
+                                }
+                            } catch (e) {
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '提交数据处理，出现错误',
+                                    type: 'error'
+                                });
+                            }
+                            this.saveLoading = false;//加载完毕
+                        },function(error){//错误
+                            this.saveLoading = false;//加载完毕
+                            this.$message({
+                                duration:0,//不自动关闭
+                                showClose: true,
+                                message: '提交数据出现错误',
+                                type: 'error'
+                            });
+                        });
+                    },//保存数据
+                    rowclick:function(row, event, column){
+                        console.log('rowclick',arguments);
+                        if(event){
+                            //    var tg = event.target;
+                            //    if(tg.is('checkbox')){
+                            //        console.log('rowclick','checkbox');
+                            //    }
+                        }
+                    },//单击行
+                    chkChange:function(val,row,action){
+                        let tf = val;
+                        if(!tf){
+                            this.ArrAction.forEach(function(val,index){
+                                //row[val.Code] = selted;
+                                if(row[val.Code])
+                                {
+                                    tf=true;
+                                    return;
+                                }
+                            });
+                        }
+                        //选中行
+                        this.$refs.Mytb.toggleRowSelection(row,tf);
+                    },//权限checkbox 值改变 自动选中菜单列
+                    selectChk:function(selection,row){
+                        console.log('selectChk',selection,row);
+                        let selted = false;
+                        if(selection.includes(row))
+                            selted = true;
+                        var thisVue = this;
+                        thisVue.ArrAction.forEach(function(val,index){
+                            //row[val.Code] = selted;
+                            thisVue.$set(row, val.Code, selted);
+                        });
+                        row.Test1 =selted;
+                        //选中所有子菜单
+                        var ArrChildId = ObjectIsEmpty(row.Children)?[]:row.Children;
+                        if(ArrChildId.length>0){
+                            thisVue.tableData.forEach(function(item,i,arr){
+                                if(item.IsEnabled && ArrChildId.includes(item.Id)){
+                                    thisVue.ArrAction.forEach(function(val,index){
+                                        //row[val.Code] = selted;
+                                        thisVue.$set(item, val.Code, selted);//选中权限
+                                    });
+                                    thisVue.$refs.Mytb.toggleRowSelection(item,selted);//选中菜单行
+                                    if(!ObjectIsEmpty(item.Children))
+                                        ArrChildId = ArrChildId.concat(item.Children);
+                                }
+                            });
+                        }
+                    },//选择/取消 菜单列 自动选中所有权限
+                    selectAll:function(selection){
+                        console.log('selectAll',arguments);
+                        var thisVue = this;
+                        if(selection.length>0){
+                            thisVue.tableData.forEach(function(item,i){
+                                if(item.IsEnabled){
+                                    thisVue.ArrAction.forEach(function(val,index){
+                                        //item[val.Code] = true;
+                                        thisVue.$set(item, val.Code, true);
+                                    });
+                                }
+                            });
+                        }else{
+                            //thisVue.tableData=[];
+                            thisVue.tableData= JSON.parse(JSON.stringify(thisVue.OriginTbData));//thisVue.OriginTbData.concat('');//Array.from(thisVue.OriginTbData);//[...thisVue.OriginTbData];//thisVue.tableData.concat(thisVue.OriginTbData);
+                        }
+                    },//选择/取消 全部
+                    toggleDisplayTr:function (obj) {
+                        let row = obj.row, index =obj.index;
+                        var Expended = row.__Expended;
+                        var display='M-fade-in';
+                        if(ObjectIsEmpty(Expended))
+                            display= 'M-fade-in';
+                        else if(!Expended){
+                            if(!ObjectIsEmpty(row.ParentId)&&row.ParentId>0)
+                                display= 'M_child M-fade-out';
+                        }
+                        return display;
+                    },//显示/隐藏 tr
+                    toggleFoldingStatus:function(row) {
+                        if(ObjectIsEmpty(row.Children))
+                            return false;
+                        var expendStr = '__Expended';
+                        var Expended = row['__ExpendAror'];
+                        if(ObjectIsEmpty(Expended))
+                            Expended = true;
+                        row['__ExpendAror'] = !Expended;
+                        var thisVue = this;
+                        var ArrChildId = ObjectIsEmpty(row.Children)?[]:row.Children;
+                        if(ArrChildId.length>0){
+                            this.tableData.forEach(function(item,i,arr){
+                                if(ArrChildId.includes(item.Id)){
+                                    item[expendStr]=!Expended;
+                                    item['__ExpendAror']=!Expended;
+                                    if(!ObjectIsEmpty(item.Children))
+                                        ArrChildId = ArrChildId.concat(item.Children);
+                                }
+                            });
+                        }
+                    },//点击改变 icon和行 显示样式
+                    toggleFoldingClass:function(row) {
+                        var expendStr = '__ExpendAror';
+                        var Expended = row[expendStr];
+                        if(ObjectIsEmpty(Expended))
+                            return (ObjectIsEmpty(row.Children)?'':'expanded');
+                        else
+                            return Expended?(ObjectIsEmpty(row.Children)?'':'expanded'):'';
+                    },//获取icon显示样式打开关闭
+                },
+            });
+            window.vue_TreeGrid = vue_TreeGrid;
+        });
+        //监控 animation-end 方法，动画结束 移除占位
+        document.addEventListener('animationend', function (e) {
+            if (e.animationName === 'Mfade-out') {
+                e.target.style.display='';
+                e.target.classList.remove('M-fade-out');
+            }
+        });
+    </script>
+}

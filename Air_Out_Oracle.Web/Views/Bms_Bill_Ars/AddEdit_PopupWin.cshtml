@@ -1,0 +1,692 @@
+﻿@*是否是应收账单*@
+@model bool?
+@{
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+    AirOut.Web.Models.BmsBillAp_ArPopupView AddEditModel = null;
+    bool? NewModel =null;
+    object DtlObjModel = null;
+    int FTParentId = ViewData["FTParentId"] == null ? 0 : (int)ViewData["FTParentId"];
+    string readOnly = FTParentId > 0 ? ",readonly:true" : "";
+    ViewData["readOnly"] = readOnly;
+    if (Model != null)
+    {
+        if ((bool)Model)
+        {
+            NewModel = true;
+            if (ViewBag.Bms_Bill_Ar == null)
+            {
+                ViewData.ModelState.AddModelError("","数据格式，不正确");
+                NewModel = null;
+            }
+            else
+            {
+                DtlObjModel = new AirOut.Web.Models.Bms_Bill_Ar_Dtl();
+                AddEditModel = (AirOut.Web.Models.BmsBillAp_ArPopupView)ViewBag.Bms_Bill_Ar;
+            }
+        }
+        else
+        {
+            NewModel = false;
+            if (ViewBag.Bms_Bill_Ap == null)
+            {
+                ViewData.ModelState.AddModelError("", "数据格式，不正确");
+                NewModel = null;
+            }
+            else
+            {
+                DtlObjModel = new AirOut.Web.Models.Bms_Bill_Ap_Dtl();
+                AddEditModel = (AirOut.Web.Models.BmsBillAp_ArPopupView)ViewBag.Bms_Bill_Ap;
+            }
+        }
+    }
+    //var ArrStatus = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    //var ArrAuditStatus = AirOut.Web.Extensions.Common.GetEnumToDic("AuditStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    //var ArrUseStatus = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusIsOrNoEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    //var ArrBms_BillCreate_Status = AirOut.Web.Extensions.Common.GetEnumToDic("Bms_BillCreate_Status", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+}
+<div id="AddEdit_PoupWin" class="easyui-dialog" title="添加/编辑 @(Model==null?"":((bool)Model ? "应收" : "应付"))数据" style="width:800px; height:408px"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            dg_reload();
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存(Q)',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },{
+         text:'保存并新增(W)',
+         iconCls:'icon-plus',
+         handler:function(){
+             Form_Submit(1);
+             return false;
+         }
+     },
+     {
+         text:'关闭(C)',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#AddEdit_PoupWin').window('close');
+            return false;
+         }
+     }]">
+    @if (NewModel == null || Model == null)
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    }
+    else
+    {
+        ViewData["Num"] = Num;
+        //Html.BeginForm(ActionName, ControllerName, FormMethod.Post, new { @Id = "BmsBillArApFrom" });
+        <input id="IsBms_Bill_Ar" name="IsBms_Bill_Ar" type="hidden" value="@((bool)Model ? "true" : "false")" />
+        <div id="div_BmsBillArApFrom" class="row" style="width:780px; padding-left:10px; padding-top:11px;">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                @if (AddEditModel.Ar_ApDetl.DtlId <= 0 && AddEditModel.Ar_ApDetl.DtlHeadId <= 0)
+                {
+                    <form id="formHead" class="form-inline">
+                        <div id="@((bool)Model?"Ar":"Ap")Head" class="easyui-panel" title="@((bool)Model ? "应收" : "应付")表头" style="height:130px; @(AddEditModel.Ar_ApHead.Id > 0 ? "" : "border-bottom:0;") background:#fafafa;"
+                             data-options="fit:false,iconCls:'icon-save',closable:false,collapsible:false,minimizable:false,maximizable:false">
+                            @{
+                                Html.RenderPartial("PopupAddEdit", AddEditModel.Ar_ApHead, ViewData);
+                                //部分试图与主视图之间传递值用TempData 注：TempData使用过一次后就会销毁
+                                var NumStr = (TempData["Num"] ?? "").ToString();
+                                if (!string.IsNullOrEmpty(NumStr))
+                                {
+                                    int.TryParse(NumStr, out Num);
+                                }
+                            }
+                        </div>
+                    </form>
+                }
+                @if (AddEditModel.Ar_ApHead.Id <= 0)
+                {
+                    ViewData["IsShort"] = true;
+                    Html.RenderPartial("../" + ((bool)Model ? "Bms_Bill_Ar_Dtls" : "Bms_Bill_Ap_Dtls") + "/ListView", DtlObjModel, ViewData);
+                    <form id="formDetl" class="form-inline">
+                        <div id="@((bool)Model?"Ar":"Ap")Detl" class="easyui-panel" title="@((bool)Model ? "应收" : "应付")明细" style="height:130px; background:#fafafa;"
+                             data-options="fit:false,iconCls:'icon-save',closable:false,collapsible:false,minimizable:false,maximizable:false">
+                            @{
+                                ViewData["Num"] = Num;
+                                Html.RenderPartial("PopupAddEditDtl", AddEditModel.Ar_ApDetl, ViewData);
+                            }
+                        </div>
+                        <input id="DtlHeadId" name="DtlHeadId" type="hidden" value="@AddEditModel.Ar_ApDetl.DtlHeadId" />
+                    </form>
+                }
+                <input id="OPS_M_OrdId" name="OPS_M_OrdId" type="hidden" value="@AddEditModel.OPS_M_OrdId" />
+                <input id="Dzbh" name="Dzbh" type="hidden" value="@AddEditModel.Dzbh" />
+                <input id="MBL" name="MBL" type="hidden" value="@AddEditModel.MBL" />
+                <input id="IsMBLJS" name="IsMBLJS" type="hidden" value="@(AddEditModel.IsMBLJS?"true":"false")" />
+            </div>
+        </div>
+        //Html.EndForm();
+    }
+</div>
+
+@*@Scripts.Render("~/bundles/jqueryval")*@
+<script type="text/javascript" id="AddEdit_PoupWin_js">
+    @*const ArrStatus = @Html.Raw(ArrStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrStatus));//数据状态
+    const ArrAuditStatus = @Html.Raw(ArrAuditStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrAuditStatus));//数据审核状态
+    const ArrUseStatus = @Html.Raw(ArrUseStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrUseStatus));//数据bool状态
+    const ArrBms_BillCreate_Status = @Html.Raw(ArrBms_BillCreate_Status == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrBms_BillCreate_Status));//账单产生标志*@
+    @{
+        var HideSaveNew = true;
+        if (AddEditModel != null)
+        {
+            if (AddEditModel.Ar_ApHead == null || AddEditModel.Ar_ApHead.Id <= 0)
+            {
+                if(AddEditModel.Ar_ApDetl == null){
+                    HideSaveNew = false;
+                }
+                else if (AddEditModel.Ar_ApDetl.DtlId <= 0 && AddEditModel.Ar_ApDetl.DtlHeadId <= 0)
+                {
+                    HideSaveNew = false;
+                }
+            }
+        }
+    }
+    @Html.Raw(HideSaveNew ? "var HideSaveNew = true;" : "var HideSaveNew = false;")
+    var $dgShortd = $("#@(Model==null?"":(bool)Model ? "bms_bill_ar_dtl_short_datagrid" : "bms_bill_ap_dtl_short_datagrid")");//表体明细数据
+    var FTParentId = @FTParentId;//指示是否是 分摊数据
+    var IsBmsBillAr = '@Model';//是否是应收账单
+    function InitAddEdit_PopupWinFuc() {
+        //console.log('InitAddEdit_PopupWinFuc---------------');
+        initEasyUIControl('div_BmsBillArApFrom');
+        initPageWin();
+        if ($dgShortd.length > 0) {
+            try{
+                //console.log($dgShortd.data());
+                var $dgpanel = $dgShortd.datagrid("getPanel");
+                if($dgpanel)
+                    $dgpanel.panel('close');
+            } catch (e) {
+
+            }
+        }
+        if (typeof (HideSaveNew) === 'boolean') {
+            if (HideSaveNew) {
+                $("div.dialog-button", $("#AddEdit_PoupWin").parent()).find("span.l-btn-text").each(function () {
+                    if ($(this).text() == '保存并新增') {
+                        $(this).parent().parent().hide();
+                    }
+                });
+            }
+        }
+        //console.log($("#btnAddDtl"));
+        $("#btnAddDtl", "#AddEdit_PoupWin").unbind('click').bind('click', function () {
+            try {
+                var $Panel = $dgShortd.datagrid("getPanel");
+                $Panel.panel('open');
+                $Panel.css({"border-bottom":"0px"});
+                var formDetl =$($('#formDetl', "#AddEdit_PoupWin")[0]);
+                formDetl.find("input.textbox-text[id^='_easyui_textbox']").trigger("blur");
+                IsValid = $($('#formDetl', "#AddEdit_PoupWin")[0]).form('enableValidation').form('validate');
+                if (!IsValid){
+                    return false;
+                }else{
+                    var adddata = {};
+                    var fromdtldata = getFormSerializeJson(formDetl);
+                    fromdtldata["OPS_M_OrdId"]=$("#OPS_M_OrdId", "#AddEdit_PoupWin").val();
+                    fromdtldata["DtlHeadId"]=$("#DtlHeadId", "#AddEdit_PoupWin").val();
+                    fromdtldata["Dzbh"]=$("#Dzbh", "#AddEdit_PoupWin").val();
+                    $dgShortd.datagrid("appendRow", fromdtldata);
+                    $("#Charge_Code", "#AddEdit_PoupWin").combogrid('setValue','');
+                    $("#Charge_Desc", "#AddEdit_PoupWin").textbox('setValue','');
+                    $("#Unitprice2", "#AddEdit_PoupWin").numberbox('setValue','');
+                    $("#Qty", "#AddEdit_PoupWin").numberbox('setValue','');
+                    $("#Account2", "#AddEdit_PoupWin").numberbox('setValue','');
+                    $("#Summary", "#AddEdit_PoupWin").textbox('setValue','');
+                    setTimeout(function(){
+                        $("#Charge_Code", "#AddEdit_PoupWin").textbox('textbox').focus();
+                    },100);
+                }
+                return false;
+            } catch (e) {
+                alert(e);
+                //console.log(e);
+                return false;
+            }
+        });
+        $("#btnDelDtl", "#AddEdit_PoupWin").unbind('click').on('click', function () {
+            if ($dgShortd.length > 0) {
+                var ChkedRows = $dgShortd.datagrid("getChecked");
+                if (!(ChkedRows == null || ChkedRows.length <= 0)) {
+                    for (var i in ChkedRows) {
+                        var row = ChkedRows[i];
+                        var rowIndex =  $dgShortd.datagrid("getRowIndex",row);
+                        $dgShortd.datagrid("deleteRow", rowIndex);
+                    }
+                    return false;
+                }
+                return false;
+            }
+            return false;
+        });
+    }
+    //初始化页面
+    function initPageWin() {
+        initCombogrid('_FromCache');
+        var FromData = @Html.Raw((AddEditModel == null || AddEditModel.Ar_ApHead == null) ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(AddEditModel.Ar_ApHead));
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //resetCombogridUrl(obj, VirtualUrlName, IsReLoad, data, isSimplePager)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl('div_BmsBillArApFrom', null, false, FormNAMEData);
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        //状态
+        //$('#Status').combogrid($.extend({},combogrid_DefaultSettings,{
+        //    required:true,
+        //    mode: 'loacl',
+        //    pagination: false,
+        //    data:ArrStatus
+        //}));
+        //审核状态
+        //$('#AuditStatus').combogrid($.extend({},combogrid_DefaultSettings,{
+        //    required:true,
+        //    mode: 'loacl',
+        //    pagination: false,
+        //    data:ArrAuditStatus
+        //}));
+        //账单类型
+        var $Bill_Type =$('#Bill_Type');
+        if($Bill_Type.length>0){
+            $Bill_Type.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required: true,
+                textField: "Id",
+                url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT' + _FromCache + '?DOCCODE=Bill_Type_' + (IsBmsBillAr.toLowerCase() == "true" ? "Ar" : "Ap")
+            }));
+            //账单类型 keyup事件 小写转大写
+            $Bill_Type.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        //币种
+        var $Money_Code =$('#Money_Code');
+        if($Money_Code.length>0){
+            $Money_Code.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                textField:"Id",
+                url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache,
+                onChange:function(newval,oldval){
+                    $('#Org_Money_Code').val(newval);
+                }
+            }));
+            //币种 keyup事件 小写转大写
+            $Money_Code.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        ////原始币别
+        //$('#Org_Money_Code').combogrid($.extend({}, dg_combo_coSettings, {
+        //    textField:"Id",
+        //    required: true,
+        //    url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache
+        //}));
+        function Bill_Object_IdSleted(Selted){
+            if (Selted) {
+                var NameVal = Selted['TEXT'];
+                //var TextVal = Selted[$(this).combogrid('options').textField];
+                if (!(typeof NameVal === 'undefined' || NameVal == null)) {
+                    $("#Bill_Object_Name").textbox('setValue',NameVal);
+                }
+                //else if(!(typeof TextVal === 'undefined' || TextVal == null)){
+                //    $("#Bill_Object_Name").textbox('setValue',TextVal);
+                //}
+            }
+        }
+        //供方代码
+        var $Bill_Object_Id =$('#Bill_Object_Id');
+        if($Bill_Object_Id.length>0){
+            $Bill_Object_Id.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                textField:"Id",
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+_FromCache,
+                onChange: function () {
+                    var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                    Bill_Object_IdSleted(Selted);
+                }
+            }));
+        }
+        //支付方式
+        var $Payway =$('#Payway');
+        if($Payway.length>0){
+            $Payway.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required:true,
+                textField:"Id",
+                url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=PayWay'
+            }));
+            //支付方式 keyup事件 小写转大写
+            $Payway.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        //产生标志
+        //$('#Create_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+        //    required:true,
+        //    disabled: true,
+        //    mode: 'loacl',
+        //    pagination: false,
+        //    data:ArrBms_BillCreate_Status
+        //}));
+        function Bill_TaxRateTypeSleted(Selted){
+            if (Selted) {
+                var NameVal = Selted["ENAME"];
+                if (!(typeof NameVal === 'undefined' || NameVal == null || NameVal=='' )) {
+                    if (!isNaN(NameVal)) {
+                        var taxRate = parseFloat(NameVal);
+                        $("#Bill_TaxRate").numberbox("setValue", taxRate);
+                        var val = '1';
+                        if (taxRate <= 0) {
+                            val = '0';
+                        }
+                        $("input:radio[name='Bill_HasTax'][value='" + val + "']", "#AddEdit_PoupWin").prop('checked', 'checked');
+                    }
+                }
+            } else {
+                $("#Bill_TaxRate").numberbox("setValue", 0);
+                $("input:radio[name='Bill_HasTax'][value='0']", "#AddEdit_PoupWin").prop('checked', 'checked');
+            }
+        }
+        //税率类型
+        var $Bill_TaxRateType =$('#Bill_TaxRateType');
+        if($Bill_TaxRateType.length>0){
+            $Bill_TaxRateType.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required: true,
+                url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT' + _FromCache + '?DOCCODE=Bill_TaxRateType',
+                onChange: function () {
+                    var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                    Bill_TaxRateTypeSleted(Selted);
+                }
+            }));
+        }
+        function Charge_CodeSleted(Selted){
+            if (Selted) {
+                var NameVal = Selted["TEXT"];
+                if (!(typeof NameVal === 'undefined' || NameVal == null)) {
+                    $("#Charge_Desc").textbox('setValue',NameVal);
+                }else {
+                    NameVal = Selted[$(this).combogrid('options').textField];
+                    if (!(typeof NameVal === 'undefined' || NameVal == null))
+                        $("#Charge_Desc").textbox('setValue',NameVal);
+                }
+            }
+        }
+        //费用代码
+        var $Charge_Code = $('#Charge_Code');
+        if($Charge_Code.length>0){
+            $Charge_Code.combogrid($.extend({},combogrid_DefaultSettings,{
+                textField:"ID",
+                url1: '/FeeTypes/GetPagerFeeTypes'+_FromCache,
+                onChange: function () {
+                    var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                    Charge_CodeSleted(Selted);
+                }
+            }));
+            //费用代码 keyup事件 小写转大写
+            $Charge_Code.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            }).focus();
+        }
+        //单价
+        var Unitprice2data = $("#Unitprice2").data();
+        if(Unitprice2data){
+            var opts = Unitprice2data.textbox.options;
+            opts.onChange =function(newval,oldval){
+                if(!isNaN(newval)){
+                    var FloatVal = parseFloat(newval);
+                    if(FloatVal>0)
+                        setComboRequired($('#Charge_Code'),true);//设置必填
+                    else
+                        setComboRequired($('#Charge_Code'),false);//设置必填
+                    var QtyVal = $("#Qty").numberbox('getValue');//数量
+                    if(!isNaN(QtyVal)){
+                        var Account2Val = FloatVal*parseFloat(QtyVal);
+                        $("#Account2").numberbox('setValue',Account2Val);
+                    }
+                }
+                else
+                    setComboRequired($('#Charge_Code'),false);//设置必填
+            };
+        }
+        //数量
+        var Qtydata = $("#Qty").data();
+        if(Qtydata){
+            var opts = Qtydata.textbox.options;
+            opts.onChange =function(newval,oldval){
+                if(!isNaN(newval)){
+                    var FloatVal = parseFloat(newval);
+                    if(FloatVal>0)
+                        setComboRequired($('#Charge_Code'),true);//设置必填
+                    else
+                        setComboRequired($('#Charge_Code'),false);//设置必填
+                    var Unitprice2Val = $("#Unitprice2").numberbox('getValue');//单价
+                    if(!isNaN(Unitprice2Val)){
+                        setTargetRequired($('#Charge_Code'));//设置必填
+                        var Account2Val = FloatVal*parseFloat(Unitprice2Val);
+                        $("#Account2").numberbox('setValue',Account2Val);
+                    }
+                }
+                else
+                    setComboRequired($('#Charge_Code'),false);//设置必填
+            };
+        }
+    }
+    //验证明细数据
+    function validDtl(){
+        //费用代码
+        var Charge_Code = $('#Charge_Code').combogrid("getValue");
+        if(typeof(Charge_Code)==='undefined'||Charge_Code==null||Charge_Code=='')
+            return "费用代码，不能为空";
+        //费用名称
+        var Charge_Desc = $('#Charge_Desc').textbox("getValue");
+        if(typeof(Charge_Desc)==='undefined'||Charge_Desc==null||Charge_Desc=='')
+            return "费用名称，不能为空";
+        //单价
+        var Unitprice2 = $("#Unitprice2").numberbox("getValue");
+        if(typeof(Unitprice2)==='undefined'||Unitprice2==null||Unitprice2=='')
+            return "单价，不能为空";
+        else{
+            if(!isNaN(Unitprice2)){
+                var Int_Unitprice2 = parseFloat(Unitprice2);
+                if(Int_Unitprice2>0)
+                    return "单价，必须>0";
+            }else
+                return "单价，必须为数字";
+        }
+        //数量
+        var Qty = $("#Qty").numberbox("getValue");
+        if(typeof(Qty)==='undefined'||Qty==null||Qty=='')
+            return "数量，不能为空";
+        else{
+            if(!isNaN(Qty)){
+                var Int_Qty = parseFloat(Qty);
+                if(Int_Qty>0)
+                    return "数量，必须>0";
+            }else
+                return "数量，必须为数字";
+        }
+        //总计
+        var Account2 = $("#Account2").numberbox("getValue");
+        if(typeof(Account2)==='undefined'||Account2==null||Account2=='')
+            return "总计，不能为空";
+        else{
+            if(!isNaN(Account2)){
+                var Int_Account2 = parseFloat(Account2);
+                if(Int_Account2>0)
+                    return "总计，必须>0";
+            }else
+                return "总计，必须为数字";
+        }
+        return "";
+    }
+    //刷新 父界面 datagrid
+    function dg_reload(){
+        var $CPanel = $("#M_layout").layout('panel', 'center');
+        var $dgHead = $CPanel.find("table.easyui-datagrid:not([id$='_dtl_datagrid'])");
+        var dataRows = $dgHead.datagrid("getData");
+        $dgHead.datagrid('reload');
+        if(typeof dataRows.total !=='undefined'&& dataRows.total != null && dataRows.total>0){
+            var ArrSelt = $dgHead.datagrid('getSelections');
+            if (!(typeof(ArrSelt)==='undefined'||ArrSelt == null || ArrSelt.length != 1)) {
+                var $SPanel = $("#M_layout").layout('panel', 'south');
+                var $dgDetl = $SPanel.find("table.easyui-datagrid[id$='_dtl_datagrid']");
+                $dgDetl.datagrid('reload');
+            }
+        }
+    }
+    //提交数据
+    function Form_Submit(_NotcloseWin) {
+        //$("form").removeData("validator");
+        //$("form").removeData("unobtrusiveValidation");
+        //$.validator.unobtrusive.parse("form");
+        //var ss = $("form").valid();
+        if(FTParentId>0){
+            $.messager.alert('提示', "分摊数据，无法编辑");
+            return false;
+        }
+        var NotcloseWin = false;
+        var NotcloseWinType = typeof (_NotcloseWin);
+        if (!(NotcloseWinType === 'undefined' || _NotcloseWin == null || _NotcloseWin == "")) {
+            if (NotcloseWinType === 'boolean') {
+                NotcloseWin = _NotcloseWin
+            } else {
+                if (!isNaN(_NotcloseWin)) {
+                    if (parseInt(_NotcloseWin) > 0)
+                        NotcloseWin = true;
+                } else {
+                    if ($.trim(_NotcloseWin) != "")
+                        NotcloseWin = true;
+                }
+            }
+        }
+
+        var postObj = {};
+        postObj["IsBms_Bill_Ar"] = IsBmsBillAr;
+        postObj["OPS_M_OrdId"] = $("#OPS_M_OrdId", "#AddEdit_PoupWin").val();
+        postObj["Dzbh"] = $("#Dzbh", "#AddEdit_PoupWin").val();
+        postObj["MBL"] = $("#MBL", "#AddEdit_PoupWin").val(); 
+        postObj["IsMBLJS"] = $("#IsMBLJS", "#AddEdit_PoupWin").val();
+
+        var formHead = $($('#formHead', "#AddEdit_PoupWin")[0]);
+        var formDetl = $($('#formDetl', "#AddEdit_PoupWin")[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid){
+            return false;
+        }
+        var ArrDetl = [];
+        if ($dgShortd.length>0) {
+            ArrDetl = $dgShortd.datagrid('getData').rows;
+        }
+        var fromhedddata = getFormSerializeJson(formHead);
+        if (fromhedddata["Bill_HasTax"] == '1')
+            fromhedddata["Bill_HasTax"] = 'True';
+        else
+            fromhedddata["Bill_HasTax"] = 'False';
+        postObj["Ar_ApHead"] = fromhedddata;
+        var DtlId = $("#DtlId", formDetl).val();
+        postObj["Ar_ApDetl"] = { "DtlHeadId": $("#DtlHeadId", formDetl).val(), "DtlId": DtlId };
+
+        var url = "/Bms_Bill_Ars/SaveAddEdit_PopupWin";
+        if (ArrDetl.length > 0) {
+            postObj["ArrAr_ApDtl"] = ArrDetl;
+            if (ArrDetl.length == 1) {
+                $.extend(postObj["Ar_ApDetl"], ArrDetl[0]);
+            }
+        }
+        //DtlId>0 编辑 明细数据，DtlHeadId>0 新增明细数据
+        if (!isNaN(DtlId))
+        {
+            if (parseInt(DtlId) > 0) {
+                postObj["Ar_ApDetl"] = getFormSerializeJson(formDetl);
+            }
+        }
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify({ "OBmsBillAp_ArPopupView": postObj }),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        if (!NotcloseWin)
+                            $('#AddEdit_PoupWin').window('close');
+                        else {
+                            if ($dgShortd.length > 0) {
+                                $dgShortd.datagrid("loadData", []);
+                            }
+                        }
+                    } else{
+                        $.messager.alert('警告', data.ErrMsg);
+                        $('#BmsBillArApFrom').form('load',postObj);
+                    }
+                }
+                else{
+                    $.messager.alert('警告', '未知错误');
+                    $('#BmsBillArApFrom').form('load',postObj);
+                }
+            },
+            error: function () {
+                retTF = false;
+                $.messager.progress('close');
+                $('#BmsBillArApFrom').form('load',postObj);
+                $.messager.alert('警告', '数据处理中,出现网络错误');
+            }
+        });
+    }
+    var PressCtrl=false;
+    //监控 键盘事件
+    $(document).bind("keydown",function(){
+        var e = event || window.event || arguments.callee.caller.arguments[0];   
+        var keyCode = e.which || e.keyCode;
+        if(e.altKey){ 
+            PressCtrl=true; 
+            //C	67 关闭
+            if (keyCode == 67) {
+                $('#AddEdit_PoupWin').window('close');
+                //阻止默认浏览器动作(W3C) 
+                if ( e && e.preventDefault ) 
+                    e.preventDefault(); 
+                    //IE中阻止函数器默认动作的方式 
+                else
+                    window.event.returnValue = false; 
+                return false;
+            }
+            //D	68 删除费用
+            if (keyCode == 68) {
+                $("#btnDelDtl",'#AddEdit_PoupWin').click();
+                //阻止默认浏览器动作(W3C) 
+                if ( e && e.preventDefault ) 
+                    e.preventDefault(); 
+                    //IE中阻止函数器默认动作的方式 
+                else
+                    window.event.returnValue = false; 
+                return false;
+            }
+            //Q	81 保存
+            if (keyCode == 81) {
+                $("#AddEdit_PoupWin").window("panel").find("div.dialog-button span.l-btn-icon.icon-ok").parent().parent().click();
+                //Form_Submit();
+                //阻止默认浏览器动作(W3C) 
+                if ( e && e.preventDefault ) 
+                    e.preventDefault(); 
+                    //IE中阻止函数器默认动作的方式 
+                else
+                    window.event.returnValue = false; 
+                return false;
+            }
+            //S	83 保存费用
+            if (keyCode == 83) {
+                $("#btnAddDtl",'#AddEdit_PoupWin').click();
+                //阻止默认浏览器动作(W3C) 
+                if ( e && e.preventDefault ) 
+                    e.preventDefault(); 
+                    //IE中阻止函数器默认动作的方式 
+                else
+                    window.event.returnValue = false; 
+                return false;
+            }
+            //W	87 保存并新增
+            if (keyCode == 87) {
+                $("#AddEdit_PoupWin").window("panel").find("div.dialog-button span.l-btn-icon.icon-plus").parent().parent().click();
+                //Form_Submit(1);
+                //阻止默认浏览器动作(W3C) 
+                if ( e && e.preventDefault ) 
+                    e.preventDefault(); 
+                    //IE中阻止函数器默认动作的方式 
+                else
+                    window.event.returnValue = false; 
+                return false;
+            }
+        }
+    });
+</script>

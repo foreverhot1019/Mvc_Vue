@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="/CSS/app.css" type="text/css" />
+    <link href="../Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="../Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="../Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="../Scripts/require.js" defer async="true"></script>
+    <!--<script>
+        require.config({
+            baseUrl: "/Scripts/",
+            // Add this map config in addition to any baseUrl or
+            // paths config you may already have in the project.
+            map: {
+                // '*' means all modules will get 'jquery-private'
+                // for their 'jquery' dependency.
+                '*': { 'jquery': 'jquery-private' },
+
+                // 'jquery-private' wants the real jQuery module
+                // though. If this line was not here, there would
+                // be an unresolvable cyclic dependency.
+                'jquery-private': { 'jquery': 'jquery' }
+            }
+        });
+    </script>-->
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+    <script src="../Scripts/bootstrap.min.js"></script>
+    <script src="/Scripts/app.js"></script>
+</head>
+<body>
+    <h1>TypeScript HTML App</h1>
+
+    <div id="content"></div>
+</body>
+</html>

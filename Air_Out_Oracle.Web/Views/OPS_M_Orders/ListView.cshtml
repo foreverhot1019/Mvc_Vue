@@ -1,0 +1,448 @@
+﻿@model AirOut.Web.Models.OPS_M_Order
+<table id="ops_m_order_datagrid" class="easyui-datagrid" title="" style="width:auto; height:auto; min-height:490px;max-height:480px;"
+       data-options="
+	rownumbers:true,
+	checkOnSelect:true,
+	selectOnCheck:true,
+	idField:'Id',
+	sortName:'Id',
+	sortOrder:'desc',
+	remoteFilter: true,
+	singleSelect: false,
+	toolbar: '#show_total_JMT_toolbar',
+    onCheck:checktotal,
+    onUncheck:checktotal,
+    onSelectAll:checktotal,
+    onUnselectAll:checktotal,
+    onLoadSuccess:onLoadSuccess,
+    pageList: [15,50, 100, 200, 500, 1000, 2000 , 5000],
+    pageSize: 15,
+	method: 'get',
+	pagination: 'true'">
+    <thead>
+        <tr>
+            <th data-options="field:'ck',checkbox:true"></th>
+            @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+            <th data-options="field:'Batch_Num',width:100,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,20]'
+			    }
+		    }">批次号</th>
+            <th data-options="field:'Operation_Id',width:100,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+			        required:false ,validType:'length[0,50]'
+			    }
+		    }">业务编号</th>
+            <th data-options="field:'Entrustment_Name',width:140,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,200]'
+			    }
+		    }">委托方</th>
+            <th data-options="field:'MBL',width:100,sortable:true,resizable:true,
+                formatter: MBLFormatter,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,20]'
+			    }
+		    }">@Html.DisplayNameFor(model => model.MBL)</th>
+            <th data-options="field:'HBL',width:120,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,20]'
+			    }
+		    }">分单号</th>
+            <th data-options="field:'Flight_No',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,20]'
+			    }
+		    }">@Html.DisplayNameFor(model => model.Flight_No)</th>
+            <th data-options="field:'Flight_Date_Want',width:100,align:'right',sortable:true,resizable:true,
+			formatter:dateformatter,
+			editor:{
+			    type:'datebox',
+			    options:{
+				    required:false
+			    }
+		    }">@Html.DisplayNameFor(model => model.Flight_Date_Want)</th>
+            <th data-options="field:'End_Port',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">@Html.DisplayNameFor(model => model.End_Port)</th>
+            <th data-options="field:'Book_Flat_Code',width:140,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,100]'
+			    }
+		    }">订舱方</th>
+            <th data-options="field:'Airways_Code',width:140,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,20]'
+			    }
+		    }">@Html.DisplayNameFor(model => model.Airways_Code)</th>
+            <th data-options="field:'Depart_Port',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">@Html.DisplayNameFor(model => model.Depart_Port)</th>
+            <th data-options="field:'Pieces_Fact',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">实际件数</th>
+            <th data-options="field:'Weight_Fact',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">实际重量</th>
+            <th data-options="field:'Volume_Fact',width:80,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">实际体积</th>
+            <th data-options="field:'Pieces_SK',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">分单件数</th>
+            <th data-options="field:'Weight_SK',width:70,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">分单重量</th>
+            <th data-options="field:'Volume_SK',width:80,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">分单体积</th>
+            <th data-options="field:'Entrustment_Code',width:100,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">委托方编号</th>
+            <th data-options="field:'Remark',width:140,sortable:true,resizable:true,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,1000]'
+			    }
+		    }">备注</th>
+            <th data-options="field:'Is_Self',width:70,sortable:true,resizable:true,
+            formatter:formatterIs_Self,
+			editor:{
+			    type:'textbox',
+			    options:{
+				    required:false ,validType:'length[0,50]'
+			    }
+		    }">代理</th>
+            <th data-options="field:'ADDWHO',width:100,sortable:true,resizable:true,
+            editor:{
+                type:'textbox',
+                options:{
+                    required:false ,validType:'length[0,50]'
+                }
+            }">接单人</th>
+            @*<th data-options="field:'FWD_CodeNAME',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.FWD_Code)</th>
+                <th data-options="field:'Shipper_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,200]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Shipper_M)</th>
+                <th data-options="field:'Consignee_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,200]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Consignee_M)</th>
+                <th data-options="field:'Notify_Part_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,200]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Notify_Part_M)</th>
+                <th data-options="field:'Currency_MNAME',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Currency_M)</th>
+                <th data-options="field:'Bragainon_Article_MNAME',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Bragainon_Article_M)</th>
+                <th data-options="field:'Pay_Mode_MNAME',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Pay_Mode_M)</th>
+                <th data-options="field:'Carriage_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Carriage_M)</th>
+                <th data-options="field:'Incidental_Expenses_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Incidental_Expenses_M)</th>
+                <th data-options="field:'Declare_Value_Trans_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Declare_Value_Trans_M)</th>
+                <th data-options="field:'Declare_Value_Ciq_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Declare_Value_Ciq_M)</th>
+                <th data-options="field:'Risk_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,20]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Risk_M)</th>
+                <th data-options="field:'Marks_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1000]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Marks_M)</th>
+                <th data-options="field:'EN_Name_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,500]'
+                    }
+                }">@Html.DisplayNameFor(model => model.EN_Name_M)</th>
+                <th data-options="field:'Hand_Info_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1000]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Hand_Info_M)</th>
+                <th data-options="field:'Signature_Agent_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1000]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Signature_Agent_M)</th>
+                <th data-options="field:'Rate_Class_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Rate_Class_M)</th>
+                <th data-options="field:'Air_Frae',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Air_Frae)</th>
+                <th data-options="field:'AWC',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.AWC)</th>
+                <th data-options="field:'Pieces_M',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Pieces_M)</th>
+                <th data-options="field:'Weight_M',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Weight_M)</th>
+                <th data-options="field:'Volume_M',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Volume_M)</th>
+                <th data-options="field:'Charge_Weight_M',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Charge_Weight_M)</th>
+                <th data-options="field:'Price_Article',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,50]'
+                    }
+                }">@Html.DisplayNameFor(model => model.Price_Article)</th>
+                <th data-options="field:'CCC',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,50]'
+                    }
+                }">@Html.DisplayNameFor(model => model.CCC)</th>
+                <th data-options="field:'File_M',width:140,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,1000]'
+                    }
+                }">@Html.DisplayNameFor(model => model.File_M)</th>
+                <th data-options="field:'Status',width:120,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.Status)</th>
+                <th data-options="field:'OperatingPoint',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                    options:{
+                        required:true ,precision:0
+                    }
+                }">@Html.DisplayNameFor(model => model.OperatingPoint)</th>*@
+            <th data-options="field:'Is_HDQ',width:100,sortable:true,resizable:true,
+            formatter:NewBoolFommater,
+			editor:{
+				type:'textbox',
+				options:{
+					required:false ,validType:'length[0,1000]'
+				}
+		    }">是否到齐</th>
+            <th data-options="field:'Is_BG',width:100,sortable:true,resizable:true,
+            formatter:NewBoolFommater,
+			editor:{
+				type:'textbox',
+				options:{
+					required:false ,validType:'length[0,1000]'
+				}
+		    }">是否报关</th>
+            <th data-options="field:'Is_BQ',width:100,sortable:true,resizable:true,
+            formatter:NewBoolFommater,
+			editor:{
+				type:'textbox',
+				options:{
+					required:false ,validType:'length[0,1000]'
+				}
+		    }">打印标签</th>
+            <th data-options="field:'Is_OutGoing',width:100,sortable:true,resizable:true,
+            formatter:NewBoolFommater,
+			editor:{
+				type:'textbox',
+				options:{
+					required:false ,validType:'length[0,1000]'
+				}
+		    }">是否出库</th>
+            @*<th data-options="field:'ADDID',width:120,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,50]'
+                    }
+                }">@Html.DisplayNameFor(model => model.ADDID)</th>
+                <th data-options="field:'ADDTS',width:170,align:'right',sortable:true,resizable:true,
+                formatter:datetimeformatter,
+                editor:{
+                    type:'datetimebox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.ADDTS)</th>
+                <th data-options="field:'EDITWHO',width:120,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,50]'
+                    }
+                }">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+                <th data-options="field:'EDITTS',width:160,align:'right',sortable:true,resizable:true,
+                formatter:datetimeformatter,
+                editor:{
+                    type:'datetimebox',
+                    options:{
+                        required:false
+                    }
+                }">@Html.DisplayNameFor(model => model.EDITTS)</th>
+                <th data-options="field:'EDITID',width:120,sortable:true,resizable:true,
+                editor:{
+                    type:'textbox',
+                    options:{
+                        required:false ,validType:'length[0,50]'
+                    }
+                }">@Html.DisplayNameFor(model => model.EDITID)</th>*@
+        </tr>
+    </thead>
+</table>
+
+
+<div id="show_total_JMT_toolbar" style="height:auto">
+   <label for="name" id="lab_show_total_JMT"></label>
+</div>

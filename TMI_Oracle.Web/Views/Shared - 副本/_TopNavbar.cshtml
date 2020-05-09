@@ -1,0 +1,153 @@
+﻿<!--菜单缩小后页面panel 宽度相应变化 扩展-->
+<script type="text/javascript" src="~/Scripts/jquery.NavResize.js"></script>
+@{
+    var UserOperatePoints = TMI.Web.Controllers.Utility.CurrentUserOperatePoint;
+    
+    string CurrentOPName = "";
+    if (UserOperatePoints == null)
+    {
+        CurrentOPName = "";
+        //Response.Redirect("/Account/Login");
+        Response.Write("<script>window.location.href='/Account/Login'</script>");
+    }else{
+        CurrentOPName = UserOperatePoints.First().OperatePointName;
+    }
+}
+
+<div class="row border-bottom" style="margin-bottom: 0;height:40px;">
+    <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0; min-height: 40px; height:40px;" id="navbar--minimalize">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#" style="margin:5px 5px 0px 20px" id="navbar-minimalize">
+                <i class="fa fa-bars"></i>
+            </a>
+        </div>
+        <ul class="nav navbar-top-links navbar-right" style="height:40px;">
+            <li>
+                <a href="/Home/Index" style="height:40px; padding:10px 10px;">
+                    <i class="fa fa-shopping-cart"></i> 当前操作点: @CurrentOPName
+                </a>
+            </li>
+            <li class="dropdown" style="height:50px;">
+                <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#" style="height:40px; padding:10px 10px;">
+                    <i class="fa fa-bell"></i>
+                    <span class="label label-primary" style="top:0px;right:0px;">8</span>
+                </a>
+                <ul class="dropdown-menu dropdown-alerts">
+                    @*<li>
+                        <a href="#">
+                            <div>
+                                <i class="fa fa-envelope fa-fw"></i> You have 16 messages
+                                <span class="pull-right text-muted small">4 minutes ago</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="#">
+                            <div>
+                                <i class="fa fa-twitter fa-fw"></i> 3 New Followers
+                                <span class="pull-right text-muted small">12 minutes ago</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="#">
+                            <div>
+                                <i class="fa fa-upload fa-fw"></i> Server Rebooted
+                                <span class="pull-right text-muted small">4 minutes ago</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <div class="text-center link-block">
+                            <a href="#">
+                                <strong>See All Alerts</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </div>
+                    </li>*@
+                </ul>
+            </li>
+            @{
+                if (User != null)
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <a href="@Url.Action("LogOff", "Account")" style="height:40px; padding:10px 10px;">
+                                <i class="fa fa-sign-out"></i> 退出
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("ResetPassword", "Account")" style="height:40px; padding:10px 10px;">
+                                <i class="fa fa-key"></i> 改密
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="@Url.Action("Login", "Account")" style="height:40px; padding:10px 10px;">
+                                <i class="fa fa-sign-in"></i> 登录
+                            </a>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li>
+                        <a href="@Url.Action("Login", "Account")" style="height:40px; padding:10px 10px;">
+                            <i class="fa fa-sign-in"></i> 登录
+                        </a>
+                    </li>
+                }
+            }
+            <li>
+                <a class="right-sidebar-toggle" style="height:40px; padding:10px 10px;">
+                    <i class="fa fa-tasks"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<script>
+    $(function () {
+        $("#navbar-minimalize").NavResize({
+            Auto: true,//自动找datagrid并自适应width
+            navbarlinkid: 'navbar-minimalize',//收缩菜单 按钮Id
+            delay: 300//延迟执行自适应width方法时间
+        });
+
+        $("#TOP_OperatPoints").change(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/OperatePoints/SaveLayOutOperatePoint',//获取数据的函数
+                async: true,//true 异步，false 同步
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ UserId: '@((HttpContext.Current.Session == null || HttpContext.Current.Session["LoginUser"] == null) ? "" : (HttpContext.Current.Session["LoginUser"] as TMI.Web.Models.ApplicationUser).Id)', OperatePointID: $(this).val() }),//查询条件JSON.stringify()
+                beforeSend: function (XHR) {
+                    $.messager.progress({
+                        title: '设置操作点',
+                        msg: '正在提交数据，请等待...'
+                    });
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    $.messager.progress('close');
+                    if (data.Success) {
+                        window.location.reload();
+                    }
+                    else {
+                        $.messager.alert("设置操作点错误", data.ErrMsg, 'error');
+                    }
+                },
+                error: function (response) {
+                    $.messager.progress('close');
+                    $.messager.alert("错误", "处理数据时发生错误了！", 'error');
+                }
+            });
+        });
+    });
+</script>

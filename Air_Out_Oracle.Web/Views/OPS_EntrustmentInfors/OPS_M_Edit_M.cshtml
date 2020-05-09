@@ -1,0 +1,281 @@
+﻿@{
+    //控件排序
+    var Num = 11;
+    var item = ViewBag.m_order;
+}
+
+    <div id="zdxx" style="padding-top:5px; padding-bottom:3px; width:auto;display: none;" class="easyui-panel" title="总单信息"
+         data-options="collapsible:true">
+        <input type="hidden" value="@item.Id" id="Id" />
+        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <input type="checkbox" id="is_MBL" />
+                <label for="name" style="width:20%">总单号:</label>
+                <input id="MBL" name="MBL" data-options="prompt1:'总单号'" tabindex=@(Num++) value="@item.MBL" style="width:70%" class="easyui-textbox" type="text" />
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label for="name" style="width:20%">航空公司:</label>
+                <input id="Airways_Code" name="Airways_Code" tabindex=@(Num++) value="@item.Airways_Code" data-options="prompt1:'航空公司'" style="width:79%" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label for="name" style="width:20%">国外代理:</label>
+                <input id="FWD_Code" name="FWD_Code" tabindex=@(Num++) value="@item.FWD_Code" data-options="prompt1:'国外代理'" style="width:79%" class="easyui-combogrid" type="text" />
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">发货人:</label>*@
+            <a href="#">发货人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Shipper_M" tabindex=@(Num++) value="@item.Shipper_M" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">收货人:</label>*@
+            <a href="#">收货人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Consignee_M" tabindex=@(Num++) value="@item.Consignee_M" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">通知人:</label>*@
+            <a href="#">通知人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Notify_Part_M" tabindex=@(Num++) value="@item.Notify_Part_M" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <input type="checkbox" id="is_Depart" style="width:9%" />
+            <label for="name" style="width:15%">起运港:</label>
+            <input id="Depart_Port" name="Depart_Port" tabindex=@(Num++) value="@item.Depart_Port" data-options="prompt1:'起运港'" style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">目的港:</label>
+            <input id="End_Port" name="End_Port" tabindex=@(Num++) value="@item.End_Port" data-options="prompt1:'目的港'" style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">航班号:</label>
+            <input id="Flight_No" name="Flight_No" value="@item.Flight_No" data-options="prompt1:'航班号'" style="width:40%" class="easyui-combogrid" type="text" />
+            <input id="Flight_No1" name="Flight_No1" tabindex=@(Num++) data-options="prompt1:'航班号'" style="width:38%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">航班日期:</label>
+            <input id="Flight_Date_Want" name="Flight_Date_Want" tabindex=@(Num++) value="@item.Flight_Date_Want" data-options="prompt1:'航班日期'" style="width:74%" class="easyui-datebox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">币种:</label>
+            <input id="Currency_M" name="Currency_M" tabindex=@(Num++) value="@item.Currency_M" data-options="prompt1:'币种'" style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">成交条款:</label>
+            <input id="Bragainon_Article_M" name="Bragainon_Article_M" tabindex=@(Num++) value="@item.Bragainon_Article_M" data-options="prompt1:'成交条款'" style="width:79%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">付款方式:</label>
+            <input id="Pay_Mode_M" name="Pay_Mode_M" tabindex=@(Num++) value="@item.Pay_Mode_M" data-options="prompt1:'付款方式'" style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">运费P/C:</label>
+            <input id="Carriage_M" name="Carriage_M" tabindex=@(Num++) value="@item.Carriage_M" data-options="prompt1:'运费P/C'" style="width:9%" class="easyui-textbox" type="text" />
+            <input id="Carriage_M2" name="Carriage_M2" data-options="prompt1:'运费P/C'" disabled="disabled" style="width:64%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">杂费/C:</label>
+            <input id="Incidental_Expenses_M" name="Incidental_Expenses_M" tabindex=@(Num++) value="@item.Incidental_Expenses_M" data-options="prompt1:'杂费/C'" style="width:9%" class="easyui-textbox" type="text" />
+            <input id="Incidental_Expenses_M2" name="Incidental_Expenses_M2" data-options="prompt1:'杂费/C'" disabled="disabled" style="width:69%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">申明价值（运输）:</label>
+            <input id="Declare_Value_Trans_M" name="Declare_Value_Trans_M" tabindex=@(Num++) value="@item.Declare_Value_Trans_M" data-options="prompt1:'申明价值（运输）'" style="width:74%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">申明价值（海关）:</label>
+            <input id="Declare_Value_Ciq_M" name="Declare_Value_Ciq_M" tabindex=@(Num++) value="@item.Declare_Value_Ciq_M" data-options="prompt1:'申明价值（海关）'" style="width:74%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">保险额度:</label>
+            <input id="Risk_M" name="Risk_M" value="@item.Risk_M" tabindex=@(Num++) data-options="prompt1:'保险额度'" style="width:79%" class="easyui-textbox" type="text" />
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">主单唛头:</label>*@
+            <a href="#">主单唛头:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Marks_M" tabindex=@(Num++) value="" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">主单英文货名:</label>*@
+            <a href="#">主单英文货名:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="EN_Name_M" tabindex=@(Num++) value="" style="width:100%">
+        </div>
+        <div class="form-group col-md-12">
+            <label for="name" style="width:20%">Handing Information:</label>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Hand_Info_M" value="" tabindex=@(Num++) style="width:100%">
+        </div>
+        <div class="form-group col-md-12">
+            <label for="name" style="width:20%">Signature of Shipper or his Agent:</label>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Signature_Agent_M" value="" tabindex=@(Num++) style="width:100%">
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            is_BL_M();
+            $("#is_MBL", "#zdxx").on('click', function () {
+                is_BL_M();
+            });
+
+            is_Depart();
+            $("#is_Depart", "#zdxx").on('click', function () {
+                is_Depart();
+            });
+
+            //加载时绑定combogrid数据源
+            initbindcombogriddata_M();
+        });
+
+        //判断，是否有 总单号
+        function is_BL_M() {
+            if ($("#is_MBL", "#zdxx").get(0).checked) {
+                $("#MBL", "#zdxx").textbox("enable");
+            } else {
+                $("#MBL", "#zdxx").textbox("disable");
+            }
+        }
+
+        //判断，是否有 起运港
+        function is_Depart() {
+            if ($("#is_Depart", "#zdxx").get(0).checked) {
+                $("#Depart_Port", "#zdxx").combogrid("enable");
+            } else {
+                $("#Depart_Port", "#zdxx").combogrid("disable");
+            }
+        }
+
+
+        //加载时绑定combogrid数据源
+        function initbindcombogriddata_M() {
+
+            //航空公司
+            $("#Airways_Code", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetCusBusInf',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+            //币种
+            $("#Currency_M", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetPARA_CURR',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+            //启运港
+            $("#Depart_Port", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetPARA_AIRPorts',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+            //目的港
+            $("#End_Port", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetPARA_AIRPorts',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+
+            //航班号
+            $("#FLIGHT_No", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'TEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetPARA_AirLine',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+            //国外代理
+            $("#FWD_Code","#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetCusBusInf',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+
+            //成交条款
+            $("#Bragainon_Article_M", "#zdxx").combogrid({
+                panelHeight: 'auto',
+                mode: 'remote',
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                pageSize: 10,
+                pageList: [5, 10, 20],
+                pagination: true,
+                url: '/OPS_EntrustmentInfors/GetDealArticle',
+                columns: [[
+                    { field: 'ID', title: '代码', width: 100 },
+                    { field: 'TEXT', title: '名称', width: 130 }
+                ]]
+            });
+        }
+</script>

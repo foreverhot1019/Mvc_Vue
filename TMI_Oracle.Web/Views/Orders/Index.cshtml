@@ -1,0 +1,1245 @@
+﻿@model IEnumerable<TMI.Web.Models.Order>
+@{
+    ViewBag.Title = "订单";
+}
+<div id="app" v-cloak>
+    <el-row style="background-color: #eee; padding:10px 0px 0px 10px">
+        <el-col>
+            <el-form v-bind:inline="true" v-bind:model="filters.filterRules" size="mini" ref="tb_search">
+                <el-form-item v-for="field in ArrSearchField"
+                              v-if="!field.IsKey && field.SearchShow"
+                              v-bind:label-width="formLabelWidth"
+                              v-bind:label="field.DisplayName"
+                              v-bind:prop="field.Name"
+                              v-bind:rules="el_FormFieldRules(field,true)">
+                    <component v-if="!field.IsForeignKey" v-model="filters.filterRules[field.Name]"
+                               v-bind:is="el_inputType(field)"
+                               v-bind:prop="field.Name"
+                               v-bind:type="el_inputProtoType(field,true)"
+                               v-bind:precision="field.Precision"
+                               value-value-format="yyyy-MM-dd"
+                               range-separator="至"
+                               start-placeholder="日期起"
+                               end-placeholder="日期讫">
+                        <i slot="suffix" class="el-input__icon fa"
+                           v-show="field.Name.toLowerCase().indexOf('password')>=0"
+                           v-on:click="pswView(field)"
+                           v-bind:class="el_inputClass(field)"></i>
+                    </component>
+                    <el-select v-else v-model="filters.filterRules[field.Name]"
+                               reserve-keyword clearable
+                               v-bind:remote-method="q=>el_remoteMethod(q,field,'search')"
+                               v-bind:loading="el_selt.el_selt_loading">
+                        <template v-if="el_selt[field.Name+'_search']">
+                            <el-option v-for="item in el_selt[field.Name+'_search'].ArrOption"
+                                       v-bind:key="item.ID"
+                                       v-bind:label="item.TEXT"
+                                       v-bind:value="item.ID">
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
+                <br>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button type="primary" icon="el-icon-search" v-on:click="search" v-bind:loading="tbLoading">查询</el-button>
+                </el-form-item>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button icon="el-icon-refresh" v-on:click="resetFilter('tb_search')" v-bind:disabled="tbLoading">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row><!--搜索条件-->
+    <templete>
+        <el-row style="padding: 3px 10px 3px 10px;">
+            <el-col>
+                <el-button-group>
+                    <el-button type="primary" icon="el-icon-plus" size="small" v-bind:disabled="!UserRoles.Create" v-on:click="handleAddRow">新增</el-button>
+                    <el-button icon="el-icon-download" size="small" v-bind:disabled="!UserRoles.Export" v-on:click="ExportXls(tableData,'Excel导出')">导出</el-button>
+                    <el-button icon="el-icon-upload" size="small" v-bind:disabled="!UserRoles.Import" v-on:click="ImportXls">导入</el-button>
+                </el-button-group>
+            </el-col>
+        </el-row><!--列表按钮组-->
+        <el-row>
+            <el-col>
+                <el-table ref="Mytb" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                          v-bind:default-sort="{prop:'Id',order:'descending'}"
+                          v-bind:data="tableData"
+                          v-loading="tbLoading"
+                          v-on:row-dblclick="handledblclick"
+                          v-on:selection-change="handleSelectionChange"
+                          v-on:sort-change="tbSortChange">
+                    <el-table-column fixed type="selection" width="36"></el-table-column>
+                    <template>
+                        <el-table-column show-overflow-tooltip prop="OrderNo" label="咨询单号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'OrderNo'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravleType" label="旅游类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'TravleType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravleOrdType" label="订单类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'TravleOrdType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TravlePersonNum" label="出游人数" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'TravlePersonNum'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="UnitPrice" label="单价" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'UnitPrice'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TotalPrice" label="总价" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'TotalPrice'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RouteNo" label="线路编号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'RouteNo'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RouteName" label="线路名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'RouteName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RoutePhoto" label="线路图" v-bind:formatter="formatter({Type: 'string', Name: 'RoutePhoto'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.RoutePhoto)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.RoutePhoto}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">线路图</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerRequire" label="客户诉求" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustomerRequire'})" width="200px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Status" label="使用状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'Status', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerName" label="客户名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustomerName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ContactType" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ContactType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Contact" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Contact'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ActiveStatus" label="活跃状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ActiveStatus', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerSource" label="客户来源" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerSource', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerLevel" label="等级" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerLevel', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="CustomerType" label="客户类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ComponyName" label="公司名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ComponyName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="OP" label="客服" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'OP'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Saller" label="销售" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Saller'})" width="150px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="OrderStatus" label="订单状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'OrderStatus', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                        @*<el-table-column show-overflow-tooltip prop="OperatingPoint" label="操作点" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'OperatingPoint'})" width="120px"></el-table-column>
+                            <el-table-column show-overflow-tooltip prop="ADDID" label="新增人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDID'})" width="120px"></el-table-column>*@
+                        <el-table-column show-overflow-tooltip prop="ADDWHO" label="新增人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDWHO'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ADDTS" label="新增时间" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'ADDTS'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="EDITWHO" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITWHO'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="EDITTS" label="修改时间" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'EDITTS'})" width="120px"></el-table-column>
+                        @*<el-table-column show-overflow-tooltip prop="EDITID" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITID'})" width="120px"></el-table-column>*@
+                    </template>
+                </el-table><!--Table列表-->
+                <el-row style="padding-top: 10px;">
+                    <el-col v-bind:span="8">
+                        <el-button type="danger" size="small" v-on:click="handledelSeltRow" v-bind:disabled="(UserRoles.Delete ? selctRows.length===0 : true)">批量删除</el-button>
+                    </el-col>
+                    <el-col v-bind:span="16">
+                        <el-pagination v-model="pagiNation" style="float:right;"
+                                       v-on:size-change="pageSizeChange"
+                                       v-on:current-change="pageCurrentChange"
+                                       v-on:prev-click="PrevPage"
+                                       v-on:next-click="NextPage"
+                                       v-bind:current-page="pagiNation.currentPage"
+                                       v-bind:page-sizes="pagiNation.pageSizes"
+                                       v-bind:page-size="pagiNation.pageSize"
+                                       v-bind:layout="pagiNation.layout"
+                                       v-bind:total="pagiNation.total">
+                        </el-pagination>
+                    </el-col>
+                </el-row><!--列表底部 按钮+翻页-->
+            </el-col>
+        </el-row>
+    </templete>
+    <!--弹出框-->
+    <el-dialog v-bind:title="dgTitle" ref="MyDialog" width="60%" center
+               v-bind:visible.sync="centerDialogVisible"
+               v-loading="dlgLoading"
+               v-on:close="dlgClose"
+               v-on:open="dlgOpen"
+               v-bind:fullscreen="dlgfullscreen"
+               v-bind:show-close="false">
+        <div slot="title" v-on:dblclick="dlgfullscreen = !dlgfullscreen" class="el-dialog__title" style="">
+            <el-row>
+                <el-col v-bind:span="8" style="cursor:move;">&nbsp;</el-col>
+                <el-col v-bind:span="8" style="cursor:move;">{{dgTitle}}</el-col>
+                <el-col v-bind:span="8" style="text-align:right;">
+                    <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit" title="确 定" circle></el-button>
+                    <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="centerDialogVisible = false" title="取 消" circle></el-button>
+                </el-col>
+            </el-row>
+        </div>
+        @*:label-position="left/right/top"*@
+        <el-form ref="MyForm" v-bind:model="curr_rowdata" label-position="right" inline size="small">
+            基本信息<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" prop="AdvsyOrdNo" label="咨询单号"
+                          v-bind:rules="el_FormFieldRules({Name: 'AdvsyOrdNo', DisplayName: '咨询单号', Required: false, Editable: true, MinLength: 0, MaxLength: 100})">
+                @*<el-input v-model="curr_rowdata['AdvsyOrdNo']" v-bind:clearable="true" style="width:178px;" />*@
+                <el-autocomplete v-model="curr_rowdata['AdvsyOrdNo']" style="width:178px"
+                                 popper-class="my-autocomplete"
+                                 value-key="OrderNo"
+                                 v-on:select="AdvsyOrdNoSelt"
+                                 v-bind:fetch-suggestions="AdvsyOrdNoQSearch">
+                    <template slot-scope="{ item }">
+                        <div class="name" style="text-overflow: ellipsis; overflow: hidden;">{{ item.OrderNo }} - {{ item.TravleTypeNAME }}</div>
+                        <span class="addr" style="font-size: 12px; color: #b4b4b4;">{{ item.CustomerName }}-{{ item.TotalPrice }}-{{ item.RouteNo }}</span>
+                    </template>
+                </el-autocomplete>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="TravleType" label="旅游类型"
+                          v-bind:rules="el_FormFieldRules({Name: 'TravleType', DisplayName: '旅游类型', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['TravleType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           style="width:178px;">
+                    <template v-if="el_selt.TravleType_form">
+                        <el-option v-for="item in el_selt.TravleType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="出团日期" prop="STravleDate"
+                          v-bind:rules="el_FormFieldRules({Name:'STravleDate',DisplayName:'出团日期',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker v-model="curr_rowdata['STravleDate']" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width:178px" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="回程日期" prop="ETravleDate"
+                          v-bind:rules="el_FormFieldRules({Name:'ETravleDate',DisplayName:'回程日期',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker v-model="curr_rowdata['ETravleDate']" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width:178px" />
+            </el-form-item>
+            @*<el-form-item v-bind:label-width="formLabelWidth" prop="TravleType" label="订单类型"
+                              v-bind:rules="el_FormFieldRules({Name: 'TravleOrdType', DisplayName: '订单类型', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                    <el-select v-model="curr_rowdata['TravleOrdType']"
+                               reserve-keyword clearable
+                               v-bind:loading="el_selt.el_selt_loading"
+                               style="width:178px;">
+                        <template v-if="el_selt.TravleOrdType_form">
+                            <el-option v-for="item in el_selt.TravleOrdType_form.ArrOption"
+                                       v-bind:key="item.ID|filterInt"
+                                       v-bind:label="item.TEXT"
+                                       v-bind:value="item.ID|filterInt">
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" prop="TravlePersonNum" label="出游人数"
+                              v-bind:rules="el_FormFieldRules({Name: 'TravlePersonNum', DisplayName: '出游人数', Required: false, Editable: true, Precision: 0, MinLength: 0, MaxLength: 0})">
+                    <el-input-number v-model="curr_rowdata['TravlePersonNum']" v-bind:clearable="true" style="width:178px;" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" prop="UnitPrice" label="单价"
+                              v-bind:rules="el_FormFieldRules({Name: 'UnitPrice', DisplayName: '单价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                    <el-input-number v-model="curr_rowdata['UnitPrice']" v-bind:precision="2" v-bind:clearable="true" style="width:178px;" />
+                </el-form-item>*@
+            <el-form-item v-bind:label-width="formLabelWidth" prop="Status" label="使用状态"
+                          v-bind:rules="el_FormFieldRules({Name: 'Status', DisplayName: '使用状态', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['Status']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           style="width:178px;">
+                    <template v-if="el_selt.Status_form">
+                        <el-option v-for="item in el_selt.Status_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="AuditStatus" label="审核状态"
+                          v-bind:rules="el_FormFieldRules({Name: 'AuditStatus', DisplayName: '审核状态', Required: true, Editable: true, MinLength: 0, MaxLength: 0})">
+                <el-select v-model="curr_rowdata['AuditStatus']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           style="width:178px;">
+                    <template v-if="el_selt.AuditStatus_form">
+                        <el-option v-for="item in el_selt.AuditStatus_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RouteNo" label="线路编号"
+                          v-bind:rules="el_FormFieldRules({Name: 'RouteNo', DisplayName: '线路编号', Required: false, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-input v-model="curr_rowdata['RouteNo']" v-bind:clearable="true" style="width:178px;" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RouteName" label="线路名称"
+                          v-bind:rules="el_FormFieldRules({Name: 'RouteName', DisplayName: '线路名称', Required: true, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-input v-model="curr_rowdata['RouteName']" v-bind:clearable="true" style="width:178px;" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" prop="CustomerRequire" label="客户诉求"
+                          v-bind:rules="el_FormFieldRules({Name: 'CustomerRequire', DisplayName: '客户诉求', Required: false, Editable: true, MinLength: 0, MaxLength: 2000})">
+                <el-input v-model="curr_rowdata['CustomerRequire']" type="textarea" v-bind:autosize="{ minRows: 2, maxRows: 5}" v-bind:clearable="true" style="width:178px;" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="Remark" label="备注"
+                          v-bind:rules="el_FormFieldRules({Name: 'Remark', DisplayName: '备注', Required: false, Editable: true, MinLength: 0, MaxLength: 1000})">
+                <el-input v-model="curr_rowdata['Remark']" type="textarea" v-bind:autosize="{ minRows: 2, maxRows: 5}" v-bind:clearable="true" style="width:178px;" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" prop="RoutePhoto" label="线路图"
+                          v-bind:rules="el_FormFieldRules({Name: 'RoutePhoto', DisplayName: '线路图', Required: false, Editable: true, MinLength: 0, MaxLength: 50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('RoutePhoto',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('RoutePhoto',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('RoutePhoto','线路图')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">图片文件，大小不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <br />订单详情<hr />
+            <el-row>
+                <el-col v-bind:span="8">
+                    <div class="el-form-item el-form-item--small">
+                        <label class="el-form-item__label" style="width: 120px;">&nbsp;</label>
+                        <div class="el-form-item__content">
+                            <div class="el-input-number el-input-number--small" style="width: 178px;text-align:center;">
+                                订单人数
+                            </div><!---->
+                        </div>
+                    </div>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <div class="el-form-item el-form-item--small">
+                        <label class="el-form-item__label" style="width: 120px;">&nbsp;</label>
+                        <div class="el-form-item__content">
+                            <div class="el-input-number el-input-number--small" style="width: 178px;text-align:center;">
+                                实际人数
+                            </div><!---->
+                        </div>
+                    </div>
+                </el-col>
+                <el-col v-bind:span="8">&nbsp;</el-col>
+            </el-row>
+            <el-row>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="AdultNum" label="成人"
+                                  v-bind:rules="el_FormFieldRules({Name: 'AdultNum', DisplayName: '成人', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['AdultNum']" v-bind:precision="0" style="width:178px;" placeholder="人" />人
+                        @*<el-input v-model="curr_rowdata['AdultNum']" type="number" style="width:178px;" v-on:keydown.native="keydownInt">
+                                <template slot="append">
+                                    人
+                                </template>
+                            </el-input>*@
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="AdultActualNum" label="成人"
+                                  v-bind:rules="el_FormFieldRules({Name: 'AdultActualNum', DisplayName: '成人', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['AdultActualNum']" v-bind:precision="0" style="width:178px;" />人
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="AdultPrice" label="售价"
+                                  v-bind:rules="el_FormFieldRules({Name: 'AdultPrice', DisplayName: '售价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['AdultPrice']" v-bind:precision="2" style="width:178px;" />元/人
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="BoyNum" label="大童"
+                                  v-bind:rules="el_FormFieldRules({Name: 'BoyNum', DisplayName: '大童', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['BoyNum']" style="width:178px;" />人
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="BoyActualNum" label="大童"
+                                  v-bind:rules="el_FormFieldRules({Name: 'BoyActualNum', DisplayName: '大童', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['BoyActualNum']" style="width:178px;" />人
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="BoyPrice" label="售价"
+                                  v-bind:rules="el_FormFieldRules({Name: 'BoyPrice', DisplayName: '售价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['BoyPrice']" v-bind:precision="2" style="width:178px;" />元/人
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="ChildNum" label="儿童"
+                                  v-bind:rules="el_FormFieldRules({Name: 'ChildNum', DisplayName: '儿童', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['ChildNum']" style="width:178px;" />人
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="ChildActualNum" label="儿童"
+                                  v-bind:rules="el_FormFieldRules({Name: 'ChildActualNum', DisplayName: '儿童', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['ChildActualNum']" style="width:178px;" />人
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="ChildPrice" label="售价"
+                                  v-bind:rules="el_FormFieldRules({Name: 'ChildPrice', DisplayName: '售价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['ChildPrice']" v-bind:precision="2" style="width:178px;" />元/人
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col v-bind:span="8">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="PriceRepair" label="补差价"
+                                  v-bind:rules="el_FormFieldRules({Name: 'PriceRepair', DisplayName: '补差价', Required: false, Editable: true, MinLength: 0, MaxLength: 0})">
+                        <el-input-number v-model="curr_rowdata['PriceRepair']" v-bind:precision="2" style="width:178px;" />元
+                    </el-form-item>
+                </el-col>
+                <el-col v-bind:span="16">
+                    <el-form-item v-bind:label-width="formLabelWidth" prop="PriceRepairRemark" label="补差备注"
+                                  v-bind:rules="el_FormFieldRules({Name: 'PriceRepairRemark', DisplayName: '补差备注', Required: false, Editable: true, MinLength: 0, MaxLength: 500})">
+                        <el-input v-model="curr_rowdata['PriceRepairRemark']" type="textarea" v-bind:clearable="true" style="width:100%;" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-form-item v-bind:label-width="formLabelWidth" prop="TotalRemark" label="合计"
+                              v-bind:rules="el_FormFieldRules({Name: 'TotalRemark', DisplayName: '合计', Required: false, Editable: true, MinLength: 0, MaxLength: 500})">
+                    <el-input v-model="TotalRemark" type="textarea" v-bind:clearable="true" style="width:300px;" />
+                </el-form-item>
+            </el-row>
+            <el-tabs v-model="TabActiveName" ref="el_Tab" type="border-card" v-on:tab-click="TabClick">
+                <el-tab-pane label="团队联系人" name="OrderCustomer">
+                    <ordercustomer ref="OrderCustomer"
+                                   v-if="OrderCustomer.dlgVisible"
+                                   v-bind:orderid="curr_rowdata.Id"
+                                   v-bind:tb_ordcustomer_data="OrderCustomer.data"
+                                   v-on:dlgok_func="dlgOK_Func"
+                                   v-bind:user_roles="UserRoles"></ordercustomer>
+                    <!--keep-alive 保持上次渲染时的状态
+                    include: 字符串或正则表达式。只有匹配的组件会被缓存。
+                    exclude: 字符串或正则表达式。任何匹配的组件都不会被缓存。-->
+                </el-tab-pane>
+                <el-tab-pane label="预算成本" name="CostMoney">
+                    <costmoney ref="CostMoney"
+                               v-if="CostMoney.dlgVisible"
+                               v-bind:orderid="curr_rowdata.Id"
+                               v-bind:tb_costmoney_data="CostMoney.data"
+                               v-bind:financemoney_data="FinanceMoney.data"
+                               v-bind:actualmoney_data="ActualMoney.data"
+                               v-bind:user_roles="UserRoles"></costmoney>
+                </el-tab-pane>
+                <el-tab-pane label="实际成本" name="ActualMoney">
+                    <actualmoney ref="ActualMoney"
+                                 v-if="ActualMoney.dlgVisible"
+                                 v-bind:orderid="curr_rowdata.Id"
+                                 v-bind:tb_actualmoney_data="ActualMoney.data"
+                                 v-bind:user_roles="UserRoles"></actualmoney>
+
+                </el-tab-pane>
+                <el-tab-pane label="财务请款" name="FinanceMoney">
+                    <financemoney ref="FinanceMoney"
+                                  v-if="FinanceMoney.dlgVisible"
+                                  v-bind:orderid="curr_rowdata.Id"
+                                  v-bind:costmoney_data="CostMoney.data"
+                                  v-bind:tb_financemoney_data="FinanceMoney.data"
+                                  v-bind:user_roles="UserRoles"></financemoney>
+                </el-tab-pane>
+            </el-tabs><!--团队联系人/预算成本/实际成本/财务请款-->
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit" plain>确 定</el-button>
+            <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="centerDialogVisible = false" plain>取 消</el-button>
+        </span>
+    </el-dialog>
+</div>
+<style>
+    .el-autocomplete-suggestion__list li {
+        line-height: normal;
+        padding: 3px;
+    }
+    /*autocomplete-li样式*/
+</style>
+@section Scripts {
+    <!--
+        import是异步加载的，<script>-type 必须是modual
+        import commonFiltes from "/Scripts/Vue/VueFilters.js
+
+        已通过requireJs 异步加载 Vue-ElementUI+Vue自定义扩展
+
+        dialogDrag:el-dialog拖动全屏扩展
+        formatter:字段格式化Vue.$formmatter
+        validtors:el-input 自定义验证Vue.$Validtors
+        VueFilters:vue全局filter v-bind:id="rawId | formatId" |前面字段后面过滤器 注：v-bind有效，v-Model 无效
+    -->
+    <script type="text/javascript">
+        const Edit = @Html.IsAuthorize("Edit").ToString().ToLower(),//编辑权限
+            Create = @Html.IsAuthorize("Create").ToString().ToLower(), //新增权限
+            Delete = @Html.IsAuthorize("Delete").ToString().ToLower(),//删除权限
+            Import = @Html.IsAuthorize("Import").ToString().ToLower(),//导入权限
+            Export = @Html.IsAuthorize("Export").ToString().ToLower();//导出权限
+        //自定义列数据
+        var CustomerFields = {
+            //"Currency":{
+            //    DisplayName: "授权币制",//显示名称
+            //    Editable: true, //可编辑
+            //    ForeignKeyGetListUrl: '/PARA_CURRs/GetPagerPARA_CURR_FromCache', //获取外键数据Url
+            //    FormOrder: 0, //Form排序
+            //    FormShow: true, //Form中展示
+            //    IsForeignKey: true, //外键
+            //    IsKey: false, //主键
+            //    ListOrder: 0, //列表排序
+            //    ListShow: true, //列表展示
+            //    MaxLength: 50, //最大长度
+            //    MinLength: 0, //最小长度
+            //    Name: "Currency", //名称
+            //    //Type为number时，可设置小数位
+            //    Required: false, //必填
+            //    SearchOrder: 0, //搜索排序
+            //    SearchShow: true, //搜索中展示
+            //    Sortable: true, //是否可排序
+            //    Type: "string", //"datetime/number/string/boolean";//类型
+            //    Width_List: "120", //列表-列宽度 <=0 默认*，>0 此宽度为准
+            //    Width_input: "178", //Form-input宽度 <=0 默认*，>0 此宽度为准
+            //    inputType: "text", //"password/datetime/text";//form中的input类型
+            //}
+        };
+        var BaseArrField = @Html.Raw(Html.RenderVue_ModelJson());
+        //设置自定义列
+        Object.keys(CustomerFields).forEach(function(item,index){
+            let OField= BaseArrField.ArrField.filter(function(val){
+                return val.Name == item;
+            });
+            if(OField.length>0){
+                OField = OField[0];
+                let CusField = CustomerFields[item];
+                Object.assign(OField,CusField);
+            }
+        });
+        if(BaseArrField.IsListOrder){
+            var ArrField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.ListOrder==b.ListOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.ListOrder-b.ListOrder;
+            });
+        }else
+            var ArrField =BaseArrField.ArrField;
+        if(BaseArrField.IsSearchOrder){
+            var ArrSearchField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.SearchOrder==b.SearchOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.SearchOrder-b.SearchOrder;
+            });
+        }else
+            var ArrSearchField =BaseArrField.ArrField;
+        if(BaseArrField.IsFormOrder){
+            var ArrFormField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.FormOrder==b.FormOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.FormOrder-b.FormOrder;
+            });
+        }else
+            var ArrFormField =BaseArrField.ArrField;
+        /*
+        自定义列数据 table-searchForm-editForm 通过此配置渲染；说明：
+        Name //名称
+        DisplayName //显示名称
+        Editable //可编辑
+        FormShow //Form中展示
+
+        Sortable //是否可排序
+        Width_List //列表-列宽度 <=0 默认*，>0 此宽度为准
+        Width_input //Form-input宽度 <=0 默认*，>0 此宽度为准
+        Type  //"datetime/number/string/boolean";//类型
+        Precision //Type为number时，可设置小数位
+        inputType  //"password/datetime/text";//form中的input类型
+        Required //必填
+        IsKey //主键
+        MaxLength //最大长度
+        MinLength //最小长度
+        SearchShow //搜索中展示
+        ListShow //列表展示
+        ListOrder //列表排序
+        SearchOrder //搜索排序
+        FormOrder //Form排序
+        IsForeignKey //外键
+        ForeignKeyGetListUrl //获取外键数据Url
+        */
+
+        //requireJs 按需加载 js
+        require(['vue', '_vue_resource','ELEMENT','IndexBaseMixin','LazyLoadingComponent','Convert_Pinyin'],function(Vue,Vue_Resource,ELEMENT,myMixin,LazyLoadingComponent,Convert_Pinyin){
+            Vue.use(ELEMENT);
+            Vue.use(Vue_Resource);
+            //
+            var vue_tb = new Vue({
+                el: '#app',
+                components: {
+                    'ordercustomer': function(resolve,reject){return LazyLoadingComponent('/Views/Orders/OrderCustomer.js')},//异步加载 团队联系人信息 注册到局部
+                    'costmoney':function(resolve,reject){ return LazyLoadingComponent('/Views/Orders/CostMoney.js')},//异步加载 预算成本
+                    'actualmoney':function(resolve,reject){ return LazyLoadingComponent('/Views/Orders/ActualMoney.js')},//异步加载 实际成本
+                    'financemoney':function(resolve,reject){ return LazyLoadingComponent('/Views/Orders/FinanceMoney.js')},//异步加载 预算成本
+                },//注册局部子组件
+                directives:{},// 注册局部指令
+                filters: {//v-bind可以使用，v-model 无效
+                    filterInt:function(value){
+                        try{
+                            var i_val = parseInt(value);
+                            if(isNaN(i_val))
+                                return 0;
+                            else
+                                return i_val;
+                        }catch(e){
+                            return value;
+                        }
+                    },
+                },//数据过滤器
+                mixins: [myMixin],//混入相当于extend
+                computed: {//计算属性
+                    FileAttach:function(){
+                        return function(field,lable){
+                            var t_curr_rowdata =this.curr_rowdata;
+                            if(ObjectIsEmpty(t_curr_rowdata) || JSON.stringify(t_curr_rowdata)=='{}')
+                                return [];
+                            if(ObjectIsEmpty(t_curr_rowdata[field]))
+                            {
+                                return [];
+                            }else{
+                                return [{name:lable,url:'/FileUpload/GetImgMinByte?FileGuid='+t_curr_rowdata[field],response:{FileGuid:t_curr_rowdata[field]}}];
+                            }
+                        }
+                    },
+                    TotalRemark:{
+                        get: function () {
+                            var data = this.curr_rowdata;
+                            var AdultPrice = parseFloat(data.AdultPrice),AdultPrice=isNaN(AdultPrice)?0:AdultPrice;
+                            var AdultActualNum = parseInt(data.AdultActualNum),AdultActualNum=isNaN(AdultActualNum)?0:AdultActualNum;
+                            var BoyPrice = parseFloat(data.BoyPrice),BoyPrice=isNaN(BoyPrice)?0:BoyPrice;
+                            var BoyActualNum = parseInt(data.BoyActualNum),BoyActualNum=isNaN(BoyActualNum)?0:BoyActualNum;
+                            var ChildPrice = parseFloat(data.ChildPrice),ChildPrice=isNaN(ChildPrice)?0:ChildPrice;
+                            var ChildActualNum = parseInt(data.ChildActualNum),ChildActualNum=isNaN(ChildActualNum)?0:ChildActualNum;
+                            var PriceRepair = parseFloat(data.PriceRepair),PriceRepair=isNaN(PriceRepair)?0:PriceRepair;
+                            //成人单价*数量+大童单价*数量+儿童单价*数量+补差价 = 合计
+                            var CalcStr = AdultPrice.toFixed(2)+'*'+AdultActualNum+'+'+
+                                BoyPrice.toFixed(2)+'*'+BoyActualNum+'+'+
+                                ChildPrice.toFixed(2)+'*'+ChildActualNum+'+'+
+                                PriceRepair.toFixed(2);
+                            return CalcStr+'='+eval(CalcStr);
+                        },
+                        // setter
+                        set: function (newValue) {
+                            this.curr_rowdata.TotalRemark = newValue;
+                        }
+                    }
+                },//计算属性
+                watch:{
+                    "curr_rowdata.TravlePersonNum": {
+                        handler :function(newValue, oldValue)
+                        {
+                            var UnitPrice = parseFloat(this.curr_rowdata.UnitPrice);
+                            if(!isNaN(UnitPrice))
+                                this.curr_rowdata.TotalPrice = UnitPrice*newValue;
+                            //console.log('watch-TravlePersonNum',this.curr_rowdata.TotalPrice);
+                        }
+                    },
+                    "curr_rowdata.UnitPrice": {
+                        handler :function(newValue, oldValue)
+                        {
+                            var TravlePersonNum = parseFloat(this.curr_rowdata.TravlePersonNum);
+                            if(!isNaN(TravlePersonNum))
+                                this.curr_rowdata.TotalPrice = TravlePersonNum*newValue;
+                            //console.log('watch-TravlePersonNum',this.curr_rowdata.TotalPrice);
+                        }
+                    },
+                    "CostMoney.data":{
+                        handler: function (newval, oldval)
+                        {
+                            console.log("CostMoney.data");
+                            let Num=0,TotalAmount=0;
+                            newval.forEach(function(item){
+                                if(!ObjectIsEmpty(item.Num))
+                                    Num +=item.Num;
+                                if(!ObjectIsEmpty(item.TotalAmount))
+                                    TotalAmount+=item.TotalAmount;
+                            });
+                            this.$set(this.curr_rowdata,'Num', Num);
+                            this.$set(this.curr_rowdata,'TotalAmount', TotalAmount);
+                            this.$set(this.curr_rowdata,'UnitPrice', Num<=0?0:TotalAmount/Num);
+                        },
+                        immediate: true,
+                        deep:true,
+                    }
+                },//监听属性变化
+                created: function () {
+                },//数据初始化，还未渲染dom,在此处设置的数据 不受响应
+                data:function(){//混入的data 会与此data 合并，相同名字会被此data覆盖
+                    return {
+                        tbUrl: {
+                            controller: '/Orders/',
+                            getdata: 'GetData',//获取数据 action
+                            batchSave: 'SaveData',//批量操作 action
+                            exportExcel: 'ExportExcel',//导出Excel action
+                            importExcel: '/FileUpload/Upload?modelType=AdvisoryOrder',//导入Excel action
+                            AddFileAttach:'/FileUpload/AddAttach',//新增附件 返回：FileGuid，FileAttachID
+                            DelFileAttach:'/FileUpload/DeleteAttach',//删除附件 参数：FileGuid，FileAttachID
+                            GetOrderCustomer:'GetOrderCustomerById',//获取订单客户
+                            GetCostMoney:'GetCostMoneyById',//获取预算成本
+                            GetActualMoney:'GetActualMoneyById',//获取实际成本
+                            GetFinanceMoney:'GetFinanceMoneyById',//获取财务请款
+                        },
+                        dlgfullscreen:true,//弹出框全屏
+                        fileList:{},//文件上传列表
+                        TabActiveName:'',//选中tab名称
+                        LastOrderId:null,//最后一次修改的订单Id
+                        OrderCustomer:{
+                            data:[],//实时数据
+                            deltRows:[],//删除的数据
+                            dlgVisible:false,//弹出状态
+                        },//订单客户 
+                        CostMoney:{
+                            data:[],//实时数据
+                            deltRows:[],//删除的数据
+                            dlgVisible:false,//弹出状态
+                        },//预算成本
+                        ActualMoney:{
+                            data:[],//实时数据
+                            deltRows:[],//删除的数据
+                            dlgVisible:false,//弹出状态
+                        },//实际成本
+                        FinanceMoney:{
+                            data:[],//实时数据
+                            deltRows:[],//删除的数据
+                            dlgVisible:false,//弹出状态
+                        },//财务请款
+                    }
+                },
+                methods:{
+                    handleAddRow:function(e){
+                        //console.log('handleAddRow',e);
+                        this.centerDialogVisible = true;
+                        this.curr_rowdata = { Id: --this.AddNum,Status:1,AuditStatus:1 };
+                        this.LastOrderId = this.curr_rowdata.Id;
+                        this.dlgLoading = false;
+                        this.OrderCustomer.data.splice(0,this.OrderCustomer.data.length);//订单客户
+                        this.CostMoney.data.splice(0,this.CostMoney.data.length);//预算成本
+                        this.ActualMoney.data.splice(0,this.ActualMoney.data.length);//实际成本
+                        this.FinanceMoney.data.splice(0,this.FinanceMoney.data.length);//财务请款
+                    },//增加行数据 弹出框添加
+                    handledelSeltRow:function(e){
+                        //console.log('handledelSeltRow', e, this.selctRows);
+                        if (this.selctRows.length <= 0) {
+                            this.$message({
+                                duration:0,//不自动关闭
+                                showClose: true,
+                                message: '错误:未选择需要删除的数据',
+                                type: 'error'
+                            });
+                        } else {
+                            var batchSaveData = {};//批量操作数据
+                            var thisVue = this;
+                            batchSaveData.deleted = thisVue.selctRows.map(function(item){return {Order:item}});
+                            var url = thisVue.tbUrl.controller + thisVue.tbUrl.batchSave;//批量保存url
+                            thisVue.tbLoading = true;//加载中
+                            //提交数据
+                            thisVue.$http.post(url, batchSaveData, {
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function (success){//成功
+                                thisVue.tbLoading = false;//加载完毕
+                                try {
+                                    var retData = success.body;
+                                    if (retData.Success) {
+                                        thisVue.tb_GetData();//删除数据后，重新获取数据
+                                    } else {
+                                        thisVue.$message({
+                                            duration:0,//不自动关闭
+                                            showClose: true,
+                                            message: '删除错误:' + retData.ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }
+                                } catch (e) {
+                                    thisVue.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '删除数据处理，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                            }, function (error){//错误
+                                thisVue.tbLoading = false;//加载完毕
+                                thisVue.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '删除数据，出现错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                        //rows.splice(index, 1);
+                    },//删除选中行数据
+                    handledblclick:function(row){
+                        this.centerDialogVisible = true;
+                        this.curr_rowdata_Original = row;//原始行数据
+                        this.curr_rowdata = Object.assign({}, row);
+                        this.LastOrderId = this.curr_rowdata.Id;
+                        let curr_rowdata = this.curr_rowdata;
+                        this.OrderId = row.Id;
+                        let ArrEnumField = this.ArrEnumField;//所有select/枚举
+                        let thisVue = this;
+                        Object.keys(this.curr_rowdata).forEach(function(item,index){
+                            let val = curr_rowdata[item]+'';
+                            if(!ObjectIsEmpty(val)){
+                                if(val.indexOf('/Date(')>=0){
+                                    var d = new moment(val);
+                                    if (d.isValid())
+                                        curr_rowdata[item] = d.toDate();
+                                }
+                                var ArrFilter = ArrEnumField.filter(function(field){return field.Name === item;});
+                                if(ArrFilter.length>0){
+                                    let OFilter = ArrFilter[0];
+                                    let url = OFilter.ForeignKeyGetListUrl;//'/MenuItems/GetData';
+                                    if(!ObjectIsEmpty(url) && url.indexOf('GetPagerEnum')<0)
+                                        thisVue.el_remoteMethod(val,OFilter,'form',false);
+                                }
+                            }
+                        });
+                        //订单客户-预算成本-实际成本-财务请款
+                        this.GetCusCostActualFinance();
+                    },//双击行
+                    GetCusCostActualFinance:function(){
+                        let thisVue = this;
+                        let curr_rowdata = this.curr_rowdata;
+                        let OrderId = this.curr_rowdata.Id;
+                        const HttpGetOCAFFunc = function(OCAFData,Tital,url){//获取 订单客户-预算成本-实际成本-财务请款 数据
+                            var c_data = OCAFData.data;
+                            var any = !ObjectIsEmpty(OCAFData.IsGetData);
+                            if(any){
+                                if(!c_data.some(function(item){return item.OrderId == OrderId}))
+                                    any = false;//没有订单对应数据，强制书信数据
+                                var Now = new moment();
+                                var IsGetData = new moment(OCAFData.IsGetData);
+                                let maxDiff = 60;
+                                var diff_min =Now.diff(IsGetData, 'seconds');
+                                if(diff_min>maxDiff)
+                                    any = false;//10分钟后，继续获取新的数据
+                            }
+                            if(OrderId<=0 || any)
+                                return false;
+                            let paramData = {
+                                OrderId:OrderId
+                            };
+                            let SuccessFunc = function (success){//成功
+                                var res = success.body;
+                                try {
+                                    if (res.Success) {
+                                        var LastAddNum =0;
+                                        let Empty = c_data.length<=0;
+                                        if(!c_data.some(function(item){return item.OrderId == OrderId})){
+                                            c_data.splice(0,c_data.length);
+                                            Empty = true;
+                                        }
+                                        res.rows.forEach(function(item,i){
+                                            var Hasitem=false;
+                                            if(!Empty){
+                                                c_data.forEach(function(data){
+                                                    if(data.Id == item.Id)
+                                                    {
+                                                        Hasitem = true;
+                                                    }
+                                                });
+                                            }
+                                            if(!Hasitem)
+                                                c_data.push(item);
+                                        });
+                                        OCAFData.IsGetData = new Date();
+                                    }else{
+                                        var ErrMsg = res.ErrMsg;
+                                        thisVue.$message({
+                                            duration: 0,//不自动关闭
+                                            showClose: true,
+                                            message: ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }
+                                } catch (e) {
+                                    thisVue.$message({
+                                        duration: 0,//不自动关闭
+                                        showClose: true,
+                                        message: '获取'+Tital+'数据，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                            };//成功
+                            let ErrorFunc = function (error){//错误
+                                thisVue.$message({
+                                    duration: 0,//不自动关闭
+                                    showClose: true,
+                                    message: '获取'+Tital+'数据，网络错误',
+                                    type: 'error'
+                                });
+                            };//成功
+                            thisVue.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(SuccessFunc, ErrorFunc);
+                        };//获取 订单客户-预算成本-实际成本-财务请款 数据
+                        var GetOrderCustomer = function(){
+                            let url = thisVue.tbUrl.controller+thisVue.tbUrl.GetOrderCustomer;
+                            let Tital = "订单客户";
+                            HttpGetOCAFFunc(thisVue.OrderCustomer,Tital,url);
+                        }(),
+                        GetCostMoney = function(){
+                            let url = thisVue.tbUrl.controller+thisVue.tbUrl.GetCostMoney;
+                            let Tital = "预算成本";
+                            var c_data = thisVue.CostMoney.data;
+                            HttpGetOCAFFunc(thisVue.CostMoney,Tital,url);
+                        }(),
+                        GetActualMoney = function(){
+                            let url = thisVue.tbUrl.controller+thisVue.tbUrl.GetActualMoney;
+                            let Tital = "实际成本";
+                            HttpGetOCAFFunc(thisVue.ActualMoney,Tital,url);
+                        }(),
+                        GetFinanceMoney = function(){
+                            let url = thisVue.tbUrl.controller+thisVue.tbUrl.GetFinanceMoney;
+                            let Tital = "财务请款";
+                            HttpGetOCAFFunc(thisVue.FinanceMoney,Tital,url);
+                        }();
+                    },//获取订单客户-预算成本-实际成本-财务请款
+                    dlgOpen:function(){
+                        var thisVue = this;
+                        setTimeout(function(){
+                            if(ObjectIsEmpty(thisVue.TabActiveName)||thisVue.TabActiveName=='0'){
+                                thisVue.TabActiveName ='OrderCustomer';
+                                thisVue.OrderCustomer.dlgVisible = true;//设置异步组件显示
+                            }
+                        },1000);
+                    },//弹出框打开
+                    dlgSubmit:function(e){
+                        let thisVue = this;
+                        thisVue.curr_rowdata.TotalRemark = thisVue.TotalRemark;
+                        let MyForm = this.$refs['MyForm'];
+                        //MyForm.resetFields();//重置验证字段
+                        MyForm.clearValidate();//清除验证
+                        MyForm.validate(function(valid){
+                            if (valid) {
+                                thisVue.dlgLoading = true;//弹出框加载中
+                                var url = thisVue.tbUrl.controller + thisVue.tbUrl.batchSave;//批量保存url
+                                var OOCAFdeltRows ={
+                                    DelOrdCustomer:thisVue.OrderCustomer.deltRows,//团队联系人
+                                    DelCostMoney:thisVue.CostMoney.deltRows,//预算成本
+                                    DelActualMoney:thisVue.ActualMoney.deltRows,//实际成本
+                                    DelFinanceMoney:thisVue.FinanceMoney.deltRows,//财务请款
+                                };//需要删除的数据
+                                var batchSaveData = {//批量操作数据
+                                    inserted: [],
+                                    deleted: [],
+                                    updated: [],
+                                    OOCAFdeltRows:OOCAFdeltRows,//需要删除的数据
+                                };
+                                var data={
+                                    Order:thisVue.curr_rowdata,//订单
+                                    ArrOrderCustomer : thisVue.OrderCustomer.data,//团队联系人
+                                    ArrCostMoney: thisVue.CostMoney.data,//预算成本
+                                    ArrActualMoney : thisVue.ActualMoney.data,//实际成本
+                                    ArrFinanceMoney : thisVue.FinanceMoney.data,//财务请款
+                                }
+                                if (thisVue.curr_rowdata.Id <= 0) {
+                                    batchSaveData.inserted.push(data);
+                                } else {
+                                    batchSaveData.updated.push(data);
+                                }
+                                //提交数据
+                                thisVue.$http.post(url,batchSaveData, {
+                                    headers: {//指示为 ajax请求
+                                        "X-Requested-With": "XMLHttpRequest"
+                                    }
+                                }).then(function (success){//成功
+                                    thisVue.dlgLoading = false;//弹出框加载完毕
+                                    try {
+                                        var retData = success.body;
+                                        if (retData.Success) {
+                                            thisVue.centerDialogVisible = false;//显示/关闭弹出框
+                                            if (thisVue.curr_rowdata.Id <= 0){
+                                                if(thisVue.pagiNation.currentPage==1)
+                                                    thisVue.tb_GetData();
+                                                else
+                                                    thisVue.pageCurrentChange(1);//新增数据时，重新获取数据
+                                            }
+                                            else
+                                                $.extend(thisVue.curr_rowdata_Original, thisVue.curr_rowdata);
+                                            //清除缓存 明细数据
+                                            thisVue.OrderCustomer.data.IsGetData = null,thisVue.OrderCustomer.data.splice(0,thisVue.OrderCustomer.data.length);
+                                            thisVue.CostMoney.data.IsGetData = null,thisVue.CostMoney.data.splice(0,thisVue.CostMoney.data.length);
+                                            thisVue.ActualMoney.data.IsGetData = null,thisVue.ActualMoney.data.splice(0,thisVue.ActualMoney.data.length);
+                                            thisVue.FinanceMoney.data.IsGetData = null,thisVue.FinanceMoney.data.splice(0,thisVue.FinanceMoney.data.length);
+                                            thisVue.OrderCustomer.deltRows.IsGetData = null,thisVue.OrderCustomer.deltRows.splice(0,thisVue.OrderCustomer.deltRows.length);
+                                            thisVue.CostMoney.deltRows.IsGetData = null,thisVue.CostMoney.deltRows.splice(0,thisVue.CostMoney.deltRows.length);
+                                            thisVue.ActualMoney.deltRows.IsGetData = null,thisVue.ActualMoney.deltRows.splice(0,thisVue.ActualMoney.deltRows.length);
+                                            thisVue.FinanceMoney.deltRows.IsGetData = null,thisVue.FinanceMoney.deltRows.splice(0,thisVue.FinanceMoney.deltRows.length);
+                                        }else{
+                                            thisVue.$message({
+                                                duration:0,//不自动关闭
+                                                showClose: true,
+                                                message: '错误:' + retData.ErrMsg,
+                                                type: 'error'
+                                            });
+                                        }
+                                    } catch (e) {
+                                        thisVue.$message({
+                                            duration:0,//不自动关闭
+                                            showClose: true,
+                                            message: '提交数据处理，出现错误',
+                                            type: 'error'
+                                        });
+                                    }
+                                }, function (error){//错误
+                                    thisVue.dlgLoading = false;//弹出框加载完毕
+                                    thisVue.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '提交数据出现错误',
+                                        type: 'error'
+                                    });
+                                });
+                            } else {
+                                console.log('error submit!!');
+                                return false;
+                            }
+                        });
+                    },//弹出框提交数据
+                    //自定义方法会覆盖 混入的 methods
+                    handleRemove:function(field,file, fileList) {
+                        //console.log(file, fileList);
+                        if(file.response){
+                            let url = this.tbUrl.DelFileAttach;//'/FileUpload/DeleteAttach';
+                            let paramData = {FileGuid:file.response.FileGuid,FileAttachID:file.response.FileAttachID};
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function(success){//成功
+                                try{
+                                    var data = success.body;
+                                    var Success=true;
+                                    if(!ObjectIsEmpty(data.Success)){
+                                        Success = data.Success;
+                                    }else if(!ObjectIsEmpty(data.success)){
+                                        Success = data.success;
+                                    }
+                                    if(!Success){
+                                        var ErrMsg =data.ErrMsg;
+                                        if(ObjectIsEmpty(data.ErrMsg))
+                                            ErrMsg =data.errMsg;
+                                        if(ObjectIsEmpty(data.errMsg))
+                                            ErrMsg =data.errmsg;
+                                        if(ObjectIsEmpty(data.errmsg))
+                                            ErrMsg =data.err;
+                                        if(ObjectIsEmpty(data.err))
+                                            ErrMsg ='';
+                                        this.$message({
+                                            duration:0,//不自动关闭
+                                            showClose: true,
+                                            message: '删除附件，出现错误：'+ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }else{
+                                        this.curr_rowdata[field] = '';//清空值
+                                        this.$message({
+                                            showClose: true,
+                                            message: '删除附件，成功：',
+                                            type: 'success'
+                                        });
+                                    }
+                                } catch (e) {
+                                    this.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '删除附件，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                            },function(error){//错误
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '获取数据出现错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//删除附件
+                    handlePreview:function(file) {
+                        console.log('handlePreview',file);
+                        if(!ObjectIsEmpty(file.url))
+                        {
+                            var url = file.url;
+                            url = url.replace('/GetImgMinByte?','/GetFileByte?');
+                            window.open(url);
+                        }
+                    },//预览附件
+                    handleOnSuccess:function(field,res,file, fileList){
+                        this.$set(this.curr_rowdata,field,res.FileGuid);
+                        console.log('handleOnSuccess');
+                    },//附件上传成功
+                    dlgOK_Func:function(){
+                        console.log('dlgOK_Func');
+                    },//团队联系人弹出框-确定(新增/编辑)
+                    TabClick:function(tab, event){
+                        //console.log('TabClick',tab);
+                        this.TabActiveName = tab.name;
+                        var tabObjComponent = this[tab.name];
+                        tabObjComponent.dlgVisible = true;//设置异步组件显示
+                    },//tab点击事件
+                    keydownInt:function(e){
+                        //var input =$(e.target);
+                        //var startPos = input.selectionStart;
+                        //var endPos = input.selectionEnd;
+                        //console.log('keydownInt',e,input,startPos,endPos);
+                        //e.stopPropagation();//停止冒泡
+                        var value = e.target.value;
+                        var key = e.key;
+                        if(key=='.'){
+                            e.preventDefault();//阻止原生事件
+                            return false;
+                        }
+                    },//数字类型keydown
+                    keydownFloat:function(e,precision){
+                        //console.log('keydownFloat',e);
+                        //e.stopPropagation();//停止冒泡
+                        var value = e.target.value;
+                        var key = e.key;
+                        if(ObjectIsEmpty(precision)){
+                            if(key=='.'){
+                                e.preventDefault();//阻止原生事件
+                                return false;
+                            }
+                        }else{
+                            precision = parseInt(precision);
+                            if(isNaN(precision)){
+                                if(key=='.'){
+                                    e.preventDefault();//阻止原生事件
+                                    return false;
+                                }
+                            }else{
+                                var idx= value.indexOf('.');
+                                if(idx>0){
+                                    var pointStr = value.slice(idx);
+                                    if(pointStr.length>=precision+1) {
+                                        e.preventDefault();//阻止原生事件
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    },//浮点数字类型keydown
+                    AdvsyOrdNoQSearch:function (queryString, cb)
+                    {
+                        console.log('AdvsyOrdNoQSearch', queryString);
+                        if (ObjectIsEmpty(queryString))
+                            cb([]);
+                        else {
+                            let url = '/AdvisoryOrders/GetData';
+                            let paramData = {
+                                filterRules:JSON.stringify([{
+                                    field: 'OrderNo',
+                                    op:"equles",
+                                    value:queryString
+                                }])
+                            };
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function (success)
+                            {//成功
+                                var res = success.body.rows;
+                                try {
+                                    if (res != null && res !== 'undefined' && ObjectIsArray(res)) {
+                                        cb(res);
+                                    }
+                                } catch (e) {
+                                    cb([]);
+                                    this.$message({
+                                        duration: 0,//不自动关闭
+                                        showClose: true,
+                                        message: '查询咨询单数据，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                            }, function (error)
+                            {//错误
+                                this.$message({
+                                    duration: 0,//不自动关闭
+                                    showClose: true,
+                                    message: '查询咨询单数据，网络错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//咨询单输入单号回调
+                    AdvsyOrdNoSelt: function (data)
+                    {
+                        let curr_rowdata = this.curr_rowdata;
+                        curr_rowdata.AdvisoryOrderId = data.Id;
+                        if (ObjectIsEmpty(curr_rowdata.TravleType))
+                            this.$set(curr_rowdata,'TravleType',data.TravleType);//旅游订单类型
+                        if (ObjectIsEmpty(curr_rowdata.RouteNo))
+                            this.$set(curr_rowdata,'RouteNo',data.RouteNo);//线路编号
+                        if (ObjectIsEmpty(curr_rowdata.RouteName))
+                            this.$set(curr_rowdata,'RouteName',data.RouteName);//线路名称
+                        if (ObjectIsEmpty(curr_rowdata.RoutePhoto))
+                            this.$set(curr_rowdata,'RoutePhoto',data.RoutePhoto);//线路图
+                        if (ObjectIsEmpty(curr_rowdata.CustomerRequire))
+                            this.$set(curr_rowdata,'CustomerRequire',data.CustomerRequire);//客户述求
+                        //if (ObjectIsEmpty(curr_rowdata.Birthday))
+                        //    this.$set(curr_rowdata,'Birthday',this.$formatter.dateformatter(data, null, data.Birthday, 0));//出生年月
+                        var OrderId = this.curr_rowdata.Id;
+                        if(OrderId<=0){
+                            let url = '/AdvisoryOrders/GetSplyAskPrcById';
+                            let paramData = {
+                                Id:data.Id,
+                                Target:true
+                            };
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function (success)
+                            {//成功
+                                var res = success.body;
+                                try {
+                                    if (res.Success) {
+                                        var c_data = this.CostMoney.data;
+                                        var LastAddNum =0;
+                                        res.rows.forEach(function(item,i){
+                                            item.OrderId = OrderId;
+                                            LastAddNum = -(i+1);
+                                            item.Id = LastAddNum;
+                                            c_data.push(item);
+                                        });
+                                        c_data.addNum = LastAddNum;//设置新增Id序号
+                                        console.log(c_data);
+                                    }else{
+                                        var ErrMsg = res.ErrMsg;
+                                        this.$message({
+                                            duration: 0,//不自动关闭
+                                            showClose: true,
+                                            message: ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }
+                                } catch (e) {
+                                    this.$message({
+                                        duration: 0,//不自动关闭
+                                        showClose: true,
+                                        message: '咨询单预算成本数据，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                            }, function (error)
+                            {//错误
+                                this.$message({
+                                    duration: 0,//不自动关闭
+                                    showClose: true,
+                                    message: '咨询单预算成本数据，网络错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//选择 客户
+                    Convert2Pinyin:function(val){
+                        var PinyinStr = "";
+                        if(!ObjectIsEmpty(val))
+                            PinyinStr = Convert_Pinyin.getFullChars(val);
+                        return PinyinStr;
+                    },//中文转换拼英
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,171 @@
+﻿@model AirOut.Web.Models.CusBusInfo
+@{
+    ViewBag.Title = "客商管理 | 创建";
+}
+<!--回车下一个-->
+<script src="~/Scripts/jsext.js?date=2019013001"></script>
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+    $(document).ready(function () {
+        initJcdt(); //初始化基础数据
+        initPage();//初始化页面
+    });
+    //初始化基础数据
+    function initJcdt() {
+        Data_Unit = @Html.Raw(ViewData["Data_Unit"] ?? "[]");
+        Data_Currency = @Html.Raw(ViewData["Data_Currency"] ?? "[]");
+        Data_Country = @Html.Raw(ViewData["Data_Country"] ?? "[]");
+    }
+    //初始化页面
+    function initPage() {
+        //////账册号
+        ////$("#BOOKSNO").combogrid({
+        ////    panelWidth: comgridWidth,
+        ////    //panelHeight: 'auto',
+        ////    fitColumns:true,
+        ////    mode: 'remote',
+        ////    idField: 'EMS_NO',
+        ////    valueField: 'EMS_NO',
+        ////    textField: 'EMS_NO',
+        ////    url1: '/EMS_HEADs/GetEMS_NOS',
+        ////    columns: [[
+        ////        { field: 'EMS_NO', title: '账册号', width: comfiledWidth },
+        ////        { field: 'EMS_TYPE', title: '账册类型', width: comfiledWidth }
+        ////    ]]
+        ////});
+
+    }
+    //加载成功
+    function onLoadSuccess(rowdata) {
+        //行号自适应宽度
+        $(this).datagrid("fixRownumber");
+    }
+    //自适应页面大小
+    function MyNavResize() {
+        //var opts = $("#navbar-minimalize").NavResize('getOptions');
+        //opts.Auto = false;
+        //opts.OnNavResizefunc = function () {
+        //
+        //};
+    }
+    //异步获取 提取 借用账册 强行提取 选择框
+    var ArrIsLoadWin ={
+        //IsLoadMyWin1 : false,//提取
+    };
+    //AsyncGetMyWin(url,IsLoadMyWin,InitMyWinFucName,Async_Load) 扩展在jsext.js
+    //导入
+    function importexcel() {
+        //异步获取 提取 借用账册 强行提取 选择框
+        var retTF = AsyncGetMyWin('/ORDERS_SECLINE_HEADS/Get_ImportWinDialog','IsLoadImportWin',"InitImportWin()");
+        if(!retTF)
+            return;
+        var OrderId = getQueryString("id");
+        $('#file_upload_pmByhand').data('uploadifive').settings.formData = { 'ID': OrderId, 'modelType': 'ORDERS_SECLINE_PRODUCT' };
+        $('#importwindow_pmByhand').window('open');
+        $('#importwindow_pmByhand').window('center');
+    }
+    //导出
+    function exportexcel() {
+        //$.messager.progress({ title: '正在执行导出！' });
+        //var inserted_product = $('#ProductNameMerge').datagrid('getRows');
+        //if (inserted_product.length > 0) {
+        //    var postdata = { orders_secline_productStr: JSON.stringify(inserted_product) };
+        //    var url = '/ORDERS_SECLINE_HEADs/ExportExcelProduct';
+        //    $.DownLoadProgress({
+        //        url: url,         //下载文件的url
+        //        method: 'Post',   //链接打开方式
+        //        data: postdata,         //要发送的数据
+        //        downLoadInfo: '下载文件', //下载界面文字
+        //        closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+        //        callbackFuc: function () {
+        //            $.messager.progress('close');
+        //        }
+        //    });
+        //} else {
+        //    $.messager.alert('提示！', '没有可以导出的数据。');
+        //}
+    }
+</script>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">客商管理</a>
+            </li>
+            <li class="active">
+                <strong>创建 客商信息</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="div_CusBusInfos" class="easyui-panel" title="客商信息" style="padding-top:5px; padding-bottom:5px; width:auto; "
+                     data-options="collapsible:true">
+                    @*@Html.AntiForgeryToken()*@
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.Partial("EditForm")
+                    <!--表单唯一值，防止重复提交-->
+                    @Html.Hidden("ActionGuidName", ViewData["ActionGuidName"] ?? "")
+                    @Html.Hidden("ActionGuid", ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <center>
+                        <button class="btn btn-white" type="reset">取消</button>
+                        <button class="btn btn-primary" type="submit">保存</button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!--用于后端 加载dom并且渲染成EasyUI样式-->
+<div id="EasyUIDom" style="height:35px; clear:both; border:0 solid;"></div>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    <script type="text/javascript">
+        $("form").submit(function(){
+            try{
+                //$("form").removeData("validator");
+                //$("form").removeData("unobtrusiveValidation");
+                //$.validator.unobtrusive.parse("form");
+                //var ss = $("form").valid();
+                var xx = $($('form')[0]).form('enableValidation').form('validate');
+                if (!xx)
+                    return false;
+            }catch(e){
+                console.log(e);
+                return false;
+            }
+        });
+        $("button[type='reset']").click(function() {
+            $(location).attr('href', "/CusBusInfos/Index");
+        });
+        //$("button[type='submit']").click(function() {
+        //    if($('form').form('enableValidation').form('validate')) {
+        //        $('form').submit();
+        //    }else{
+        //        return false;
+        //    }
+        //});
+
+    </script>
+}

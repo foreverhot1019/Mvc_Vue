@@ -1,0 +1,238 @@
+﻿@model AirOut.Web.Models.OPS_M_Order
+@{
+    ViewBag.Title = "承揽接单 | 新增";
+    var mcount = 0;
+    var Num = 1;
+    var AirTime = ViewBag.AirTime;
+}
+<!--回车下一个-->
+<script src="~/Scripts/jsext.js?v=2019031501"></script>
+<script src="~/Scripts/opsmhw.js?v=2019032901"></script>
+<script src="~/Scripts/opshorder.js?v=2019031501"></script>
+<script src="~/Scripts/opswh.js?v=2019031501"></script>
+<script async defer src="~/Scripts/DownLoadProgress.js"></script>
+
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+    $(document).ready(function () {
+        initJcdt(); //初始化基础数据
+        initPage();//初始化页面
+    });
+    //初始化基础数据
+    function initJcdt() {
+        Data_Unit = @Html.Raw(ViewData["Data_Unit"] ?? "[]");
+        Data_Currency = @Html.Raw(ViewData["Data_Currency"] ?? "[]");
+        Data_Country = @Html.Raw(ViewData["Data_Country"] ?? "[]");
+    }
+	//初始化页面
+    function initPage() {
+		//////账册号
+        ////$("#BOOKSNO").combogrid({
+        ////    panelWidth: comgridWidth,
+        ////    //panelHeight: 'auto',
+        ////    fitColumns:true,
+        ////    mode: 'remote',
+        ////    idField: 'EMS_NO',
+        ////    valueField: 'EMS_NO',
+        ////    textField: 'EMS_NO',
+        ////    url: '/EMS_HEADs/GetEMS_NOS',
+        ////    columns: [[
+        ////        { field: 'EMS_NO', title: '账册号', width: comfiledWidth },
+        ////        { field: 'EMS_TYPE', title: '账册类型', width: comfiledWidth }
+        ////    ]]
+        ////});
+    }
+
+    //var FormNAMEData;//用于获取所有下拉列表框的值
+    var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");//用于获取所有下拉列表框的值
+    //初始加载为了，主单、分单、委托相同的字段栏位，一个编辑，同时改变
+    function initBindingPage(){
+    }
+	//加载成功
+    function onLoadSuccess(rowdata) {
+        //行号自适应宽度
+        $(this).datagrid("fixRownumber");
+    }
+	//自适应页面大小
+    function MyNavResize() {
+        //var opts = $("#navbar-minimalize").NavResize('getOptions');
+        //opts.Auto = false;
+        //opts.OnNavResizefunc = function () {
+        //
+        //};
+    }
+	//异步获取 提取 借用账册 强行提取 选择框
+    var ArrIsLoadWin ={
+        //IsLoadMyWin1 : false,//提取
+    };
+    //AsyncGetMyWin(url,IsLoadMyWin,InitMyWinFucName,Async_Load) jsext.js
+	//导入
+    function importexcel() {
+        //异步获取 提取 借用账册 强行提取 选择框
+        var retTF = AsyncGetMyWin('/ORDERS_SECLINE_HEADS/Get_ImportWinDialog','IsLoadImportWin',"InitImportWin()");
+        if(!retTF)
+            return;
+        var OrderId = getQueryString("id");
+        $('#file_upload_pmByhand').data('uploadifive').settings.formData = { 'ID': OrderId, 'modelType': 'ORDERS_SECLINE_PRODUCT' };
+        $('#importwindow_pmByhand').window('open');
+        $('#importwindow_pmByhand').window('center');
+    }
+	//导出
+    function exportexcel() {
+    }
+</script>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">空运出口</a>
+            </li>
+            <li class="active">
+                <strong>创建 承揽接单</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="div_OPS_M_Orders" class="easyui-panel" title="" border="false" style="padding-top:5px; padding-bottom:5px; width:auto; "
+                     data-options="collapsible:true">
+                    <div align="center" class="col-lg-12">
+                        <input type="button" accesskey="e" value="返回（E）" onclick="window.location.href='/OPS_M_Orders/Index'">
+                        <input type="button" accesskey="n" value="报关信息（N)" onclick="ToCusIndex()" disabled>
+                        @*<input type="button" accesskey="g" value="仓库信息（G）">*@
+                        <input type="button" accesskey="s" value="单证管理（S）" onclick="ToDocMent()" disabled>
+                        <input type="button" accesskey="f" value="结算信息（F）" onclick="ToBmsBill()" disabled>
+                        <input type="button" value="新增" onclick="adddata()">
+                        @*<input type="button" value="复制到">*@
+                        <input type="button" accesskey="v" value="保存（V）" onclick="SaveEMH()">
+                        <input type="button" id="bindingshow" onclick="cencelbindingwarehouse('#wtxx_1')" value="取消绑定" disabled>
+                        <input type="button" value="仓单导出E">
+                        <input type="button" value="分单导出E">
+                        <input type="button" value="发送英迪">
+                        <input type="button" onclick="savetg(true)" value="退关" disabled>
+                    </div>
+                    <div>
+                        <hr />
+                    </div>
+                    <div class="form-group col-md-12" style="text-align:center;">
+                        <label for="name" style="font-size:18px;">编辑业务</label>
+                    </div><br />
+                    @*@Html.AntiForgeryToken()*@
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @if (Model.OPS_EntrustmentInfors != null)
+                    {
+                        var items = Model.OPS_EntrustmentInfors.FirstOrDefault();
+                        int i = 1;
+                        int tabindexnum = 40;
+                        if (i == 1)
+                        {
+                            Html.RenderPartial("OPS_EntrustmentInfor_Edit", items, new ViewDataDictionary { { "i", i }, { "tabindex", tabindexnum } });
+                            var NumStr = (ViewContext.HttpContext.Items["Num"] ?? "").ToString();
+                            if (!string.IsNullOrEmpty(NumStr))
+                            {
+                                if (!int.TryParse(NumStr, out tabindexnum))
+                                {
+                                    tabindexnum += 74;
+                                }
+                            }
+                            else
+                            {
+                                tabindexnum += 74;
+                            }
+                        }
+                        <div id="tt" class="easyui-tabs" style="width:100%;height:auto;">
+                            <div title="总单信息" id="zdxx" style="padding:20px;display:none;">
+                                @Html.Partial("EditForm")
+                            </div>
+                            @foreach (var item in Model.OPS_H_Orders)
+                            {
+                                mcount = mcount + 1;
+                                <div title="分单信息 @i" id="fdxx_@i" closable="true" style="padding:20px;display:none;">
+                                    <input id="FDId_@i" name="FDId_@i" type="hidden" value="@item.Id">
+                                    @if (i == 1)
+                                    {
+                                        @Html.Partial("OPS_H_Edit", Model, new ViewDataDictionary { { "i", i }, { "OPS_H_Orders", item }, { "tabindex", tabindexnum } })
+                                    }
+                                </div>
+                                i = i + 1;
+                            }
+                            <div title="" id="addtals" data-options="iconCls:'icon-plus',plain:true" style="padding:8px;display:none;">
+                                @*用于新增委托和分单信息*@
+                            </div>
+                            <div title=" " id="addbinding" data-options="iconCls:'icon-search',plain:true" style="padding:8px;display:none;">
+                                @*用于新增委托和分单信息*@
+                            </div>
+                        </div>
+                    }
+                    <!--表单唯一值，防止重复提交-->
+                    @Html.Hidden("ActionGuidName", ViewData["ActionGuidName"] ?? "")
+                    @Html.Hidden("ActionGuid", ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))
+                    <div id="pagebottom" class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            @Html.LabelFor(model => model.ADDWHO, "创建人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                            @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", tabindex = Num++, style = "width:100%" } })
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            @Html.LabelFor(model => model.ADDTS, "创建时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                            @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", disabled = "disabled", tabindex = Num++, @Value = (Model == null ? "" : Model.ADDTS == null ? "" : ((DateTime)Model.ADDTS).ToString("yyyy-MM-dd HH:mm:ss")), style = "width:100%" } })
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            @Html.LabelFor(model => model.EDITWHO, "修改人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                            @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", tabindex = Num++, style = "width:100%" } })
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            @Html.LabelFor(model => model.EDITTS, "修改时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                            @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", disabled = "disabled", tabindex = Num++, @Value = (Model == null ? "" : Model.EDITTS == null ? "" : ((DateTime)Model.EDITTS).ToString("yyyy-MM-dd HH:mm:ss")), style = "width:100%" } })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="win_bindingWTFD" class="easyui-window" title="绑定分单信息" closed="true" style="width:600px;height:400px"
+             data-options="iconCls:'icon-add',modal:true,onBeforeClose:function(){bindingClose();}">
+            @Html.Partial("OPS_BindingWTFD")
+        </div>
+        <div id="win_contacts" class="easyui-window" title="" closed="true" style="width:750px;height:500px"
+             data-options="iconCls:'icon-add',modal:true">
+            @Html.Partial("OPS_Contacts")
+        </div>
+    </div>
+}
+<!--用于后端 加载dom并且渲染成EasyUI样式-->
+<div id="EasyUIDom" style="height:35px; clear:both; border:0 solid;"></div>
+@Scripts.Render("~/bundles/jqueryval")
+@section Scripts{
+<script type="text/javascript">
+    var loaddata = {};//tabs选项卡字典，每一个元素对应一个tab页签的Id号
+    var Is_Bindingwtxxdata = {};
+    var is_bindingwarehouse = "0";//描述 0：没有改操作；1：绑定；2取消绑定；3、全部解绑
+    //var NoNullSetDefaultDateBox =true; //不自动设置 日期格式面罩
+
+    $(function (){
+        if(@Model.OPS_EntrustmentInfors.Count >1){
+            $.messager.alert("提示", "该主单有多条委托信息，请联系管理员！");
+        }
+        loaddata["#fdxx_1"] = true;
+        //运费/杂费 输入带出 代码
+        YZFBound();
+        $("input[id='Flight_No1']").each(function () {
+            $(this).textbox("setValue", '@AirTime');
+        });
+        onChangeDataFlight();//航班号 同步
+        //Tabs 初始化
+        InitTabs();
+        //计算结算重量
+        totalCharge_Weight("#zdxx");
+    });
+</script>
+}

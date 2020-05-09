@@ -1,0 +1,175 @@
+﻿
+@{
+    ViewBag.Title = "Index33";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    var Num = 1;
+}
+
+<script src="~/Scripts/jsext.js"></script>
+
+<script type="text/javascript">
+    var i = 0, editIndex = undefined;
+    var dg1;
+    $(document).ready(function () {
+
+    });   
+
+    function append1() {
+        dg1 = $('#表头信息_table');
+        rowindex = i++;
+        dg1.datagrid('appendRow', {
+            报关单号: '报关单号' + rowindex,
+            进出标志: '进出标志' + rowindex,
+            申报日期: '申报日期' + rowindex,
+            贸易方式: '贸易方式' + rowindex,
+            锁定: '锁定' + rowindex,
+            状态: '状态' + rowindex,
+        });
+    }
+
+    function removeit1() {
+        dg1 = $('#表头信息_table');
+        if (editIndex == undefined) { return };
+        dg1.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+        editIndex = undefined;
+    }
+
+    function append2() {
+        dg1 = $('#表体信息_table');
+        rowindex = i++;
+        dg1.datagrid('appendRow', {
+            报关单号: '报关单号' + rowindex,
+            进出标志: '进出标志' + rowindex,
+            申报日期: '申报日期' + rowindex,
+            贸易方式: '贸易方式' + rowindex,
+            锁定: '锁定' + rowindex,
+            状态: '状态' + rowindex,
+        });
+    }
+
+    function removeit2() {
+        dg1 = $('#表体信息_table');
+        if (editIndex == undefined) { return };
+        dg1.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+        editIndex = undefined;
+    }
+
+    function endEditing() {
+        if (editIndex == undefined) { return true }
+        if (dg1.datagrid('validateRow', editIndex)) {
+            dg1.datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onClickCell1(index, field) {
+        dg1 = $('#表头信息_table');
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndex != index) {
+            if (endEditing()) {
+                dg1.datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                var ed = dg1.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                dg1.datagrid('selectRow', editIndex);
+            }
+        }
+    }
+
+    function onClickCell2(index, field) {
+        dg1 = $('#表体信息_table');
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndex != index) {
+            if (endEditing()) {
+                dg1.datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                var ed = dg1.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                dg1.datagrid('selectRow', editIndex);
+            }
+        }
+    }
+
+</script>
+
+<style>
+    td, th {
+        padding: 5px;
+        padding-top: 7px;
+    }
+</style>
+
+<div style="margin-left:10px;margin-right:10px;width:100%">
+
+    <div id="表头信息div" class="easyui-panel" title="表头信息" style="width:100%;padding:0px;">
+
+        <div style="width:100%">
+            <select tabindex="@(Num++)" style="width:100%" class="easyui-combobox" name="language"><option value="111">下拉值1</option><option value="222">下拉值2</option></select>
+        </div>
+
+        <table id="表头信息_table" class="easyui-datagrid" title="" style="height:200px"
+               data-options="singleSelect:true,collapsible:true,method:'get',pagination: 'true',rownumbers:true,toolbar: '#表头信息_toolbar',onClickCell: onClickCell1">
+            <thead>
+                <tr>
+                    <th data-options="field:'报关单号',width:150">报关单号</th>
+                    <th data-options="field:'进出标志',width:150">进出标志</th>
+                    <th data-options="field:'申报日期',width:150">申报日期</th>
+                    <th data-options="field:'贸易方式',width:150">贸易方式</th>
+                    <th data-options="field:'锁定',width:150">锁定</th>
+                    <th data-options="field:'状态',width:150">状态</th>
+                </tr>
+            </thead>
+        </table>
+
+        <div id="表头信息_toolbar" style="height:auto">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true" onclick="append1()">新增</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true" onclick="removeit1()">删除</a>
+        </div>
+
+    </div>
+
+    <div id="表体信息div" class="easyui-panel" title="表体信息" style="width:100%;padding:0px;">
+
+        <table id="表体信息_table" class="easyui-datagrid" title="" style="height:400px"
+               data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get',pagination: 'true',rownumbers:true,toolbar: '#表体信息_toolbar',onClickCell: onClickCell2">
+            <thead>
+                <tr>
+                    <th data-options="field:'报关单号',width:150">报关单号</th>
+                    <th data-options="field:'项号',width:150">项号</th>
+                    <th data-options="field:'品名',width:150">品名</th>
+                    <th data-options="field:'申报单位',width:150">申报单位</th>
+                    <th data-options="field:'申报数量',width:150">申报数量</th>
+                    <th data-options="field:'总金额',width:150">总金额</th>
+                </tr>
+            </thead>
+        </table>
+
+        <div id="表体信息_toolbar" style="height:auto">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true" onclick="append2()">新增</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true" onclick="removeit2()">删除</a>
+        </div>
+
+    </div>
+
+    <div id="zhangwei" style="height:35px">
+
+    </div>
+
+</div>

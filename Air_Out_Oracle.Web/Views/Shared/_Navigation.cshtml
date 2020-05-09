@@ -1,0 +1,282 @@
+﻿<nav class="navbar-default navbar-static-side " role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            <span class="block m-t-xs">
+                                <strong class="font-bold">@(ViewData["WebSiteName"]==null?"MVC网站":ViewData["WebSiteName"].ToString())</strong>
+                            </span>
+                            <span class="text-muted text-xs block">
+                                @(User.Identity.IsAuthenticated == true ? User.Identity.Name : "") <b class="caret"></b>
+                            </span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li>
+                            <a href="@Url.Action("Profile", "AppViews")">
+                                <i class="fa fa-comment-o"></i> 信息
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Contacts", "AppViews")">
+                                <i class="fa fa-phone"></i> 联系方式
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Inbox", "Mailbox")">
+                                <i class="fa fa-envelope-o"></i> 邮件
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        @{
+                            if (User != null)
+                            {
+                                if (User.Identity.IsAuthenticated)
+                                {
+                                    <li>
+                                        <a href="@Url.Action("LogOff", "Account")">
+                                            <i class="fa fa-sign-out"></i> 退出
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("ResetPassword", "Account")">
+                                            <i class="fa fa-key"></i> 改密
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a href="@Url.Action("Login", "Account")">
+                                            <i class="fa fa-sign-in"></i> 登录
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li>
+                                    <a href="@Url.Action("Login", "Account")">
+                                        <i class="fa fa-sign-in"></i> 登录
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    @(ViewData["WebSiteName"] == null ? "MVC网站" : ViewData["WebSiteName"].ToString())
+                </div>
+            </li>
+            @Html.Raw(Html.WriteMenu())
+            @*@{
+                var CurrSession = HttpContext.Current == null ? null : (HttpContext.Current.Session == null ? null : HttpContext.Current.Session);
+                var SessionMenuItem = CurrSession == null ? null : CurrSession[AirOut.Web.Extensions.Common.GeSessionEnumByName("Login_MenuItem").ToString()];
+
+                List<AirOut.Web.Models.MenuItem> ArrMenuItem = new List<AirOut.Web.Models.MenuItem>();
+                if (SessionMenuItem != null)
+                {
+                    ArrMenuItem = SessionMenuItem as List<AirOut.Web.Models.MenuItem>;
+                    if (ArrMenuItem.Any())
+                    {
+                        ArrMenuItem = ArrMenuItem.Where(x => x.IsEnabled == true).ToList();
+                        var Menu_Parents = ArrMenuItem.Where(x => x.ParentId == null || x.ParentId == 0).OrderBy(x => x.Code);
+                        if (Menu_Parents.Any())
+                        {
+                            foreach (var item in Menu_Parents)
+                            {
+                                var Menu_Items = ArrMenuItem.Where(x => x.ParentId == item.Id).OrderBy(x => x.Code);
+                                <li class="@Html.IsSelected(controller: string.Join(",", Menu_Items.Select(x => x.Controller)))">
+                                    <a href="#"><i class="@Html.Raw(string.IsNullOrEmpty(item.IconCls)?"fa fa-link":item.IconCls)"></i> <span class="nav-label">@item.Title</span> <span class="fa arrow"></span></a>
+                                    <ul class="nav nav-second-level collapse">
+                                        @foreach (var itemSub in Menu_Items)
+                                        {
+                                            var Sub_Items = ArrMenuItem.Where(x => x.ParentId == itemSub.Id).OrderBy(x => x.Code);
+                                            if (Sub_Items.Any()) { 
+                                                
+                                            }
+                                            else
+                                            { 
+                                                <li class="@Html.IsSelected(action: itemSub.Action, controller: itemSub.Controller)">
+                                                    <a href="@itemSub.Url" target="@(System.Configuration.ConfigurationManager.AppSettings["NavUrlTarget"]??"_self")"><i class="@Html.Raw(string.IsNullOrEmpty(itemSub.IconCls) ? "fa fa-link" : itemSub.IconCls)"></i>@itemSub.Title</a>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+
+                }
+            }*@
+            @*<li class="">
+                <a href="#"><i class="fa fa-sitemap"></i> <span class="nav-label">WECD业务</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li class="">
+                        <a href="#"><i class="fa fa-sitemap"></i> <span class="nav-label">业务</span> <span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse">
+                            <li class="">
+                                <a href="@Url.Action("Index", "WSKUs")">SKU主数据</a>
+                            </li>
+                            <li class="">
+                                <a href="@Url.Action("Index", "HSCODEs")">HSCODE基础表</a>
+                            </li>
+
+                            <li class="">
+                                <a href="@Url.Action("Index", "WBookItems")">电子账册数据</a>
+                            </li>
+                            <li class="">
+                                <a href="@Url.Action("Index", "WReceiptDetails")">收货单数据</a>
+                            </li>
+                            <li class="">
+                                <a href="@Url.Action("Index", "WOrderDetails")">出货单数据</a>
+                            </li>
+                            <li class="@Html.IsSelected(action: "Index", controller: "WDecDetails")">
+                                <a href="@Url.Action("Index", "WDecDetails")">归并后数据</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>        
+            </li>*@
+            @*<li class="@Html.IsSelected(controller: "WReceiptDetails,WBookItems,WOrderDetails,WSKUs,WDecDetails,HSCODEs")">
+                    <a href="#"><i class="fa fa-sitemap"></i> <span class="nav-label">WECD业务</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li class="@Html.IsSelected(action: "Index", controller: "WSKUs")">
+                            <a href="@Url.Action("Index", "WSKUs")">SKU主数据</a>
+                        </li>
+
+                        <li class="@Html.IsSelected(action: "Index", controller: "HSCODEs")">
+                            <a href="@Url.Action("Index", "HSCODEs")">HSCODE基础表</a>
+                        </li>
+
+                        <li class="@Html.IsSelected(action: "Index", controller: "WBookItems")">
+                            <a href="@Url.Action("Index", "WBookItems")">电子账册数据</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "WReceiptDetails")">
+                            <a href="@Url.Action("Index", "WReceiptDetails")">收货单数据</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "WOrderDetails")">
+                            <a href="@Url.Action("Index", "WOrderDetails")">出货单数据</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "WDecDetails")">
+                            <a href="@Url.Action("Index", "WDecDetails")">归并后数据</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="@Html.IsSelected(controller: "AccountManage,Management,BaseCodes,MenuItems,RoleMenus,DataTableImportMappings,Notifications")">
+                    <a href="#"><i class="fa fa-database"></i> <span class="nav-label">系统管理 </span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li class="@Html.IsSelected(action: "Index", controller: "AccountManage")">
+                            <a href="/AccountManage"><i class="fa fa-fw fa-user"></i>用户管理</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "Management")">
+                            <a href="/Management"><i class="fa fa-users"></i>授权管理</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "CodeItems")">
+                            <a href="/CodeItems"><i class="fa fa-file-code-o"></i>基础代码管理</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "MenuItems")">
+                            <a href="/MenuItems"><i class="fa fa-link"></i>菜单维护</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "RoleMenus")">
+                            <a href="/RoleMenus"><i class="fa fa-sitemap"></i>菜单授权</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "DataTableImportMappings")">
+                            <a href="/DataTableMappings"><i class="fa fa-file-excel-o"></i>Excel导入配置</a>
+                        </li>
+                        <li class="@Html.IsSelected(action: "Index", controller: "Notifications")">
+                            <a href="/Notifications"><i class="fa fa-bell-o"></i>消息通知&提醒</a>
+                        </li>
+                    </ul>
+                </li>*@
+        </ul>
+    </div>
+</nav>
+<script>
+    @{
+        Dictionary<string, List<string>> ArrOneToManyCtrl = null;
+        try { 
+            ArrOneToManyCtrl =(Dictionary<string, List<string>>)CacheHelper.Get_SetCache(AirOut.Web.Extensions.Common.CacheNameS.dictOnetoManyControllerName);
+        }catch{
+            ArrOneToManyCtrl = null;
+        }
+    }
+    var ArrOneToManyCtrl =@Html.Raw(ArrOneToManyCtrl == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrOneToManyCtrl));
+    //编辑页面时
+    function SetNavActive() {
+        //var href = window.location.href;
+        var pathname = window.location.pathname;
+        if (typeof pathname === 'undefined' || pathname == null || pathname == "")
+            return;
+        else
+            pathname = pathname.toLowerCase();
+        var $nav = $("ul[id='side-menu'].nav:first");
+        var $ArrA = [];
+
+        //var xx = $nav.find("a[href]").filter(function () {
+        //    var $this = $(this);
+        //    if ($this.attr('href').toLowerCase().indexOf(pathname) < 0)
+        //        return false;
+        //    else
+        //        return true;
+        //});//
+        $nav.find("a[href]").each(function () {
+            var $this = $(this);
+            $ArrA.push({ a: $this, href: $this.attr('href').toLowerCase(), _href: $this.attr('href') });
+        });//[href^='"+pathname+"']
+        var $Arr_a = $.grep($ArrA, function (value) {
+            return value.href.indexOf(pathname) >= 0;//筛选
+        });
+        var $a;
+        if ($Arr_a.length <= 0) {
+            var idx = pathname.lastIndexOf('/');
+            var controll_name = pathname.substr(0, idx);
+            $a = $.grep($ArrA, function (value) {
+                return value.href.indexOf(controll_name + "/index") >= 0;//筛选
+            });//$nav.find("a[href^='" + controll_name + "/Index" + "']:first");
+        } else {
+            $nav.find("ul.in").removeClass("in");
+            $nav.find("li.active").removeClass("active");
+            $a = $Arr_a;
+        }
+        //设置菜单展开与选中
+        if ($a) {
+            var $li = $a[0].a.parent();
+            if(!$li.hasClass("nav-header"))
+                $li.addClass("active");
+            var x = 0;
+            var Num = 0;
+            while (x == 0 && Num < 100) {
+                Num++;
+                if ($li.attr("id") == 'side-menu') {
+                    x = 1;
+                    break;
+                } else {
+                    var tagName = $li.get(0).tagName.toLowerCase();
+                    if (tagName == "ul" && !$li.hasClass("in"))
+                        $li.addClass("in");
+                    if (tagName == "li" && !$li.hasClass("active")){
+                        if(!$li.hasClass("nav-header"))
+                            $li.addClass("active");
+                    }
+                    $li = $li.parent();
+                }
+            }
+        }
+    }
+    try {
+        SetNavActive();
+    } catch (e) {
+        console.log('设置菜单展开，错误：', e);
+    }
+</script>

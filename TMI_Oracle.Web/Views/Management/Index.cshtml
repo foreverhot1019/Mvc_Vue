@@ -1,0 +1,51 @@
+﻿@using TMI.Web.Models
+@model ManagementViewModel
+@{
+    ViewBag.Title = "授权管理";
+}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox-content m-b-sm border-bottom">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="col-md-4">
+                    <h3>角色</h3>
+                    @Html.Partial("_AddRolePartial", new RoleViewModel())
+                    <br>
+                    <table id="role-table" class="table table-bordered">
+                        @foreach (var role in Model.Roles)
+                        {
+                            @Html.Partial("_RoleRecordPartial", role);
+                        }
+                    </table>
+                </div>
+                <div class="col-md-8">
+                    @*<h3>用户</h3>
+                    @Html.Partial("_AddAccountPartial", new AccountViewModel())
+                    <br>*@
+                    <table id="account-table" class="table table-bordered">
+                        <tr>
+                            <th width="15%">登录名</th>
+                            <th width="10%">姓名</th>
+                            <th width="23%">角色</th>
+                            <th width="*">角色操作</th>
+                            @*<th>删除账户</th>*@
+                        </tr>
+                        @foreach (var user in Model.Users)
+                        {
+                            @Html.Partial("_AccountRecordPartial", new AccountRecordViewModel { User = user, Roles = Model.Roles })
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        window.addEventListener('load', function ()
+        {
+            document.querySelector('#div_Loading').hidden = true;//必须得有，不然一直显示加载中。。。
+        }, false);
+    </script>
+}

@@ -1,0 +1,79 @@
+﻿﻿@model AirOut.Web.Models.Warehouse_receipt
+@{
+    ViewBag.Title = "WarehouseSize";
+    var model = ViewBag.h_order;
+    //控件排序
+    var Num = 100;
+}
+<div id="div_WarehouseSize" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="仓库接单明细"
+     data-options="collapsible:true">
+    <div class="table-responsive">
+        <table id="warehouse_cargo_size_datagrid" class="easyui-datagrid" title="" style="width:auto;height:350px"
+               data-options="
+				rownumbers:true,
+				checkOnSelect:true,
+				selectOnCheck:true,
+				idField:'Id',
+				sortName:'Id',
+				sortOrder:'desc',
+				remoteFilter: true,
+				singleSelect: true,
+				toolbar: '#warehouse_cargo_size_toolbar',
+				method: 'get',
+				onClickCell: onClickCellDetail,
+                onBeginEdit:onBeginEditDetail,
+                onLoadSuccess:totalCount">
+            <thead>
+                <tr>
+                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                    @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+                    <th data-options="field:'CM_Length',width:200,align:'right',sortable:true,resizable:true,
+					editor:{
+						type:'numberbox',
+						options:{
+							required:false,
+                            onChange:function(newValue, oldValue){
+                                 totalCount()
+                            }
+						}
+					}">长(CM)</th>
+                    <th data-options="field:'CM_Width',width:200,align:'right',sortable:true,resizable:true,
+					editor:{
+						type:'numberbox',
+						options:{
+							required:false,
+                            onChange:function(newValue, oldValue){
+                                 totalCount()
+                            }
+						}
+					}">宽(CM)</th>
+                    <th data-options="field:'CM_Height',width:200,align:'right',sortable:true,resizable:true,
+					editor:{
+						type:'numberbox',
+						options:{
+							required:false,
+                            onChange:function(newValue, oldValue){
+                                 totalCount()
+                            }
+						}
+					}">高(CM)</th>
+                    <th data-options="field:'CM_Piece',width:200,align:'right',sortable:true,resizable:true,
+					editor:{
+						type:'numberbox',
+						options:{
+							required:false,
+                            onChange:function(newValue, oldValue){
+                                 totalCount()
+                            }
+						}
+					}">件</th>
+                </tr>
+            </thead>
+        </table>
+        <div id="warehouse_cargo_size_toolbar" style="height:auto">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="appendDetail()">新建</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeitDetail()">删除</a>
+            <label id="totalCount" onclick="totaldataCount()"></label>
+        </div>
+    </div>
+</div>

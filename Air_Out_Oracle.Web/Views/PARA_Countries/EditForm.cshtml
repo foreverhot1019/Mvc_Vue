@@ -1,0 +1,45 @@
+﻿﻿@model AirOut.Web.Models.PARA_Country
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.COUNTRY_CO)
+    @*<div class="row">*@
+     <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.COUNTRY_CO,"国别（地区）代码", htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.COUNTRY_CO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+                @*@Html.ValidationMessageFor(model => model.COUNTRY_CO,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.COUNTRY_EN,"国别英文简称", htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.COUNTRY_EN, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+            @*@Html.ValidationMessageFor(model => model.COUNTRY_EN,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.COUNTRY_NA,"国别（地区）名称", htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.COUNTRY_NA, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+            @*@Html.ValidationMessageFor(model => model.COUNTRY_NA,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.EXAM_MARK,"EXAM_MARK", htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EXAM_MARK, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+            @*@Html.ValidationMessageFor(model => model.EXAM_MARK,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.HIGH_LOW,"HIGH_LOW", htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.HIGH_LOW, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+            @*@Html.ValidationMessageFor(model => model.HIGH_LOW,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+			@Html.LabelFor(model => model.Status,"使用状态", htmlAttributes: new { @class = "control-label " })
+				@Html.CheckBoxFor(model => model.Status, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+            @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+        </div>
+    @*</div>*@
+		<!-- output all Scaffold = false Hiden field -->
+	@Html.HiddenFor(model => model.ADDWHO)
+	@Html.HiddenFor(model => model.ADDTS)
+	@Html.HiddenFor(model => model.EDITWHO)
+	@Html.HiddenFor(model => model.EDITTS)
+		<!--end output all Scaffold = false Hiden field -->
+

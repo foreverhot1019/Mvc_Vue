@@ -1,0 +1,56 @@
+﻿﻿@model AirOut.Web.Models.PARA_Area
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.ID)
+<div class="form-group">
+    @Html.LabelFor(model => model.AreaCode,"国内地区代码", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.AreaCode, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.AreaCode,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.AreaName,"国内地区名称", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.AreaName, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.AreaName,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Status,"使用状态", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.CheckBoxFor(model => model.Status, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+        @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDWHO,"新增人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ADDWHO,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDTS,"新增时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ADDTS,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITWHO,"修改人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.EDITWHO,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITTS,"修改时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.EDITTS,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+

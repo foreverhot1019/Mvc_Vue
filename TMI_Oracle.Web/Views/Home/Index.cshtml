@@ -1,0 +1,285 @@
+﻿<style>
+    .ibox {
+        clear: both;
+        margin-bottom: 10px;
+        margin-top: 0;
+        padding: 0;
+    }
+
+    .ibox-title {
+        min-height: 38px;
+    }
+</style>
+<script src="~/Scripts/plugins/morris/morris.js"></script>
+@*<script src="~/Scripts/plugins/morris/raphael-2.1.0.min.js"></script>*@
+<link href="~/Scripts/plugins/morris/morris.css" rel="stylesheet">
+<script>
+  //  require.config({
+  //      baseUrl: "/TypeScript_File",
+  //      paths: {
+  //          "app": "app/v1.0"
+  //      },
+  //      waitSeconds: 15
+  //  });
+  //  require(["some/module", "my/module", "C_AB.js", "index.js"],
+  //  function (someModule, myModule) {
+  //      //This function will be called when all the dependencies
+  //      //listed above are loaded. Note that this function could
+  //      //be called before the page is loaded.
+  //      //This callback is optional.
+  //  }
+  //);
+</script>
+@*<script data-main="/TypeScript_File" src="~/TypeScript_File/index.js"></script>*@
+<div class="wrapper wrapper-content" style="padding-top:5px;">
+    <button class="warning" onclick="window.open('/home/TakePhotoByEZ7')">萤石云拍照</button>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins" title="总数：{0} 当月：{1} 上月：{2}">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">当月</span>
+                    <h5>TM ASN </h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">123 </h1>
+                    <small>收货订单</small>123<i class="fa fa-bolt"></i><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins" title="总数：{0} 当日：{1} 上日：{2}>
+                <div class=" ibox-title">
+                <span class="label label-primary pull-right">当日</span>
+                <h5>TM ASN</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" style="width:40%">123</h1>
+                <small>收货订单</small>123<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当月：{1} 上月：{2}">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">当月</span>
+                <h5>TM SO</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">100</h1>
+                <small>出货订单</small>100<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当日：{1} 上日：{2}">
+            <div class="ibox-title">
+                <span class="label label-primary pull-right">当日</span>
+                <h5>TM SO</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">100</h1>
+                <small>出货订单</small>100<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当月：{1} 上月：{2}">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">当月</span>
+                <h5>一线接单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">30</h1>
+                <small>一线接单</small>30<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当日：{1} 上日：{2}">
+            <div class="ibox-title">
+                <span class="label label-primary pull-right">当日</span>
+                <h5>一线接单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">10</h1>
+                <small>一线接单</small>10<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当月：{1} 上月：{2}">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">当月</span>
+                <h5>二线接单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">50</h1>
+                <small>二线接单</small>50<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当日：{1} 上日：{2}">
+            <div class="ibox-title">
+                <span class="label label-primary pull-right">当日</span>
+                <h5>二线接单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">70</h1>
+                <small>二线接单</small>70<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当月：{1} 上月：{2}">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">当月</span>
+                <h5>制单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">80</h1>
+                <small>制单</small>80<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins" title="总数：{0} 当日：{1} 上日：{2}">
+            <div class="ibox-title">
+                <span class="label label-primary pull-right">当日</span>
+                <h5>制单</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">60</h1>
+                <small>制单</small>60<i class="fa fa-bolt"></i><br />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span class="label label-success pull-right">最近30天</span>
+                <h5>接单/制单数据</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="MorrisChart">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" style="padding-bottom:10px;">
+    <div class="col-lg-12">
+        <div class="ibox-title">
+            <span class="label label-success pull-right">当月</span>
+            <h5>制单</h5>
+        </div>
+        <div class="ibox-content">
+            <ul class="stat-list">
+                <li>
+                    <h2 class="no-margins">12</h2>
+                    <small>当月制单数量</small>
+                    <div class="stat-percent">10 <i class="fa fa-level-down text-warning"></i></div>
+
+                    <div class="progress progress-striped active progress-mini">
+                        <div class="stat-percent">10 <i class="fa fa-bolt text-danger"></i></div>
+                        <div class="progress progress-striped active progress-mini">
+                            <div class="progress-bar progress-bar-success"
+                                 style="width: 10%;" title="上月总数 10">
+                            </div>
+                            <div class="progress-bar progress-bar-info"
+                                 style="width: 10%;" title="当月总数 10">
+                            </div>
+                            <div class="progress-bar progress-bar-navy"
+                                 style="width: 90%;" title="当月增长 10%">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li title="进口业务-当月：10 上月：10">
+                    <h2 class="no-margins ">12</h2>
+                    <small>进口业务</small>
+                    <div class="stat-percent">10 <i class="fa fa-bolt text-danger"></i></div>
+                    <div class="progress progress-striped active progress-mini">
+                        <div class="progress-bar progress-bar-success"
+                             style="width: 10%;" title="上月总数 10">
+                        </div>
+                        <div class="progress-bar progress-bar-info"
+                             style="width: 10%;" title="当月总数 10">
+                        </div>
+                        <div class="progress-bar progress-bar-navy"
+                             style="width: 90%;" title="当月增长 10%">
+                        </div>
+                    </div>
+                </li>
+                <li title="出口业务-当月：100 上月：10">
+                    <h2 class="no-margins ">12</h2>
+                    <small>出口业务</small>
+                    <div class="stat-percent">10 <i class="fa fa-level-up text-success"></i></div>
+                    <div class="progress progress-striped active progress-mini">
+                        <div class="progress-bar progress-bar-warning"
+                             style="width: 10%;"
+                             title="当月下跌 10%">
+                        </div>
+                        <div class="progress-bar progress-bar-success"
+                             style="width: 10%;" title="当月占上月 10%">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="dd" class="easyui-dialog" title="日志内容" style="width:600px;height:450px;"
+     data-options="resizable:true,modal:true,closed: true">
+    <div class="summernote">
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/plugins/flot")
+    @Scripts.Render("~/plugins/vectorMap")
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //var month_data = [];
+
+            //var data = [];
+            //var data1 = [];
+            //var data2 = [];
+
+            //$.each(orderdata1,function(i,item){
+            //    var  itemdata = {xkeyName:item.Year+'/'+item.Month+'/'+item.Day, yKey1:item.Value, yKey2:preorderdata1[i].Value, yKey3:preorderdata2[i].Value};
+            //    month_data.push(itemdata);
+            //});
+            //Morris.Area({
+            //    element: 'MorrisChart',
+            //    data: month_data,
+            //    xkey: 'xkeyName',
+            //    ykeys: ['yKey1', 'yKey2', 'yKey3'],
+            //    labels: ['制单', '一线接单', '二线接单'],
+            //    parseTime: false,
+            //    ymax: 'auto',
+            //    smooth: true,
+            //    pointSize: 1,
+            //    hideHover: 'auto',
+            //    resize: true
+            //});
+        });
+        window.addEventListener('load', function ()
+        {
+            document.querySelector('#div_Loading').hidden = true;//必须得有，不然一直显示加载中。。。
+        }, false);
+    </script>
+}

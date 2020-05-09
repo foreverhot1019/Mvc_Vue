@@ -1,0 +1,548 @@
+﻿@model IEnumerable<AirOut.Web.Models.Notification>
+
+@{
+    ViewBag.Title = "通知&提醒";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">系统管理</a>
+            </li>
+            <li class="active">
+                <strong>通知&提醒</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>通知&提醒</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <!--
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="table_data_tables.html#">Config option 1</a>
+                            </li>
+                            <li>
+                                <a href="table_data_tables.html#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        -->
+                    </div>
+                </div>                
+                <!-- ibox-content --> 
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="notifications_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                            data-options="
+                            rownumbers:true,
+                            checkOnSelect:true,
+                            selectOnCheck:true,
+                            idField:'Id',
+                            sortName:'Id',
+                            sortOrder:'desc',
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#notifications_toolbar',
+                            url: '/Notifications/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            onSelect:onSelect,
+                            pagination: 'true'
+                            ">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    <th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>
+
+                                    <th data-options="field:'Name',width:140,editor:{type:'textbox',options:{required:true} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Name)</th>
+
+                                    <th data-options="field:'Description',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Description)</th>
+
+                                    <th data-options="field:'Type',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Type)</th>
+
+                                    <th data-options="field:'Sender',width:140,editor:{type:'textbox',options:{required:true} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Sender)</th>
+
+                                    <th data-options="field:'Receiver',width:140,editor:{type:'textbox',options:{required:true} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Receiver)</th>
+
+                                    <th data-options="field:'Schedule',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Schedule)</th>
+
+                                    <th data-options="field:'Disabled',width:120,editor: {type:'combobox',options:{
+                                    panelHeight:'auto',
+                                    data: [
+                                        { value:'true', text:'true' },
+                                        { value:'false', text:'false' }
+                                    ],
+                                    required:false}}">@Html.DisplayNameFor(model => model.Disabled)</th>
+
+                                    <th data-options="field:'AuthUser',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.AuthUser)</th>
+
+                                    <th data-options="field:'AuthPassword',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.AuthPassword)</th>
+
+                                    <th data-options="field:'Host',width:140,editor:{type:'textbox',options:{required:false} } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Host)</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="notifications_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            @if (Html.IsAuthorize("Edit"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            @if (Html.IsAuthorize("Import"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                            }
+                        </div>
+                    </div>                    
+                    <!--detail entity tabs -->
+                    <div id="detailtabs" class="easyui-tabs" style="width:100%;height:auto;">
+                        <!--Messages tab   -->
+                        <div title="@Html.DisplayNameFor(model => model.Messages)" id="messages" style="padding:10px" data-options="selected:true">
+                            <div class="table-responsive">
+                                <table id="messages_datagrid" class="easyui-datagrid" style="width:auto;height:auto"
+                                       data-options="
+								    rownumbers:true,
+                                    idField:'Id',
+                                    sortName:'Id',
+                                    sortOrder:'desc',
+                                    fitColumns:false,
+								    remoteFilter: true,
+								    singleSelect: true,
+								    toolbar: '#messages_toolbar',
+								    url: '/Messages/GetData',
+								    method: 'get',
+								    onClickCell: messages_onClickCell,
+								    pagination: 'true'">
+                                    <thead>
+                                        <tr>
+                                            @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                            @*<th data-options="field:'Id',width:80"> Id </th>*@
+
+                                            <th data-options="field:'Subject',width:140,editor:{type:'textbox',options:{required:true} } "> 主题</th>
+
+                                            <th data-options="field:'Key1',width:140,editor:{type:'textbox',options:{required:false} } "> 业务单号</th>
+
+                                            <th data-options="field:'Key2',width:140,editor:{type:'textbox',options:{required:false} } "> 业务单号</th>
+
+                                            <th data-options="field:'Content',width:280,editor:{type:'textbox',options:{required:true} } "> 内容</th>
+
+                                            <th data-options="field:'Type',width:140,editor:{type:'textbox',options:{required:false} } "> 类型</th>
+
+                                            <th data-options="field:'NewDate',width:160,align:'right',editor:{type:'datebox',options:{required:false}} ,formatter:datetimeformatter"> 创建日期</th>
+
+                                            <th data-options="field:'IsSended',width:120,
+											editor: {type:'combobox',
+											options:{
+												panelHeight: 'auto',
+												data: [
+                                                { value: 'true', text: 'true' },
+												{ value: 'false', text: 'false' }],
+											    required:false
+                                            }}">是否已发送</th>
+
+                                            <th data-options="field:'SendDate',width:160,align:'right',editor:{type:'datebox',options:{required:false}} ,formatter:dateformatter"> 发送日期</th>
+
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <!-- messages_toolbar -->
+                                <div id="messages_toolbar" style="height:auto">
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="messages_reload()">刷新</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end Messages tab   -->
+                    </div>
+                    <!--end detail entity tabs -->
+                </div>
+                <!-- end ibox-content -->          
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+<div id="dd" class="easyui-dialog" title="日志内容" style="width:600px;height:450px;"
+     data-options="resizable:true,modal:true,closed: true">
+    <div class="summernote">  
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'Notification' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    //console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+
+                }
+            });
+        });
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        var $dg = $('#notifications_datagrid');
+        var editIndex = undefined;
+
+        function reload() {
+            $dg.datagrid('reload');
+        }
+
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+
+        function append() {
+            if (endEditing()) {
+                //$dg.datagrid('appendRow', { Status: 0 });
+                //editIndex = $dg.datagrid('getRows').length - 1;
+                $dg.datagrid('insertRow', { index: 0, row: { Status: 0 } });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            }
+        }
+
+        function removeit() {
+            if (editIndex == undefined) { return }
+            $dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Notifications/SaveData',//获取数据的函数
+                        async: true,//使用同步的方式,true为异步方式
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(effectRow),
+                        beforeSend: function () {//回发前
+                        },
+                        error: function () {//查询失败
+                            $.messager.alert("错误", "提交错误了！", 'error');
+                        },
+                        success: function (data) {//查询成功,data为返回的数据
+                            if (data.Success) {
+                                $.messager.alert("提示", "提交成功！");
+                                $dg.datagrid('acceptChanges');
+                                $dg.datagrid('reload');
+                            }
+                        },
+                        complete: function () {//执行以后
+                            //console.log('complete');
+                        }
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            $dg.datagrid('enableFilter', []);
+            //去除datagrid padding
+            SetDataGridPadding();
+        })
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+            filterByNotificationId(row.Id);
+        }
+
+        function filterByNotificationId(notificationid) {
+            var value = notificationid;
+            $messagesdg.datagrid('removeFilterRule', 'NotificationId');
+            $messagesdg.datagrid('addFilterRule', {
+                field: 'NotificationId',
+                op: 'equal',
+                value: value
+            });
+            $messagesdg.datagrid('doFilter');
+        }
+        //-----------------------------------------------------------------------
+        // details datagrid functions
+        //-----------------------------------------------------------------------
+        //--------------------------------------------------------------------
+        // #messages_datagrid functions
+        //--------------------------------------------------------------------
+        var $messagesdg = $('#messages_datagrid');
+
+        var messages_editIndex = undefined;
+        function messages_reload() {
+            $messagesdg.datagrid('reload');
+        }
+
+        function messages_endEditing() {
+            if (messages_editIndex == undefined) { return true }
+            if ($messagesdg.datagrid('validateRow', messages_editIndex)) {
+                //var ed = $messagesdg.datagrid('getEditor', { index: messages_editIndex, field: 'NotificationId' });
+                //var NotificationName = $(ed.target).combobox('getText');
+                //var NotificationId = $(ed.target).combobox('getValue');
+
+                //$messagesdg.datagrid('getRows')[messages_editIndex]['NotificationName'] = NotificationName;
+                //$messagesdg.datagrid('getRows')[messages_editIndex]['NotificationId'] = NotificationId;
+
+                $messagesdg.datagrid('endEdit', messages_editIndex);
+                messages_editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function messages_onClickCell(index, field) {
+             $messagesdg.datagrid('selectRow', index);
+             var row = $messagesdg.datagrid('getSelected');
+            //console.log(index, row);
+            if (row != null) {
+                var content = row.Content;
+                //console.log(content);
+                var jsonStr = content;
+                try{
+                    var jsonObj = JSON.parse(jsonStr);
+                    var jsonPretty = JSON.stringify(jsonObj,  undefined, 2);
+                    $('.summernote').html(jsonPretty);
+                } catch (e) {
+                    $('.summernote').html(content);
+                }
+                $('#dd').dialog('open');
+            }
+
+            //if (messages_editIndex != index) {
+            //    if (messages_endEditing()) {
+            //        $messagesdg.datagrid('selectRow', index).datagrid('beginEdit', index);
+            //        var ed = $messagesdg.datagrid('getEditor', { index: index, field: field });
+            //        if (ed) {
+            //            ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+            //        }
+            //        messages_editIndex = index;
+            //    } else {
+            //        $messagesdg.datagrid('selectRow', messages_editIndex);
+            //    }
+            //}
+        }
+
+        function messages_append() {
+            if (messages_endEditing()) {
+                var notification = $dg.datagrid('getSelected');
+                $messagesdg.datagrid('appendRow', { NotificationId: notification.Id });
+                messageseditIndex = $messagesdg.datagrid('getRows').length - 1;
+                $messagesdg.datagrid('selectRow', messages_editIndex).datagrid('beginEdit', messages_editIndex);
+            }
+        }
+
+        function messages_removeit() {
+            if (messages_editIndex == undefined) { return }
+            $messagesdg.datagrid('cancelEdit', messages_editIndex).datagrid('deleteRow', messages_editIndex);
+            messageseditIndex = undefined;
+        }
+
+        function messages_reject() {
+            $messagesdg.datagrid('rejectChanges');
+            messages_editIndex = undefined;
+        }
+
+        function messages_getChanges() {
+            var rows = $messagesdg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        function messages_accept() {
+            if (messages_endEditing()) {
+                if ($messagesdg.datagrid('getChanges').length) {
+                    var inserted = $messagesdg.datagrid('getChanges', "inserted");
+                    var deleted = $messagesdg.datagrid('getChanges', "deleted");
+                    var updated = $messagesdg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/Messages/SaveData", effectRow, function (response) {
+                        //console.log(response);
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $messagesdg.datagrid('acceptChanges');
+                            $messagesdg.datagrid('reload');
+                        }
+                    }, "JSON").error(function (response) {
+                        //console.log(response);
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                    });
+                }
+                //$messagesdg.datagrid('acceptChanges');
+            }
+        }
+
+        $(function () {
+            //$('.summernote').summernote({
+            //    toolbar:false
+            //});
+            $messagesdg.datagrid('enableFilter', [
+                {
+                    field: 'Type',
+                    type: 'combobox',
+                    options: {
+                        panelHeight: 'auto',
+                        data: [
+                            { value: '', text: 'All' },
+                            { value: 'Information', text: 'Information' },
+                            { value: 'Message', text: 'Message' },
+                            { value: 'Error', text: 'Error' },
+                            { value: 'Alert', text: 'Alert' },
+                            { value: 'Warning', text: 'Warning' }
+                        ],
+                        onChange: function (value) {
+                            if (value == '') {
+                                $messagesdg.datagrid('removeFilterRule', 'Type');
+                            } else {
+                                $messagesdg.datagrid('addFilterRule', {
+                                    field: 'Type',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $messagesdg.datagrid('doFilter');
+                        }
+                    }
+                }
+            ]);
+            filterByNotificationId(-1);
+        });
+
+        //去除datagrid padding
+        function SetDataGridPadding() {
+            $("#detailtabs").find("div[id=messages]").find("div.datagrid-wrap.panel-body.panel-body-noheader").css({ "padding": "0px 0px 0px 0px" });
+        }
+
+    </script>
+}
+

@@ -1,0 +1,27 @@
+﻿@model AirOut.Web.Models.BmsBillAp_ArView
+@{
+    int Num = 20;
+    string NumStr = ViewData["Num"] == null ? "" : ViewData["Num"].ToString();
+    int.TryParse(NumStr, out Num);
+}
+<div class="row" style="margin-left:15px; margin-right:15px;padding-top:5px;">
+    @Html.HiddenFor(model => model.AuditId)
+    @Html.HiddenFor(model => model.AuditStatus)
+    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+        @Html.LabelFor(model => model.AuditNo, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.AuditNo, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.OPS_M_Id, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+        @Html.LabelFor(model => model.AuditName, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.AuditName, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    </div>
+    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+        @Html.LabelFor(model => model.AuditDate, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.AuditDate, new { htmlAttributes = new { @class = "easyui-datetimebox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    </div>
+    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+        @Html.LabelFor(model => model.AuditStatusName, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.AuditStatusName, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    </div>
+</div>

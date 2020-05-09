@@ -1,0 +1,68 @@
+﻿@model AirOut.Web.Models.QuotedPrice
+@{
+    int Num = 1;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="div_QPSeltd" class="easyui-dialog" title="报价费用 选择"
+     data-options="modal:true,collapsible:false,maximizable:true,toolbar:'#div_toolbar1',buttons: '#div_btn'"
+     style="overflow:hidden; width:830px; height:603px; background-color:rgb(243,243,244);">
+    @Html.Partial("formSearch",ViewData)
+    <!--数据列表-->
+    @Html.Partial("ListView", Model)
+</div>
+<div id="div_toolbar" style="text-align:center">
+    <button id="SeltdQP" type="button" class="btn btn-primary btn-sm"><i class="fa fa-check">选择</i></button>
+    <button id="CloseQP" type="button" class="btn btn-secondary btn-sm" onclick="$('#div_QPSeltd').dialog('close');"><i class="fa fa-check">取消</i></button>
+    @*<a href="javascript:void(0)" id="SeltdQP" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true">选择</a>
+        <a href="javascript:void(0)" id="CloseQP" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="$('#div_QPSeltd').dialog('close');">取消</a>*@
+</div>
+<div id="div_btn" style="text-align:right">
+    <button id="SeltdQP" type="button" class="btn btn-primary btn-sm"><i class="fa fa-check">选择</i></button>
+    <button id="CloseQP" type="button" class="btn btn-secondary btn-sm" onclick="$('#div_QPSeltd').dialog('close');"><i class="fa fa-check">取消</i></button>
+    @*<a href="javascript:void(0)" id="SeltdQP" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true">选择</a>
+        <a href="javascript:void(0)" id="CloseQP" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="$('#div_QPSeltd').dialog('close');">取消</a>*@
+</div>
+<script>
+    var $dgQP = $("#quotedprice_datagrid");
+    var FromCache = "_FromCache";
+    function InitQPSeltd() {
+        //设置 回车下一个
+        initEasyUIControl("div_QPSeltd");
+        initQPSeltedCombogrid("div_QPSeltd");
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        resetCombogridUrl("div_QPSeltd", null, true);
+        //设置dg 参数
+        var opts = $dgQP.datagrid('options');
+        opts.border = false;
+        opts.url = "/QuotedPrices/GetData";
+        var $Panel = $dgQP.datagrid('getPanel');
+        var p_opts = $Panel.panel('options');
+        var pdata = $Panel.data("panel");
+        var $header = $Panel.panel('header');
+        //var title = '报价数据';
+        //if ($header.length <= 0) {
+        //    $("<div class=\"panel-header\" ><div class=\"panel-title\"></div><div class=\"panel-tool\"></div></div>").prependTo($(pdata.panel));
+        //    $Panel.removeClass("panel-body-noheader");
+        //}
+        //$Panel.panel('setTitle', title);
+        //p_opts.title = title;
+        //opts.title = title;
+        $Panel.css({ 'border-left': 0, 'border-right': 0 });
+        $Panel.panel('header').css({ 'border-left': 0, 'border-right': 0 });
+        $Panel.panel('resize', { height: 250 });
+        $dgQP.datagrid('resize', { height: 250 });
+        $dgQP.datagrid('reload');
+    }
+    //渲染所有的combogrid控件
+    function initQPSeltedCombogrid(parentObj) {
+        initSearchCombogrid(1, 'searchform');//初始化页面
+    }
+    //搜索
+    function searchf() {
+        var opts = $dgQP.datagrid('options');
+        var filterRules = getrSearchParam();
+        opts.queryParams['filterRules'] = JSON.stringify(filterRules);
+        $dgQP.datagrid('reload');
+    }
+</script>

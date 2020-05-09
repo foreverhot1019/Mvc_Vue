@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--计费公式-->
+<BillFormula>
+  <item Name="A" desc="单价*计费单位">单价*计费单位</item>
+  <item Name="B" desc="单价*1">单价*1</item>
+  <item Name="C" desc="单价*(计费单位-1)">单价*(计费单位-1)</item>
+  <!--<item Name="A" desc="单价*(计费数量/计费单位数)">计费数量/计费单位数的值一般默认(n.n=n+1)</item>
+  <item Name="B" desc="单价*计费数量*(计费数量+1)/2">用于仓储费等差数列求和的特殊计算公式</item>
+  <item Name="C" desc="单价*(计费数量-1)/计费单位数">用于每增加一个计费数量加收的费用选用的公式</item>
+  <item Name="D" desc="单价+单价*(计费数量-1)/2">空出口岸</item>
+  <item Name="E" desc="单价*计费数量/6">6个品名50元 增加6个加收50</item>
+  <item Name="F" desc="计费单价*车次">运输费结算</item>-->
+</BillFormula>

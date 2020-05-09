@@ -1,0 +1,405 @@
+﻿@using TMI.Web.Models
+
+@model IEnumerable<RoleMenu>
+
+@{
+    ViewBag.Title = "菜单授权";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a>系统管理</a>
+            </li>
+            <li class="active">
+                <strong>菜单授权</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>菜单授权</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        @*<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 1</a>
+                                </li>
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>*@
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <span class="panel-title">角色</span>
+                                    <button id="refreshbtn" class="btn btn-rounded btn-success pull-right">
+                                        <i class="fa fa-refresh">刷新</i>
+                                    </button>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="panel-body" id="div_Roles">
+                                    <ul class="list-group elements-list ">
+                                        @foreach (var item in ViewBag.Roles)
+                                        {
+                                            <li class="list-group-item">
+                                                <span class="badge">@item.Count</span>
+                                                <span roleid="@item.RoleId">@item.RoleName</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <span class="panel-title">授权菜单</span> <button id="savebutton" class="btn btn-rounded btn-success pull-right"><i class="fa fa-save"></i> 保存</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="panel-body">
+                                    <table id="menu-tree" title="菜单项" style="width:auto;height:auto"
+                                           data-options="iconCls: 'icon-ok',
+                                        rownumbers: true,
+                                        animate: true,
+                                        singleSelect: false,
+                                        fitColumns: true,
+                                        url: '/RoleMenus/GetMenuList',
+                                        method: 'get',
+                                        idField: 'Id',
+                                        treeField: 'Title',
+                                        pagination: false,
+                                        checkOnSelect: true,
+                                        onSelect:onSelect,
+                                        onUnselect:onUnselect">
+                                        <thead>
+                                            <tr>
+                                                <th data-options="field:'ck',checkbox: true ">选择</th>
+                                                <th data-options="field:'Title',width:180">菜单</th>
+                                                <th data-options="field:'Code',width:80">代码</th>
+                                                <th data-options="field:'Url',width:200">链接</th>
+                                                @{
+                                                    if (HttpContext.Current.Cache[TMI.Web.Extensions.Common.GeCacheEnumByName("MenuAction").ToString()] != null)
+                                                    {
+                                                        List<MenuAction> MenuActions = HttpContext.Current.Cache[TMI.Web.Extensions.Common.GeCacheEnumByName("MenuAction").ToString()] as List<MenuAction>;
+                                                        if (MenuActions.Any())
+                                                        {
+                                                            foreach (var item in MenuActions)
+                                                            {
+                                                                <th data-options="field:'@item.Code',width:80" formatter="@Html.Raw("format" + item.Code + "checkbox")">@item.Name</th>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        var selectedrole = {};
+        @{
+            List<MenuAction> MenuActions = ViewBag.MenuActions as List<MenuAction>;
+            if (MenuActions.Any())
+            {
+                foreach (var item in MenuActions)
+                {
+                    @Html.Raw("        function format" + item.Code + "checkbox(val, row) { \r\n");
+                    @Html.Raw("            var disabled = row.Url == \"#\" ? 'disabled ' : ''; \r\n");
+                    @Html.Raw("            var checked = val == true && row.Url != \"#\" ? 'checked' : ''; \r\n");
+                    @Html.Raw("            return \"<input type=\\\"checkbox\\\"  name=\\\"op\\\"   value=\" + val + \" \" + checked + disabled + \" onClick=ckClick(\" + JSON.stringify(row) + \",'" + item.Code + "',this)  >\"; \r\n");
+                    @Html.Raw("        } \r\n");
+                }
+            }
+        }
+
+        function ckClick(row, name, element) {
+            var SletActions = [];
+            var MenuActions = [];
+            @{
+                if (MenuActions.Any())
+                {
+                    foreach (var item in MenuActions)
+                    {
+                        @Html.Raw("    MenuActions.push('" + item.Code + "'); \r\n");
+                    }
+                }
+            }
+            var updatedata = {};
+            updatedata[name] = element.checked;
+            row[name] = $(element).prop('checked');
+            $('#menu-tree').treegrid('update', {
+                id: row.Id,
+                row: updatedata
+            });
+
+            if (!$(element).prop("checked")) {
+                var ChkNum = 0;
+                for (var i = 0; i < MenuActions.length; i++) {
+                    if (row[MenuActions[i]]) {
+                        ChkNum++;
+                    }
+                }
+                if (ChkNum <= 0) {
+                    $('#menu-tree').treegrid('unselect', row.Id);
+                }
+                if (ChkNum == MenuActions.length) {
+                    $('#menu-tree').treegrid('select', row.Id);
+                }
+            }
+            if (!jQuery.isEmptyObject(selectedrole)) {
+                var $SpanNum = $("#div_Roles").find("span[roleid='" + selectedrole.RoleId + "']:eq(0)").prev();
+                if ($SpanNum) {
+                    var RoleMenuActionNum = $SpanNum.html();
+                    if (RoleMenuActionNum != "") {
+                        if (!isNaN(RoleMenuActionNum)) {
+                            RoleMenuActionNum = parseInt(RoleMenuActionNum);
+                            if ($(element).prop("checked"))
+                                RoleMenuActionNum++;
+                            else
+                                RoleMenuActionNum--;
+                            $SpanNum.html(RoleMenuActionNum);
+                        }
+                    }
+                }
+            }
+        }
+        //jsTree 去除选择时
+        function onUnselect(row) {
+            if (row != null) {
+                //$('#menu-tree').treegrid('unselect', row.Id);
+                $('#menu-tree').treegrid('update', {
+                    id: row.Id,
+                    row: {
+                        @{
+                            if (MenuActions.Any())
+                            {
+                                for (var i = 0; i < MenuActions.Count();i++ )
+                                {
+                                    if (i + 1 == MenuActions.Count()){
+                                        @Html.Raw("       " + MenuActions[i].Code + " : false");
+                                    }
+                                    else {
+                                        @Html.Raw("       " + MenuActions[i].Code + " : false, \r\n");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                var data = $('#menu-tree').treegrid('getChildren', row.Id);
+                $.each(data, function (index, elem) {
+                    var data = $('#menu-tree').treegrid('getChildren', row.Id);
+                    $('#menu-tree').treegrid('unselect', elem.Id);
+                    $('#menu-tree').treegrid('update', {
+                        id: elem.Id,
+                        row: {
+                            @{
+                                if (MenuActions.Any())
+                                {
+                                    for (var i = 0; i < MenuActions.Count();i++ )
+                                    {
+                                        if (i + 1 == MenuActions.Count()){
+                                            @Html.Raw("       " + MenuActions[i].Code + " : false");
+                                        }
+                                        else {
+                                            @Html.Raw("       " + MenuActions[i].Code + " : false, \r\n");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+        }
+        //jsTree 选择时
+        function onSelect(row) {
+            if (row != null) {
+                $('#menu-tree').treegrid('update', {
+                    id: row.Id,
+                    row: {
+                        @{
+                            if (MenuActions.Any())
+                            {
+                                for (var i = 0; i < MenuActions.Count();i++ )
+                                {
+                                    if (i + 1 == MenuActions.Count()){
+                                        @Html.Raw("       " + MenuActions[i].Code + " : true");
+                                    }
+                                    else {
+                                        @Html.Raw("       " + MenuActions[i].Code + " : true, \r\n");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                //$('#menu-tree').treegrid('select', row.Id);
+                var data = $('#menu-tree').treegrid('getChildren', row.Id);
+                //console.log("onSelect", data);
+                $.each(data, function (index, elem) {
+                    //console.log("onSelect", elem);
+                    $('#menu-tree').treegrid('select', elem.Id);
+                    $('#menu-tree').treegrid('update', {
+                        id: elem.Id,
+                        row: {
+                            @{
+                                if (MenuActions.Any())
+                                {
+                                    for (var i = 0; i < MenuActions.Count();i++ )
+                                    {
+                                        if (i + 1 == MenuActions.Count()){
+                                            @Html.Raw("       " + MenuActions[i].Code + " : true");
+                                        }
+                                        else {
+                                            @Html.Raw("       " + MenuActions[i].Code + " : true, \r\n");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        $(function () {
+            $("#refreshbtn").click(function () {
+                window.location.reload();
+            });
+
+            $('#menu-tree').treegrid();
+            $('.list-group-item').click(function () {
+                $('.list-group-item').removeClass('active');
+                $(this).addClass('active');
+                $currenitem = $(this);
+                selectedrole = { RoleId: $(this).children("span:eq(1)").attr("roleid"), RoleName: $(this).children("span:eq(1)").text() };
+                $.get('/RoleMenus/GetMenus', { roleName: selectedrole.RoleName }, function (data, status, q) {
+                    var ArrList = [];
+                    var obj = {};
+                    $.each(data, function (i, item) {
+                        //console.log(item);
+                        if (Object.prototype.toString.call(item) === '[object Array]') {
+                            obj = {};
+                            for (var i in item) {
+                                //console.log("item", i, item[i], item[i][0], item[i][1]);
+                                obj[item[i].Key] = item[i].Value;// == 1 ? true : false;
+                            }
+                            ArrList.push(obj);
+                        } else {
+                            ArrList.push(item);
+                        }
+                    });
+                    //console.log('/RoleMenus/GetMenus', ArrList);
+
+                    $('#menu-tree').treegrid('uncheckAll');
+                    //$('#menu-tree').treegrid(true).deselect_all();
+                    $('#menu-tree').parent().children("div .datagrid-view2:eq(0)").children("div .datagrid-body:eq(0)").find("input[type='checkbox']").prop('checked', false);
+
+                    $.each(ArrList, function (index, item) {
+                        $('#savebutton').attr('disabled', false);
+                        $('#menu-tree').treegrid('checkRow', item.MenuId);
+                        var uptrow = {
+                            id: item.MenuId,
+                            row: {
+                                @{
+                                    if (MenuActions.Any())
+                                    {
+                                        for (var i = 0; i < MenuActions.Count();i++ )
+                                        {
+                                            if (i + 1 == MenuActions.Count()){
+                                                @Html.Raw("       " + MenuActions[i].Code + " : item." + MenuActions[i].Code);
+                                            }
+                                            else {
+                                                @Html.Raw("       " + MenuActions[i].Code + " : item." + MenuActions[i].Code + ", \r\n");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        setTimeout(function () {
+                            $('#menu-tree').treegrid('update', uptrow);
+                        }, 500);
+                    });
+                });
+            });
+
+            function save() {
+                var selectednodes = $('#menu-tree').treegrid('getSelections');
+                //console.log(selectednodes);
+                var list = [];
+                $.each(selectednodes, function (i, data) {
+                    if (!jQuery.isEmptyObject(selectedrole)) {
+                        var item = {
+                            'RoleId': selectedrole.RoleId,
+                            'RoleName': selectedrole.Name,
+                            'MenuId': data.Id,
+                            @{
+                                if (MenuActions.Any())
+                                {
+                                    for (var i = 0; i < MenuActions.Count();i++ )
+                                    {
+                                        if (i + 1 == MenuActions.Count()){
+                                            @Html.Raw("       '" + MenuActions[i].Code + "' : data." + MenuActions[i].Code);
+                                        }
+                                        else {
+                                            @Html.Raw("       '" + MenuActions[i].Code + "' : data." + MenuActions[i].Code + ", \r\n");
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        list.push(item);
+                    }
+                });
+
+                if (!jQuery.isEmptyObject(selectedrole) && list.length > 0) {
+                    $.post('/RoleMenus/Submit', { JsonStrSeltMenu: JSON.stringify(list) }, function (data, status, q) {
+                        $.messager.alert('提示', '保存成功<br>', 'info');
+                    });
+                }
+            }
+
+            $('#savebutton').click(function () {
+                save();
+            });
+        });
+
+    </script>
+}
+

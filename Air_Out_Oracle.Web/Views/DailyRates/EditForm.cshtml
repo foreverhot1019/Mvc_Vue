@@ -1,0 +1,105 @@
+﻿﻿@model AirOut.Web.Models.DailyRate
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.LocalCurrency,"本币", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.LocalCurrency, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.LocalCurrency,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.LocalCurrCode,"本币代码", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.LocalCurrCode, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.LocalCurrCode,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ForeignCurrency,"外币", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ForeignCurrency, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ForeignCurrency,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ForeignCurrCode,"外币代码", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ForeignCurrCode, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ForeignCurrCode,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.PriceType,"钞/汇卖价", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.PriceType, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.PriceType,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.BankName,"汇率银行", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.BankName, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.BankName,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Price,"汇率", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "easyui-numberbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Price,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ScrapyDate,"爬取事件", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.ScrapyDate, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ScrapyDate,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Description,"描述", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Description,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Status,"使用状态", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.CheckBoxFor(model => model.Status, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+        @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDWHO,"新增人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ADDWHO,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDTS,"新增时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ADDTS,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITWHO,"修改人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.EDITWHO,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITTS,"修改时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.EDITTS,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+

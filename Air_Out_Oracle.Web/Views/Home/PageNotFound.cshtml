@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "页面错误";
+}
+<div class="middle-box text-center animated fadeInDown">
+    <h1>错误</h1>
+    <h3 class="font-bold">页面不存在</h3>
+
+    <div class="error-desc">
+        @ViewBag.Message<br />
+        您可以返回主页<span class="badge">5</span>: <br /><a href="/Home/Index" class="btn btn-primary m-t">主页</a>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var CloseMaxTime = 5;
+        var interTime;
+        $("div.error-desc:eq(0)").find("span.badge:eq(0)").html(CloseMaxTime);
+        var timeoutTime = setTimeout(function () {
+            interTime = setInterval(function () {
+                CloseMaxTime--;
+                if (CloseMaxTime <= 0) {
+                    window.location = "/Home/Index";
+                    clearInterval(interTime);
+                } else {
+                    $("div.error-desc:eq(0)").find("span.badge:eq(0)").html(CloseMaxTime);
+                }
+            }, 1000);
+        }, 1000);
+    });
+</script>

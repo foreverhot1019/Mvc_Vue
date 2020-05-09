@@ -1,0 +1,234 @@
+﻿
+@{
+    ViewBag.Title = "OPS_BindingWTFD";
+    //控件排序
+    var Num = 1;
+    var i = ViewData["i"];
+}
+<div class="table-responsive">
+
+    <div id="warehouse_cargo_size_toolbar_@i" style="height:auto">
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="Relation_E()">绑定</a>
+
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+            <label id="totalCount" onclick="totalCount()"></label>*@
+    </div>
+
+    <table id="WTFD_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+           data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: true,
+							toolbar: '#',
+							method: 'get',
+							pagination: 'true'
+							">
+        <thead>
+            <tr>
+                <th data-options="field:'ck',checkbox:true"></th>
+                <th data-options="field:'Operation_Id',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false
+										}
+								}">业务编号</th>
+                <th data-options="field:'HBL',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false
+										}
+								}">分单号</th>
+        </thead>
+    </table>
+
+
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+    });
+
+    var UpperLevelIdWTFD = "";//上一级，选项卡的ID
+    var $dgwf;
+    var editIndexWTFD = undefined;
+    var tabbindingindex = 0;
+
+    //点击查询按钮时，触发
+    function searchf_E(index) {
+        tabbindingindex = index;
+        console.log("tabbindingindex", tabbindingindex);
+        //UpperLevelIdWTFD = tabsId;
+        $dgwf = $('#WTFD_datagrid');
+        setfilteropts_E();//设置查询条件
+        var opts = $dgwf.datagrid('options');
+        opts.url = '/OPS_H_Orders/GetData';
+        opts.pageNumber = 1;
+        var pager = $dgwf.datagrid('getPager');
+        pager.pagination('refresh', {
+            pageNumber: 1
+        });
+        $dgwf.datagrid('reload');
+    }
+    //设置查询条件
+    function setfilteropts_E() {
+        var params = [];
+        var opts = $dgwf.datagrid('options');
+
+        params.push({ "field": "MBLId", "op": "equal", "value": 'null' });
+        //params.push({ "field": "Id", "op": "equal", "value": "" });
+
+        opts.queryParams = {
+            'filterRules': JSON.stringify(params)
+        };
+
+    }
+    //关联选择的仓库接单信息
+    function Relation_E(value) {
+        var item = $dgwf.datagrid("getSelected");
+        if (item == null) {
+            $.messager.alert("提示", "请选择您需要关联的仓库信息！");
+        }
+        bindingWTFD(item.Id);
+        //$("#Pieces_Fact", UpperLevelIdWTFD).numberbox("setValue", item.Pieces_CK);
+        //$("#Weight_Fact", UpperLevelIdWTFD).numberbox("setValue", item.Weight_CK);
+        //$("#Volume_Fact", UpperLevelIdWTFD).numberbox("setValue", item.Volume_CK);
+        $("#win_bindingWTFD").window('close');
+        //is_binding = item.Id;
+        //btnbindingshow(UpperLevelIdWTFD);
+    }
+
+    function getwarehousesize() {
+        if ($dgwf.datagrid('getChanges').length) {
+            var inserted = $dgwf.datagrid('getChanges', "inserted");
+            var deleted = $dgwf.datagrid('getChanges', "deleted");
+            var updated = $dgwf.datagrid('getChanges', "updated");
+            var effectRow = new Object();
+
+            if (inserted.length) {
+                effectRow.inserted = inserted;
+            }
+            if (deleted.length) {
+                effectRow.deleted = deleted;
+            }
+            if (updated.length) {
+                effectRow.updated = updated;
+            }
+            return effectRow;
+        }
+        return null;
+        //var list = $dgwf.datagrid("getChanges");
+        //return list;
+    }
+    function removeit() {
+        var Seltdata = $dgwf.datagrid('getSelections');
+        if (!(typeof editIndexWTFD === 'undefined' || editIndexWTFD == null || isNaN(editIndexWTFD))) {
+            $dgwf.datagrid('cancelEdit', editIndexWTFD);
+            editIndexWTFD = undefined;
+        }
+        for (var i = Seltdata.length; i > 0; i--) {
+            var rowindex = $dgwf.datagrid('getRowIndex', Seltdata[i - 1]);
+            $dgwf.datagrid('deleteRow', rowindex);
+        }
+    }
+
+
+    function endEditing() {
+        if (editIndexWTFD == undefined)
+            return true;
+        if ($dgwf.datagrid('validateRow', editIndexWTFD)) {
+            $dgwf.datagrid('endEdit', editIndexWTFD);
+            editIndexWTFD = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function append() {
+        if (endEditing()) {
+            var NewRow = {};
+            var Columns = $dgwf.datagrid('getColumnFields');
+            for (var column in Columns) {
+                NewRow[Columns[column]] = null;
+            }
+            //动态设置 编辑样式
+            var byteColumn = $dgwf.datagrid('getColumnOption', 'ADDWHO');
+            if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                byteColumn.editor = {
+                    type: 'textbox',
+                    options: {
+                        required: false,
+                        validType: 'length[0,20]'
+                    }
+                };
+                byteColumn = $dgwf.datagrid('getColumnOption', 'ADDTS');
+                byteColumn.editor = {
+                    type: 'datebox',
+                    options: {
+                        required: false
+                    }
+                };
+                byteColumn = $dgwf.datagrid('getColumnOption', 'EDITWHO');
+                byteColumn.editor = {};
+                byteColumn = $dgwf.datagrid('getColumnOption', 'EDITTS');
+                byteColumn.editor = {};
+            }
+            $dgwf.datagrid('insertRow', { index: 0, row: NewRow });
+            editIndexWTFD = 0;
+            //$dgwf.datagrid('selectRow', editIndexWTFD).datagrid('beginEdit', editIndexWTFD);
+        }
+    }
+
+    function onClickCell(index, field) {
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndexWTFD != index) {
+            if (endEditing()) {
+                //动态设置 编辑样式
+                var byteColumn = $dgwf.datagrid('getColumnOption', 'ADDWHO');
+                if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                    byteColumn.editor = {};
+                    byteColumn = $dgwf.datagrid('getColumnOption', 'ADDTS');
+                    byteColumn.editor = {};
+                    var byteColumn = $dgwf.datagrid('getColumnOption', 'EDITWHO');
+                    byteColumn.editor = {
+                        type: 'textbox',
+                        options: {
+                            required: false,
+                            validType: 'length[0,20]'
+                        }
+                    };
+                    byteColumn = $dgwf.datagrid('getColumnOption', 'EDITTS');
+                    byteColumn.editor = {
+                        type: 'datebox',
+                        options: {
+                            required: false
+                        }
+                    };
+                }
+
+                //$dgwf.datagrid('selectRow', index).datagrid('beginEdit', index);
+                var ed = $dgwf.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndexWTFD = index;
+            } else {
+                $dgwf.datagrid('selectRow', editIndexWTFD);
+            }
+        }
+    }
+
+</script>

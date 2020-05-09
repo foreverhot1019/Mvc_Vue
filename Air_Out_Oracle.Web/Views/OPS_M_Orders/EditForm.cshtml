@@ -1,0 +1,1540 @@
+﻿﻿@model AirOut.Web.Models.OPS_M_Order
+@{
+    //控件排序
+    var Num = 8;
+    var mbl_picture = ViewBag.mbl_picture;
+    var AirTime = ViewBag.AirTime;
+}
+@Html.HiddenFor(model => model.Id)
+@*<div class="row">*@
+<script>
+    //设置 相同 ID-Combogrid onChange
+    function SetSameValcombogrid_onChange(id, parentObj, newValue) {
+        var $cmbogd;
+        if (id.indexOf('#') == 0)
+            id = id.substr(1);
+        $cmbogd = $("#" + id, parentObj);
+        if ($cmbogd) {
+            var opts = $cmbogd.combogrid("options");
+            var data = $cmbogd.combogrid("grid").datagrid("getSelected");
+            var text = "";
+            if (data != null) {
+                text = data[opts.textField];
+            }
+            SetOtherCombogridVal($cmbogd,id, newValue, text);
+        }
+    }
+    //设置 相同 ID-Combogrid 值同步
+    function SetOtherCombogridVal($obj,id, newValue, text) {
+        $("input[textboxname='" + id + "'].easyui-combogrid").each(function (k, item) {
+            var $item = $(item);
+            if ($obj != $item) {
+                var txt = $item.combogrid('getText');
+                var val = $item.combogrid('getValue');
+                var $txt = $item.combogrid("textbox");
+                var ime = $txt.data('ime');//验证是否输入法
+                if (ObjectIsEmpty(ime)) {
+                    if (newValue != val)
+                        $item.combogrid('setValue', newValue);
+                    if (txt != text)
+                        $item.combogrid('setText', text);
+                }
+            }
+        });
+    }
+</script>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @*<input type="checkbox" id="is_MBL" />*@
+        @Html.LabelFor(model => model.MBL, "总单号", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.MBL, new { htmlAttributes = new { @class = "textbox easyui-fluid easyui-textbox1", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.MBL, "", new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Airways_Code, "航空公司", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Airways_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Airways_Code,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.FWD_Code, "国外代理", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.FWD_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.FWD_Code,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        @*@Html.LabelFor(model => model.Shipper_M, "主单发货人", htmlAttributes: new { @class = "control-label " })*@
+        <a href="javascript:void(0)" onclick="openContacts('M', '发货人', '#zdxx', 'Shipper_M')">发货人:</a>
+        @Html.EditorFor(model => model.Shipper_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,validType:'length[0,2000]',value:'" + Html.Raw(string.IsNullOrEmpty(Model.Shipper_M) ? "" : Model.Shipper_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Shipper_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        @*@Html.LabelFor(model => model.Consignee_M, "主单收货人", htmlAttributes: new { @class = "control-label " })*@
+        <a href="javascript:void(0)" onclick="openContacts('M','收货人','#zdxx', 'Consignee_M')">收货人:</a>
+        @Html.EditorFor(model => model.Consignee_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,validType:'length[0,2000]',value:'" + Html.Raw(string.IsNullOrEmpty(Model.Consignee_M) ? "" : Model.Consignee_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Consignee_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        @*@Html.LabelFor(model => model.Notify_Part_M, "主单通知人", htmlAttributes: new { @class = "control-label " })*@
+        <a href="javascript:void(0)" onclick="openContacts('M','通知人','#zdxx', 'Notify_Part_M')">通知人:</a>
+        @Html.EditorFor(model => model.Notify_Part_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,validType:'length[0,2000]',value:'" + Html.Raw(string.IsNullOrEmpty(Model.Notify_Part_M) ? "" : Model.Notify_Part_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Notify_Part_M,"" , new { @class = "text-danger" })*@
+        @*<div hidden>
+            <input class="easyui-textbox" data-options="multiline:true" id="Notify_Part_M2" name="Notify_Part_M2" tabindex=@(Num++) />
+        </div>*@
+    </div>
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+    </div>
+</div>
+<div class="form-group col-md-12">
+    <hr />
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @*<input type="checkbox" id="is_Depart" style="width:18px;" />*@
+        @Html.LabelFor(model => model.Depart_Port, "启运港", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Depart_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Depart_Port,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.End_Port, "目的港", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.End_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.End_Port,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Flight_No, "航班号", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Flight_No, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, @readonly = "readonly", style = "width:30%" } })
+        <input id="Flight_No1" name="Flight_No1" tabindex=@(Num++) disabled="disabled" data-options="prompt1:'航班号'" style="width:19%" value="@AirTime" class="easyui-textbox" type="text" />
+        @*@Html.ValidationMessageFor(model => model.Flight_No,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Flight_Date_Want, "航班日期", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @*, data_options = "onSelect:onChangeDate"*@
+        @Html.EditorFor(model => model.Flight_Date_Want, new { htmlAttributes = new { @class = "easyui-datebox", @Value = ((Model == null || Model.Flight_Date_Want == null) ? "" : ((DateTime)Model.Flight_Date_Want).ToString("yyyy-MM-dd")), tabindex = Num++, @readonly = "readonly", style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Flight_Date_Want,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Currency_M, "币种", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Currency_M, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Currency_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Bragainon_Article_M, "成交条款", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Bragainon_Article_M, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Bragainon_Article_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Pay_Mode_M, "付款方式", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Pay_Mode_M, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:50%", disabled = "disabled" } })
+        @*@Html.ValidationMessageFor(model => model.Pay_Mode_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Carriage_M, "运费P/C", htmlAttributes: new { @class = "control-label ", onkeydown = "return on_keydown(event)", style = "width:100px;" })
+        @Html.EditorFor(model => model.Carriage_M, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "value:'P'", tabindex = Num++, style = "width:9%" } })
+        <input id="Carriage_M2" name="Carriage_M2" data-options="prompt1:'运费P/C'" disabled="disabled" style="width:40%" class="easyui-textbox" type="text" />
+        @*@Html.ValidationMessageFor(model => model.Carriage_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Incidental_Expenses_M, "杂费P/C", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Incidental_Expenses_M, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "value:'P'", tabindex = Num++, style = "width:9%" } })
+        <input id="Incidental_Expenses_M2" name="Incidental_Expenses_M2" data-options="prompt1:'杂费/C'" disabled="disabled" style="width:40%" class="easyui-textbox" type="text" />
+        @*@Html.ValidationMessageFor(model => model.Incidental_Expenses_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Declare_Value_Trans_M, "申明价值（运输）", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Declare_Value_Trans_M, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "value:'NVD'", tabindex = Num++, style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Declare_Value_Trans_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Declare_Value_Ciq_M, "申明价值（海关）", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Declare_Value_Ciq_M, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "value:'NCV'", tabindex = Num++, style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Declare_Value_Ciq_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Risk_M, "保险额度", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+        @Html.EditorFor(model => model.Risk_M, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "value:'XXX'", tabindex = Num++, style = "width:50%" } })
+        @*@Html.ValidationMessageFor(model => model.Risk_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-md-12">
+    <hr />
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        @Html.LabelFor(model => model.Marks_M, "主单唛头", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.Marks_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,value:'" + Html.Raw(string.IsNullOrEmpty(Model.Marks_M) ? "" : Model.Marks_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Marks_M,"" , new { @class = "text-danger" })*@
+    </div>
+    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        @Html.LabelFor(model => model.EN_Name_M, "主单英文货名", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.EN_Name_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,value:'" + Html.Raw(string.IsNullOrEmpty(Model.EN_Name_M) ? "" : Model.EN_Name_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.EN_Name_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        @Html.LabelFor(model => model.Hand_Info_M, "Handing Information", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.Hand_Info_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,value:'" + Html.Raw(string.IsNullOrEmpty(Model.Hand_Info_M) ? "" : Model.Hand_Info_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Hand_Info_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        @Html.LabelFor(model => model.Signature_Agent_M, "Signature of Shipper or his Agent", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.Signature_Agent_M, new { htmlAttributes = new { @class = "easyui-textbox textbox-f", tabindex = Num++, @Value = "", data_options = "multiline:true,value:'" + Html.Raw(string.IsNullOrEmpty(Model.Signature_Agent_M) ? "" : Model.Signature_Agent_M.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", style = "width:100%;height:60px;white-space:pre-wrap;" } })
+        @*@Html.ValidationMessageFor(model => model.Signature_Agent_M,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Rate_Class_M, "Rate Class", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Rate_Class_M, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Air_Frae, "空运费单价", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Air_Frae, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.AWC, "AWC", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.AWC, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Pieces_M, "件数", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Pieces_M, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Weight_M, "毛重", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Weight_M, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Volume_M, "体积", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.TextBoxFor(model => model.Volume_M, new { @class = "easyui-numberbox", data_options = "min:0,precision:3", tabindex = Num++, style = "width:50%" })
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Charge_Weight_M, "计费重量", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Charge_Weight_M, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Price_Article, "约价方案", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.Price_Article, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.CCC, "CCC", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+        @Html.EditorFor(model => model.CCC, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:50%" } })
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.File_M, "附档", htmlAttributes: new { @class = "control-label ", style = "width:80px;" })
+    </div>
+</div>
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div class="form-group col-md-1">
+        <label for="CusUpload_GUID">文件上传：</label>
+    </div>
+    <div class="form-group col-md-2">
+        <input class="easyui-validatebox" type="hidden" id="CusUpload_GUID" name="CusUpload_GUID" />
+        <input id="file_upload1" name="file_upload" type="file" multiple="multiple">
+        <div id="fileQueue1" class="fileQueue"></div>
+        <div id="div_files1"></div>
+    </div>
+    <div id="div_fileupload_m" class="form-groupcol-md-5">
+        @{
+            var rowi = 0;
+            if (mbl_picture != null)
+            {
+                foreach (var item in mbl_picture)
+                {
+                    rowi = rowi + 1;
+                    <a href="@item.Address" class="delPic" id="Fileuploadm_@item.Id" target="view_frame" onmouseout="return displeyImg('Img_@item.Id', '#zdxx');" onmousemove="return imgblur('Img_@item.Id', '#zdxx');">@item.Remark </a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="Img_@item.Id" data-options="iconCls:'icon-remove',plain:true" style="visibility:hidden" onclick="deletepicture('@item.Id', '#zdxx')" onmouseout="return displeyImg('Img_@item.Id', '#zdxx');" onmousemove="return imgblur('Img_@item.Id', '#zdxx');"></a>
+                }
+            }
+        }
+    </div>
+</div>
+<!-- output all Scaffold = false Hiden field -->
+@Html.HiddenFor(model => model.ADDID)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDTS)
+@Html.HiddenFor(model => model.EDITWHO)
+@Html.HiddenFor(model => model.EDITTS)
+@Html.HiddenFor(model => model.EDITID)
+<!--end output all Scaffold = false Hiden field -->
+<!-- section Scripts Razor 合并 Script 到 layout -RenderSection("scripts", required: false) 位置-->
+<script type="text/javascript">
+    $(function () {
+        $("#Id", "#zdxx").val('@Model.Id');
+        var urlpic = '/Pictures/Upload?ID=' + $("#Id", "#zdxx").val();
+        $("#file_upload1").uploadifive({//uploadifive
+            'height': 30,
+            'fileTypeDesc': 'Image Files',
+            'fileTypeExts': '*.gif; *.jpg; *.png; *.bmp;*.tif;*.doc;*.xls;*.zip',
+            'uploadScript': urlpic + "&Talbe=OPS_M_Order&type=Fileupload_MBL",
+            'buttonText': '上传',
+            'multi': true,
+            'displayData': 'speed',
+            'formData': { 'modelType': 'Picture' },
+            'width': 120,
+            'successTimeout': 100000,
+            'onFallback': function () {
+                $.messager.alert('上传错误', '上传错误，请重试！<br>', 'error');
+                $('#file_upload').uploadifive('clearQueue')
+            },
+            'onSelect': function (queue) {
+                $.messager.progress({
+                    title: '执行上传',
+                    msg: '请等待...'
+                });
+            },
+            'onUpload': function (file) {
+                console.log("file:", file);
+            },
+            'onUploadComplete': function (file, data) {
+                $.messager.progress('close');
+                var data = $.parseJSON(data);
+                if (data.Success === false) {
+                    $.messager.alert('上传错误', '上传错误，请修改后再上传！<br>' + data.ErrMsg, 'error');
+                    $("#file_upload").uploadifive('clearQueue')
+                } else {
+                    window.location.reload();//刷新当前页面
+                }
+                return true;
+            }
+        });
+        $("#Charge_Weight_M", "#zdxx").numberbox("disable");
+        //加载时绑定combogrid数据源 20160524
+        initbindcombogriddata_M();
+        $("#is_MBL", "#zdxx").on('click', function () {
+            is_BL_M();
+        });
+        BmsBill($("#Carriage_M").textbox("getValue"), "#Carriage_M2", "#zdxx")
+        BmsBill($("#Incidental_Expenses_M").textbox("getValue"), "#Incidental_Expenses_M2", "#zdxx")
+        let FromData = {
+            "Airways_Code": "@Model.Airways_Code",//航空公司
+            "FWD_Code": "@Model.FWD_Code",//国外代理
+            "Depart_Port": "@Model.Depart_Port",//起运港
+            "End_Port": "@Model.End_Port",//目的港
+            "Currency_M": "@Model.Currency_M",//币种
+            "Flight_No": "@Model.Flight_No",//航班信息
+            "Bragainon_Article_M": "@Model.Bragainon_Article_M",//成交条款
+            "Pay_Mode_M": "@Model.Pay_Mode_M"//付款方式
+        };
+        FromData = $.extend(FromData, FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        resetCombogridUrl("#zdxx", "url1", false, FromData);
+    });
+    //----------------------  2018-12-17 Create/Edit迁移过来 -------------------------
+    //运费/杂费 输入带出 代码
+    function YZFBound() {
+        //运费/杂费 输入带出 代码
+        var ArrElemt = $("input[id^='Carriage_'],[id^='Incidental_Expenses_']");
+        if (!(typeof args === 'undefined' || args == null || args.length <= 0))
+            ArrElemt = $("input[id^='Carriage_'],[id^='Incidental_Expenses_']", args[0]);
+        ArrElemt.each(function () {
+            var $this = $(this);
+            var $this_id = $this.attr('id');
+            var lasttxt = $this_id.substr($this_id.length - 2);
+            if (lasttxt != "_H" && lasttxt != "_M")
+                return;
+            $this.textbox({
+                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                    keydown: function (event) {
+                        var $this = $(this);
+                        var $name = $this.siblings("input[type='hidden']").attr('name');
+                        var $txt = $("input[textboxname='" + $name + "']:first");
+                        var $txt_Val = $txt.val();
+                        var $div = $this.parent().parent().parent();
+                        var $div_id = $div.attr('id');
+                        var event = event || window.event;
+                        var code = event.keyCode || event.which || event.charCode;
+                        if (code == 67 || code == 80) {
+
+                        }
+                        else if (code == 8 || code == 46 || code == 37 || code == 39 || code == 190) {
+                            // Backspace, del, 左右方向键 190:小键盘 del
+                            //return true
+                        } else if (code == 13) {
+                            //回车 下一个
+                            textbox_keydown(this, event);
+                        } else {
+                            if (event && event.preventDefault)
+                                event.preventDefault();
+                            else
+                                window.event.returnValue = false;
+                            return false;
+                        }
+                        //console.log(event.shiftKey+":"+code+"-"+String.fromCharCode(code));
+                    },
+                    keyup: function (event) {
+                        var $input = $(this).parent().siblings("input.easyui-textbox:first");
+                        var $tb = $input.textbox('textbox');
+                        var _val = $tb.val().replace(/[\u4e00-\u9fa5]/g, "").replace(/[^CcPp]/g, "");
+                        $tb.val(_val);
+                        $input.textbox('setValue', _val);
+                    }
+                }),
+                onChange: function (newValue, oldValue) {
+                    var $id = $(this).attr("id");
+                    var setVal = "";
+                    var _newValue = newValue.toUpperCase();
+                    if (_newValue == "C")
+                        setVal = "FREIGHT COLLECT"
+                    if (_newValue == "P")
+                        setVal = "FREIGHT PREPAID";
+                    var $txt2 = $(this).siblings("input[id='" + $id + "2']:first");
+                    $txt2.textbox('setValue', setVal);
+                    if (!(typeof (newValue) === 'undefined' || newValue == null || newValue == '')) {
+                        var $tb = $(this).textbox('textbox');
+                        $tb.val(_newValue);
+                        $tb.siblings("input[type=hidden]:first").val(_newValue);
+                    }
+                }
+            });
+        });
+    }
+    //新增一条总单信息
+    function adddata() {
+        //$(location).attr("href", "/OPS_M_Orders/Create");
+        var url = "/OPS_M_Orders/Create";
+        window.open(url);
+    }
+    //国外代理 值修改触发
+    function FWD_Code_Change(newValue, oldValue) {
+        var $this = $(this);
+        var data = $this.combogrid("grid").datagrid("getSelected");
+        var $text = "";
+        var AddressEng = '';
+        if (data != null) {
+            $text = data.TEXT;
+            AddressEng = data.AddressEng;
+            if (ObjectIsEmpty(AddressEng))
+                AddressEng = '';
+        }
+        $("#Shipper_M").textbox('setValue', AddressEng);//设置 总单收货人-国外代理 英文地址
+        $("input[textboxname='FWD_Code'].easyui-combogrid").each(function () {
+            $item = $(this);
+            if ($item != $this) {
+                var txt = $item.combogrid('getText');
+                var val = $item.combogrid('getValue');
+                if (txt == $text && newValue == newValue)
+                    return;
+                $item.combogrid('setValue', newValue);
+                $item.combogrid('setText', $text);
+            }
+        });
+    }
+    //判断，是否有 总单号
+    function is_BL_M() {
+        if ($("#is_MBL", "#zdxx").prop("checked")) {
+            $("#MBL", "#zdxx").textbox("enable");
+        } else {
+            $("#MBL", "#zdxx").textbox("disable");
+        }
+        $('#MBL').textbox('textbox').addClass('Mask')
+    }
+    //总单 加载时绑定combogrid数据源 
+    function initbindcombogriddata_M() {
+        //航空公司
+        $("#Airways_Code", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            url1: '/CusBusInfos/GetPagerCusBusInfos_FromCache',
+            onChange: function (newValue, oldValue) {
+                //SetSameValcombogrid_onChange("#Airways_Code", "#zdxx", newValue);
+            }
+        }));
+        //币种
+        $("#Currency_M", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            url1: '/PARA_CURRs/GetPagerPARA_CURR_FromCache',
+        }));
+        //启运港
+        $("#Depart_Port", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            textField: 'IDTEXT',
+            url1: '/PARA_AirPorts/GetPARA_AirPorts_FromCache',
+            onChange: function (newValue, oldValue) {
+                //SetSameValcombogrid_onChange("#Depart_Port", "#zdxx", newValue);
+            }
+        }));
+        //目的港
+        $("#End_Port", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            textField: 'IDTEXT',
+            url1: '/PARA_AirPorts/GetPARA_AirPorts_FromCache',
+            onChange: function (newValue, oldValue) {
+                //SetSameValcombogrid_onChange("#End_Port", "#zdxx", newValue);
+            }
+        }));
+        //航班号
+        $("#Flight_No", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            url1: '/PARA_AirLines/GetPagerAirLine_FromCache',
+            columns: [[
+                { field: 'ID', title: '代码', width: 220 }
+            ]],
+            onChange: function (newValue, oldValue) {
+                var data = $(this).combogrid("grid").datagrid("getSelected");
+                var $text = "";
+                var $time = "";
+                if (data != null) {//费用代码存在时，自动填写费用名称
+                    $text = data.TEXT;
+                    $time = data.Time;
+                }
+                $("input[id='Flight_No']").each(function (k, item) {
+                    var val = $(item).combogrid('getValue');
+                    if (newValue == val)
+                        return;
+                    $(this).combogrid('setValue', newValue);
+                });
+                if ($time != null) {//费用代码存在时，自动填写费用名称
+                    $("input[id='Flight_No1']").each(function () {
+                        $(this).textbox("setValue", $time);
+                    });
+                } else {//清空费用名称
+                    $("input[id='Flight_No1']").each(function () {
+                        $(this).textbox("setValue", "");
+                    });
+                }
+            }
+        }));
+        //国外代理
+        $("#FWD_Code", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            url1: '/CusBusInfos/GetPagerCusBusInfos_FromCache',
+            onChange: FWD_Code_Change
+        }));
+        //成交条款
+        $("#Bragainon_Article_M", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            textField: 'ID',
+            url1: '/DealArticles/GetPagerDealArticle_FromCache',
+            onChange: function () {
+                var row = $(this).combogrid("grid").datagrid("getSelected");
+                if (row != null) {
+                    $("#Pay_Mode_M").combogrid("setValue", row.Pay_ModeCode);
+                    if (row.Carriage != null && row.Carriage != "") {
+                        $("#Carriage_M").textbox("setValue", row.Carriage);
+                    } else {
+                        $("#Carriage_M").textbox("setValue", "");
+                    }
+                    if (row.Incidental_Expenses != null && row.Incidental_Expenses != "") {
+                        $("#Incidental_Expenses_M").textbox("setValue", row.Incidental_Expenses);
+                    } else {
+                        $("#Incidental_Expenses_M").textbox("setValue", "");
+                    }
+                } else {
+                    $("#Pay_Mode_M").combogrid("setValue", "");
+                    $("#Carriage_M").textbox("setValue", "");
+                    $("#Incidental_Expenses_M").textbox("setValue", "");
+                }
+            }
+        }));
+        //付款方式
+        $("#Pay_Mode_M", "#zdxx").combogrid($.extend({}, combogrid_DefaultSettings, {
+            url1: '/BD_DEFDOC_LISTs/Get_DEFDOC_DICT_FromCache?DOCCODE=Pay_Mode',
+            columns: [[
+                { field: 'TEXT', title: '名称' }
+            ]]
+        }));
+    }
+    //获取主单表信息
+    function getmorderValue(tabsid) {
+        //主单表信息
+        var newM_Order = {
+            Id: $("#Id", tabsid).val(),
+            MBL: $("#MBL", tabsid).val(),
+            Airways_Code: $("#Airways_Code", tabsid).textbox("getValue"),
+            FWD_Code: $("#FWD_Code", tabsid).textbox("getValue"),
+            Shipper_M: $("#Shipper_M", tabsid).textbox("getValue"),
+            Consignee_M: $("#Consignee_M", tabsid).textbox("getValue"),
+            Notify_Part_M: $("#Notify_Part_M", tabsid).textbox("getValue"),
+            Depart_Port: $("#Depart_Port", tabsid).combogrid("getValue"),
+            End_Port: $("#End_Port", tabsid).combogrid("getValue"),
+            Flight_No: $("#Flight_No", tabsid).combogrid("getValue"),
+            Flight_Date_Want: $("#Flight_Date_Want", tabsid).datebox("getValue"),
+            Currency_M: $("#Currency_M", tabsid).combogrid("getValue"),
+            Bragainon_Article_M: $("#Bragainon_Article_M", tabsid).combogrid("getValue"),
+            Pay_Mode_M: $("#Pay_Mode_M", tabsid).combogrid("getValue"),
+            Carriage_M: $("#Carriage_M", tabsid).textbox("getValue"),
+            Incidental_Expenses_M: $("#Incidental_Expenses_M", tabsid).textbox("getValue"),
+            Declare_Value_Trans_M: $("#Declare_Value_Trans_M", tabsid).textbox("getValue"),
+            Declare_Value_Ciq_M: $("#Declare_Value_Ciq_M", tabsid).textbox("getValue"),
+            Risk_M: $("#Risk_M", tabsid).textbox("getValue"),
+            Marks_M: $("#Marks_M", tabsid).textbox("getValue"),
+            EN_Name_M: $("#EN_Name_M", tabsid).textbox("getValue"),
+            Hand_Info_M: $("#Hand_Info_M", tabsid).textbox("getValue"),
+            Signature_Agent_M: $("#Signature_Agent_M", tabsid).textbox("getValue"),
+            Rate_Class_M: $("#Rate_Class_M", tabsid).textbox("getValue"),//
+            Air_Frae: $("#Air_Frae", tabsid).numberbox("getValue"),//空运费单价
+            AWC: $("#AWC", tabsid).numberbox("getValue"),
+            Pieces_M: $("#Pieces_M", tabsid).numberbox("getValue"),
+            Weight_M: $("#Weight_M", tabsid).numberbox("getValue"),
+            Volume_M: $("#Volume_M", tabsid).numberbox("getValue"),
+            Charge_Weight_M: $("#Charge_Weight_M", tabsid).numberbox("getValue"),
+            Price_Article: $("#Price_Article", tabsid).textbox("getValue"), //约价方案
+            CCC: $("#CCC", tabsid).textbox("getValue"),
+            Status: 1
+        };
+        return newM_Order;
+    }
+    //判断取消绑定按钮是否可用
+    function btnbindingshow(tabsid) {
+        //绑定仓库接单后直接保存承揽接单数据
+        SaveEMH();
+    }
+    //给运费和杂费赋值 newValue：修改后的值，domidtxt：控件名称，parentid：“#”+页签id
+    function BmsBill(newValue, domidtxt, parentid) {
+        if (newValue.toUpperCase() == "C") {
+            $(domidtxt, parentid).textbox("setValue", "FREIGHT COLLECT");
+        } else if (newValue.toUpperCase() == "P") {
+            $(domidtxt, parentid).textbox("setValue", "FREIGHT PREPAID");
+        } else {
+            $(domidtxt, parentid).textbox("setValue", "");
+        }
+    }
+    //扩展 EasyUI-Tab方法
+    $.extend($.fn.tabs.methods, {
+        //通过页签的序号，获取页签的ID号
+        getTabId: function (jq, id) {
+            var tabs = $.data(jq[0], 'tabs').tabs;
+            for (var i = 0; i < tabs.length; i++) {
+                var tab = tabs[i];
+                if (i == id) {
+                    return tab.panel('options').id;
+                }
+            }
+            return null;
+        },
+        //通过ID号，获取对应的页签
+        getTabById: function (jq, id) {
+            var tabs = $.data(jq[0], 'tabs').tabs;
+            for (var i = 0; i < tabs.length; i++) {
+                var tab = tabs[i];
+                if (tab.panel('options').id == id) {
+                    return tab;
+                }
+            }
+            return null;
+        },
+        //通过ID选择页签
+        selectById: function (jq, id) {
+            return jq.each(function () {
+                var state = $.data(this, 'tabs');
+                var opts = state.options;
+                var tabs = state.tabs;
+                var selectHis = state.selectHis;
+                if (tabs.length == 0) { return; }
+                var panel = $(this).tabs('getTabById', id); // get the panel to be activated
+                if (!panel) { return }
+                var selected = $(this).tabs('getSelected');
+                if (selected) {
+                    if (panel[0] == selected[0]) { return }
+                    $(this).tabs('unselect', $(this).tabs('getTabIndex', selected));
+                    if (!selected.panel('options').closed) { return }
+                }
+                panel.panel('open');
+                var title = panel.panel('options').title;        // the panel title
+                selectHis.push(title);        // push select history
+                var tab = panel.panel('options').tab;        // get the tab object
+                tab.addClass('tabs-selected');
+                // scroll the tab to center position if required.
+                var wrap = $(this).find('>div.tabs-header>div.tabs-wrap');
+                var left = tab.position().left;
+                var right = left + tab.outerWidth();
+                if (left < 0 || right > wrap.width()) {
+                    var deltaX = left - (wrap.width() - tab.width()) / 2;
+                    $(this).tabs('scrollBy', deltaX);
+                } else {
+                    $(this).tabs('scrollBy', 0);
+                }
+                $(this).tabs('resize');
+                opts.onSelect.call(this, title, $(this).tabs('getTabIndex', panel));
+            });
+        },
+        //判断页签ID是否存在
+        existsById: function (jq, id) {
+            return $(jq[0]).tabs('getTabById', id) != null;
+        }
+    });
+    //获取主单分单
+    var urlwtxx = "/OPS_M_Orders/AddEntrustmentInforEditFore";
+    var urlfdxx = "/OPS_M_Orders/AddHOrderEditFore";
+    var tabIndexs = 0;//当前选项卡的序号
+    var tabId = "";//用于获取当前选中的选项卡的ID号
+    var deleteWTXX = ""; //用于记录删除的委托信息的ID号
+    var deleteFDXX = ""; //用于记录删除的分单信息的ID号
+    //用户在选择一个选项卡面板的时候触发
+    var TabonSelect = function (title, index) {
+        tabId = "#" + $("#tt").tabs("getTabId", index + "");
+        var ArrTab = $("#tt").tabs("tabs");
+        if (title == "") {
+            if (!$("#Is_Self", "#wtxx_1").prop('checked')) {
+                var tabIdMaxNum = $("#tt").tabs("getTabId", (ArrTab.length - 3) + "").replace('fdxx_', '');
+                var nowTabIdMaxNum = parseInt(tabIdMaxNum) + 1;//当前新建的ID的序号
+                var idfd = "fdxx_" + nowTabIdMaxNum;
+                var fdtab = "#fdxx_" + tabIdMaxNum;
+                var tabindex = $("#Charge_Weight_H", fdtab).attr("tabindex");//空间索引
+                loaddata["#" + idfd] = true;
+                $('#tt').tabs('add', {
+                    title: '分单信息 ' + index,
+                    href: urlfdxx + "?id=0&i=" + index + "&tabindex=" + (parseInt(tabindex) + 74) + "&mblid=" + $("#Id", "#zdxx").val(),
+                    id: idfd,
+                    closable: true,
+                    index: index,
+                    tools: [{
+                        iconCls: 'icon-mini-refresh',
+                        handler: function () {
+                            //alert('refresh');
+                        }
+                    }]
+                });
+            } else {
+                $("#tt").tabs("select", tabIndexs);
+                $.messager.alert("提示", "自营业务不能增加分单！"); return;
+            }
+            //勾选自营，删除分单 时 委托-主单-分单 数据 绑定互填
+            IsSelfAutoSetH_E();
+        } else if (title == " ") {
+            $("#tt").tabs("select", tabIndexs);
+            if (!$("#Is_Self", "#wtxx_1").prop('checked')) {
+                searchf_E(tabIndexs);
+                $("#win_bindingWTFD").window('open');
+                $("#win_bindingWTFD").window("center");
+            } else {
+                $.messager.alert("提示", "自营业务不能增加分单！"); return;
+            }
+        }
+        else if (title == "分单结算信息") {
+            $("#tt").tabs("select", tabIndexs);
+            var seltab = $("#tt").tabs("getSelected");
+            var selid = seltab.panel("options").id;
+            var id = 0;
+            if (selid.indexOf("fdxx") != -1) {
+                id = $("#Id", "#" + selid).val();
+            }
+            else {
+                if (index == 4) {
+                    id = $("#Id", "#fdxx_1").val();
+                } else {
+                    $.messager.alert("提示", "请选择分单信息"); return;
+                }
+                //num = tabIndexs/2+1;
+                //id = $("#Id", "#fdxx_"+num).val();
+            }
+            $(location).attr("href", "/Bms_Bill_Aps/BmsBillApView?OPS_H_OrdId=" + id);
+            return;
+        }
+        else if (title.indexOf("分单信息") != -1) {
+            if (typeof (loaddata[tabId]) === 'undefined' || loaddata[tabId] == false) {
+                num = index;
+                var idfd = "fdxx_" + num;
+                var fdtab = "#fdxx_" + (num - 1);
+                var tabindex = $("#Charge_Weight_H", fdtab).attr("tabindex");
+                loaddata[tabId] = true;
+
+                //加载页面
+                var fdid = $("#FDId_" + num).val();
+                var tabfd = $('#tt').tabs('getSelected');
+                $("#tt").tabs("update", {
+                    tab: tabfd,
+                    options: {
+                        href: urlfdxx + "?id=" + fdid + "&i=" + num + "&tabindex=" + (parseInt(tabindex) + 74),
+                        id: idfd,
+                        closable: true,
+                        index: index
+                    }
+                })
+            }
+        }
+        tabIndexs = index;//当前选项卡复制
+    }
+    //选项卡面板关闭的时候触发
+    var TabonBeforeClose = function (title, index) {
+        //var tab = $("#tt").tabs("select", index).tabs("options");
+        var tabs = $("#tt").tabs("tabs");//获取所有选项卡
+        if (tabs.length == 4) {//判断选项卡的数量
+            $.messager.alert("提示", "委托和分单信息不可以全部删除！");
+            return false;
+        }
+        var target = this;
+        $.messager.confirm('确认', '你确认要删除 ' + title, function (r) {
+            if (r) {
+                tabId = "#" + $("#tt").tabs("getTabId", index);
+                if (loaddata[tabId] == false) {
+                    if ($("#FDId_" + index, tabId).val() > 0) {
+                        deleteFDXX = deleteFDXX + $("#FDId_" + index, tabId).val() + ",";
+                    }
+                } else {
+                    if ($("#Id", tabId).val() > 0) {
+                        deleteFDXX = deleteFDXX + $("#Id", tabId).val() + ",";
+                    }
+                    loaddata[tabId] = false;
+                }
+                $.each(tabs, function (indextab, tab) {
+                    if (indextab > index && indextab < tabs.length - 2) {
+                        var upId = tab.panel('options').title;
+                        var settitle = "分单信息 " + (indextab - 1);
+                        tab.panel("setTitle", settitle);
+                    }
+                });
+
+                var opts = $(target).tabs('options');
+                var bc = opts.onBeforeClose;
+                opts.onBeforeClose = function () { };  // 允许现在关闭
+                $(target).tabs('close', index);
+                opts.onBeforeClose = bc;  // 还原事件函数
+                if (tabs.length == 4) {//未删除时的tab数量
+                    for (var i in nameProfixS) {
+                        var $SK = $("#" + nameProfixS[i] + "SK", "#div_EntrustmentInfor2").data();
+                        $SK.textbox.textbox.find("input.textbox-text").change();
+                        var $DC = $("#" + nameProfixS[i] + "DC", "#div_EntrustmentInfor2").data();
+                        $DC.textbox.textbox.find("input.textbox-text").change();
+                    }
+                }
+                //重新设置Title
+                var max = tabs.length - 2;
+                for (var i = index; i < max; i++) {
+                    var OTab = $("#tt").tabs('getTab', i);
+                    var Pid = 'fdxx_' + i;
+                    var title = '分单信息 ' + i;
+                    var tabopts = OTab.panel('options');
+                    //OTab.attr('id',Pid);
+                    //tabopts.id = Pid;
+                    tabopts.title = title;
+                    var tab = tabopts.tab;
+                    var tabTitle = tab.find("span.tabs-title");
+                    tabTitle.html(tabopts.title);
+                }
+                $("#tt").tabs("select", 1);
+                //勾选自营，删除分单 时 委托-主单-分单 数据 绑定互填
+                IsSelfAutoSetH_E();
+            }
+        });
+        return false;// 阻止关闭
+    }
+    //Tabs 初始化
+    function InitTabs() {
+        var TabOpts = $('#tt').tabs('options');
+        TabOpts.onSelect = TabonSelect;
+        TabOpts.onBeforeClose = TabonBeforeClose;
+    }
+    //报关报检
+    function ToCusIndex(id) {
+        var wtxxid = $("#Id", "#wtxx_1").val();
+        //$(location).attr('href', "/CustomsInspections/CusIndex?OPS_ENid="+wtxxid);
+        var url = "/CustomsInspections/CusIndex?OPS_ENid=" + wtxxid;
+        window.open(url);
+    }
+    //单证管理
+    function ToDocMent() {
+        var Operation_ID = $("#Operation_Id", "#wtxx_1").textbox("getValue");
+        //$(location).attr('href', "/DocumentManagements/Index?id=0&Operation_ID=" + Operation_ID);
+        var url = "/DocumentManagements/Index?id=0&Operation_ID=" + Operation_ID;
+        window.open(url);
+    }
+    //点击，进入主单结算
+    function ToBmsBill() {
+        var id = $("#Id", "#zdxx").val();
+        //$(location).attr("href", "/Bms_Bill_Aps/BmsBillApView?OPS_M_OrdId=" + id);
+        var url = "/Bms_Bill_Aps/BmsBillApView?OPS_M_OrdId=" + id;
+        window.open(url);
+    }
+    //导出仓单 Excel
+    function warehousereceipt() {
+        var Operation_ID = $("#Operation_Id", "#wtxx_1").textbox("getValue");
+        var formData = { filterRules: Operation_ID, sort: null, order: null, typeName: "仓单" };
+        var url = '/OPS_M_Orders/ExportWarehouseReceipt';
+        $.DownLoadProgress({
+            url: url,         //下载文件的url
+            method: 'Post',   //链接打开方式
+            data: formData,         //要发送的数据
+            downLoadInfo: '下载文件', //下载界面文字
+            closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+            callbackFuc: function (data) {
+                console.log("data", data);
+                $.messager.progress('close');
+            }
+        });
+    }
+    //导出分单 Excel
+    function exportindexExl() {
+        var Operation_ID = $("#Operation_Id", "#wtxx_1").textbox("getValue");
+        var formData = { filterRules: Operation_ID, sort: "Id", order: "asc", typeName: "分单" };
+        var url = '/OPS_M_Orders/ExportOP_H';
+        $.DownLoadProgress({
+            url: url,         //下载文件的url
+            method: 'Post',   //链接打开方式
+            data: formData,         //要发送的数据
+            downLoadInfo: '下载文件', //下载界面文字
+            closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+            callbackFuc: function (data) {
+                console.log("data", data);
+                $.messager.progress('close');
+            }
+        });
+    }
+    //导出托书
+    function exportTS() {
+        var Operation_ID = $("#Operation_Id", "#wtxx_1").textbox("getValue");
+        var formData = { filterRules: Operation_ID,  sort: "Id", order: "asc", typeName: "托书" };
+            var url = '/OPS_M_Orders/ExportTS';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: formData,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭              
+                callbackFuc: function (data) {
+                    var data = JSON.parse(data)
+                    if (data.Success == false) {
+                        $.messager.alert("提示", data.ErrMsg)
+                        $.messager.progress('close');
+                        reload();
+                    }
+                    else {
+                        $.messager.progress('close');
+                        reload();
+                    }
+                }
+            });
+        }
+    //时间修改
+    function onChangeDate(date) {
+        //alert("选中的时间为："+date);
+        var $this = $(this);
+        //var date = $this.datebox("getValue");
+        //$("input[id='Flight_Date_Want']").each(function () {
+        //    if ($(this) != $this)
+        //        $(this).datebox("setValue", date);
+        //});
+        //var $tdata = $this.datebox("textbox");
+        //$tdata.trigger('change.Michael');
+    }
+    //航班日期修改
+    function onChangeDataFlight() {
+        var fuc = function () {
+            var $this = $(this);
+            var date = $this.datebox("getValue");
+            $("input[id='Flight_Date_Want']").each(function () {
+                if ($(this) != $this)
+                    $(this).datebox("setValue", date);
+            });
+        };
+        var $Arrflight_date = $("input[id='Flight_Date_Want']");
+        $.each($Arrflight_date, function () {
+            var $this = $(this);
+            //var data = $this.data();
+            var $txt = $this.textbox("textbox");
+            $txt.addClass('hbrq');
+            $(".hbrq").mask('XXXX-FX-CX', {
+                'translation': {
+                    X: { pattern: /[0-9]/ },
+                    F: { pattern: /[0-2]/ },
+                    C: { pattern: /[0-3]/ },
+                    optional: true
+                }
+            });
+            $txt.on('change.Michael', { obj: $this }, function (event) {
+                fuc.call(event.data.obj||this);
+            });
+        });
+    }
+    //绑定窗体直接关闭时，tabIndexs赋值原来选择的序号
+    function bindingClose() {
+        tabIndexs = tabbindingindex;//
+    }
+    //加载委托分单数据
+    function bindingWTFD(valueid) {
+        var ArrTab = $("#tt").tabs("tabs");
+        var tabIdMaxNum = $("#tt").tabs("getTabId", (ArrTab.length - 3) + "").replace('fdxx_', '');
+        var nowTabIdMaxNum = parseInt(tabIdMaxNum) + 1;//当前新建的ID的序号
+        var idfd = "fdxx_" + nowTabIdMaxNum;
+        var fdtab = "#fdxx_" + tabIdMaxNum;
+        var tabindex = $("#Charge_Weight_H", fdtab).attr("tabindex");
+
+        var index = (tabIndexs - 1);
+        var num = (tabIndexs - 1);
+        loaddata[fdtab] = true;
+        $('#tt').tabs('add', {
+            title: '分单信息' + num,
+            href: urlfdxx + "?id=" + valueid + "&i=" + nowTabIdMaxNum + "&tabindex=" + (parseInt(tabindex) + 74) + "&mblid=" + $("#Id", "#zdxx").val(),
+            id: idfd,
+            closable: true,
+            index: index,
+            tools: [{
+                iconCls: 'icon-mini-refresh',
+                handler: function () {
+                    //alert('refresh');
+                }
+            }]
+        });
+    }
+
+    //打开选择发货人收获人窗口
+    function openContacts(morh, value, upperLevelId, nowid) {
+        var busiinforCode = "";//
+        if (morh == "M") {
+            var $FWD_Code = $("#FWD_Code", "#wtxx_1").combogrid("getValue");
+            if ($FWD_Code == null || $FWD_Code == "") {
+                $.messager.alert("提示", "请输入国外代理！");
+                return;
+            }
+            busiinforCode = $FWD_Code;
+        } else if (morh == "H") {
+            var $Consign_Code = $("#Consign_Code", "#wtxx_1").combogrid("getValue");
+            if ($Consign_Code == null || $Consign_Code == "") {
+                $.messager.alert("提示", "请输入发货方！");
+                return;
+            }
+            busiinforCode = $Consign_Code;
+        }
+        searchf_C(busiinforCode, upperLevelId, nowid);
+        $("#win_contacts").panel({ title: value });
+        $("#win_contacts").window('open');
+        $("#win_contacts").window("center");
+        $('#Contacts_datagrid').datagrid('clearSelections');
+        //获取
+        $('#Contacts_datagrid').datagrid("setColumnTitle", { field: 'ContactInfo', text: value });
+        //$('#win_contacts').window("resize", { top: $(document).scrollTop() + ($(window).height() - 250) * 0.5 });//居中显示
+    }
+    //公司名称转换
+    function CompanyNameformatterpublic(value) {
+        //console.log("value:", value);
+        var returnstr = '<span>';
+        if (value != null) {
+            var val = value.split(";");
+            for (i = 0; i < val.length ; i++) {
+                returnstr = returnstr + val[i] + "<br/>"; //分割后的字符输出
+            }
+        }
+        returnstr = returnstr + '</span>';
+        return [returnstr].join('');
+    }
+    //退关或取消退关
+    function savetg(value) {
+        var is_tg = $("#Is_TG", "#wtxx_1").prop("checked");
+        if (is_tg) {
+            $.messager.alert("提示", "该委托已经处于退关状态！");
+            return;
+        }
+        var $Id = $("#Id", "#wtxx_1").val();
+        if ((typeof ($Id) == "undifind" || $Id == null || $Id == "")) {
+            $.messager.alert("提示", "该委托在数据库中不存在！");
+            return;
+        } else if (parseInt($Id) <= 0) {
+            $.messager.alert("提示", "该委托是新增委托没有保存，请先保存委托！");
+            return;
+        }
+        var message = "您确认退关！";
+        $.messager.confirm('确认对话框', message, function (r) {
+            if (r) {
+                var ids = [];
+                ids.push($Id);
+                SaveBatch_TG(ids, value);
+            }
+        });
+    }
+    //取消仓库接单的绑定
+    function cencelbindingwarehouse(wtxxid) {
+        is_bindingwarehouse = "2";
+        bindingwarehouse(false, 200, 200);//打卡取消绑定仓库接单信息选择框
+        ////实际进仓清0
+        //$("#Pieces_Fact", wtxxid).textbox("setValue", 0);
+        //$("#Weight_Fact", wtxxid).textbox("setValue", 0);
+        //$("#Volume_Fact", wtxxid).textbox("setValue", 0);
+        //Is_Bindingcencel();//取消绑定
+        //SaveEMH();
+    }
+    //批量退关
+    function SaveBatch_TG(ids, value,isQZdel) {
+        var IDS = JSON.stringify(ids);
+        var IsQZDel = false;
+        if (!(typeof (isQZdel) === 'undefined' || isQZdel == null || isQZdel == ''))
+            IsQZDel = true;
+
+        var M_Id = $("#Id", "#zdxx").val();
+        var url = '/OPS_EntrustmentInfors/SaveBatch_TG?ids=' + ids + '&is_tg=' + value + '&NeedConfirm=' + IsQZDel + '&m_Ids=' + M_Id;
+        $.ajax({
+            type: 'POST',
+            url: url,//获取数据的函数
+            async: true,//true 异步，false 同步
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function (xhr) {//发送请求前运行的函数
+                //console.log('beforeSend');
+                $.messager.progress({
+                    title: '数据处理中',
+                    msg: '数据处理中，请等待...'
+                });
+                AddAjaxActionGuidName(this);
+            },
+            success: function (data) {//查询成功,data为返回的数据
+                if (data.Success) {
+                    if (data.ErrMsg != "") {
+                        $.messager.alert("提示", data.ErrMsg, "info");
+                    } else {
+                        $.messager.alert("提示", "退关成功！", "info");
+                    }
+                    $("#Is_TG", "#wtxx_1").prop("checked", value);
+                }
+                else {
+                    var NeedConfirm = false;
+                    if (!(typeof (data.NeedConfirm) === 'undefined' || data.NeedConfirm == null || data.NeedConfirm == ''))
+                        NeedConfirm = true;
+                    var ErrMsgStr = '错误';
+                    if (!(typeof (data.ErrMsg) === 'undefined' || data.ErrMsg == null || data.ErrMsg == ''))
+                        ErrMsgStr = data.ErrMsg;
+                    if (NeedConfirm) {
+                        $.messager.confirm('确认', ErrMsgStr, function (r) {
+                            if (r) {
+                                SaveBatch_TG(ids, value, NeedConfirm);
+                            }
+                        });
+                    }
+                    else {
+                        $.messager.alert("错误", ErrMsgStr, 'error');
+                    }
+                }
+            },
+            error: function () {//查询失败
+                $.messager.alert("错误", "提交错误了！", 'error');
+            },
+            complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                $.messager.progress('close');
+            }
+        });
+    }
+    var isrepeat = false;
+    //编辑保存接单
+    function SaveEMH() {
+        if (isrepeat) {
+            $.messager.alert("提示", "请不要重复点击保存！");
+            return;
+        } else
+            isrepeat = true;
+        var $mbl = $("#MBL", "#zdxx").val();
+        if (!validataMBL($mbl)) {
+            return false;
+        }
+        var tabs = $("#tt").tabs("tabs");
+
+        var newM_Order = getmorderValue("#zdxx");
+        var ops_m_order = newM_Order;
+
+        var ops_h_order = [];
+        var ops_entrustmentinfors = [];
+
+        tabsid = "#wtxx_1";
+        var item = getEntruValue(tabsid)
+        ops_entrustmentinfors.push(item);
+
+        var FdtabLen = tabs.length - 3;
+        //遍历tabs
+        for (var i = 1; i <= FdtabLen; i++) {
+            var tabsid = tabs[i].panel('options').id;
+            if (loaddata["#" + tabsid] == true) {//只有打开过的页签，在保存时，才去值
+                if (tabsid.indexOf("fdxx") != -1) {
+                    tabsid = "#" + tabsid;
+                    var wttabid = "#wtxx_" + i
+                    var item = gethorderValue(tabsid, "#wtxx_1");
+                    ops_h_order.push(item);
+                }
+            }
+        }
+        ops_m_order.OPS_H_Orders = ops_h_order;
+        ops_m_order.OPS_EntrustmentInfors = ops_entrustmentinfors;
+        //console.log(ops_m_order);
+
+        $.ajax({
+            url: '/OPS_M_Orders/SaveEMH',
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ OPS_M_Order: ops_m_order, DeleteWTXX: deleteWTXX, DeleteFDXX: deleteFDXX, Is_BindingWarehouse: is_bindingwarehouse }),
+            beforeSend: function (xhr) {//发送请求前运行的函数
+                $.messager.progress({
+                    title: '数据处理中',
+                    msg: '数据处理中，请等待...'
+                });
+                //验证重复提交时 请加上 这句
+                AddAjaxActionGuidName(this);
+            },
+            success: function (result) {
+                if (result.success) {
+                    if (result.err != "") {
+                        //$.messager.alert("提示", "该承揽接单已经绑定了仓库接单！");
+                    }
+                    var Id = result.Id;
+                    if (ObjectIsEmpty(Id)) {
+                        var Operation_Id = "";
+                        if (result.Operation_Id != "") {
+                            Operation_Id = result.Operation_Id;
+                            $(location).attr("href", "/OPS_M_Orders/Edit?id=-1&Operation_Id=" + Operation_Id);
+                        } else {
+                            $(location).attr("href", "/OPS_M_Orders/Index" + Operation_Id);
+                        }
+                    } else {
+                        $(location).attr("href", "/OPS_M_Orders/Edit?id=" + Id);
+                    }
+                } else {
+                    var errMsg = result.err;
+                    if (typeof (errMsg) === 'undefined' || errMsg == null)
+                        errMsg = result.ErrMsg;
+                    $.messager.alert("提示", errMsg);
+                }
+            },
+            error: function () {
+                $.messager.alert("错误", "提交错误了！", 'error');
+            },
+            complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                isrepeat = false;
+                $.messager.progress('close');
+            }
+        });
+    }
+    //---------------------------2018-11-29修改-------------------------//
+    var IsSelfAutoSetH_ESet = false;
+    //EasyUI 渲染完成执行
+    $.parser.onComplete = function () {
+        //console.log('-------');
+        if (!IsSelfAutoSetH_ESet) {
+            //勾选自营，删除分单 时 委托-主单-分单 数据 绑定互填
+            IsSelfAutoSetH_E();
+            IsSelfAutoSetH_ESet = true;
+        }
+    };
+    $(function () {
+        initBindingPage();
+        MBLFormatter();//给总单号加面罩
+        //勾选自营，删除分单 时 委托-主单-分单 数据 绑定互填
+        //IsSelfAutoSetH_E();//无需添加，添加主单panel会触发
+
+        //勾选 BSA 触发 结算重量重新计费
+        $("#Is_BAS").on('change.Michael', function () {
+            PJMVonChange.call($("#Charge_Weight_DC"));//posmhw.js-触发重新计算 计费重量/结算重量
+        });
+        ////航班日期
+        //$Date_box = $("#Flight_Date_Want");
+        //var $txt = $Date_box.textbox("textbox");
+        //$txt.addClass('hbrq');
+        //$txt.unbind('blur').bind("blur", Datebox_blur);
+        //$txt.on("focus.Michael", { $DateBox: $Date_box, $txt: $txt }, Date_Onfocus);
+    });
+    //给总单号加面罩
+    function MBLFormatter() {
+        var $mbl = $("input[id='MBL']");
+        $mbl.mask('AAA-AAAA AAAA', {
+            'translation': {
+                A: { pattern: /[0-9]/ },
+                optional: true
+            }
+        }).
+        bind("keydown", function (event) {
+            var obj = this;
+            var $target = $(obj);
+            var _tabIndex = $target.attr('tabindex');
+            var tabIndex = parseInt(_tabIndex);
+            if (!event) {
+                event = window.event;
+            }
+            //回车事件
+            if ((event.keyCode || event.which) == 13) {
+                //debugger;
+                if (event && event.preventDefault) {
+                    event.preventDefault();
+                    var nextNum = tabIndex + 1;
+                    var $next = $('[tabindex=' + nextNum + ']:eq(0)');
+                    if ($(obj).data('datebox')) {
+                        $(obj).datebox('setValue', moment().format('YYYY-MM-DD'));
+                    }
+                    if ($(obj).data('datetimebox')) {
+                        $(obj).datetimebox('setValue', moment().format('YYYY-MM-DD HH:mm:ss'));
+                    }
+                    if ($next) {
+                        var nextopts = getOptions($next);
+                        var times = 0;
+                        while ($next.attr('disabled') || nextopts.readonly) {
+                            nextNum++;
+                            times++;
+                            $next = $divPanel.find('[tabindex=' + nextNum + ']:eq(0)');
+                            if ($next) {
+                                nextopts = getOptions($next);
+                            }
+                            else if (times > 10)
+                                break;
+                        }
+                        if ($next) {
+                            if ($next.data("textbox")) {
+                                var $dom = $($next).siblings('span:eq(0)').children('input,textarea').get(0);
+                                $dom.focus();
+                            } else {
+                                $next.focus();
+                            }
+                            if ($($next).attr('type') == 'radio' || $($next).attr('type') == 'checkbox') {
+                                $($next).prop("checked", true);
+                                $($next).focus();
+                            }
+                        }
+                    }
+                }
+                else {
+                    window.event.returnValue = false;
+                }
+                return false;
+                //debugger;
+            }
+        }).
+        on('blur', { id: "MBL" }, MBL_blur);
+    }
+    //$.parser.auto = false;
+    //总单号 光标 移走 验证和互填
+    function MBL_blur(event) {
+        let $txt = $(this);
+        var id = event.data.id;
+        var val = $txt.val();
+        if (!validataMBL(val,true)) {
+            return false;
+        }
+        $("input[id='" + id + "']").each(function () {
+            $(this).val(val);
+        });
+    }
+    //验证总单号，是否符合规则 写在 jsext.js中
+    function validataMBL_(txtmbl) {
+        var mbl = txtmbl;
+        if (mbl != null && mbl != "") {
+            var $strmbl = mbl.replace(/-/, "");
+            var strmbl = $strmbl.replace(/ /, "");
+            if (strmbl.length != 11) {
+                $.messager.alert("提示", "总单号输入不符合规则！");
+                return false;
+            } else {
+                var mblnum = strmbl.substr(3, 7);
+                var remainder = mblnum % 7;
+                var last = $strmbl.substr($strmbl.length - 1, 1);
+                if (last != remainder.toString()) {
+                    $.messager.alert("提示", "总单号输入不符合规则！");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    //勾选自营，删除分单 时 委托-主单-分单 件数/毛重/体积/计费重量 同步修改
+    function IsSelfAutoSetH_E() {
+        var Is_Self = $("#Is_Self[type='checkbox']").prop("checked");
+        TBPWVC();//解绑 件数/毛重/体积/计费重量 同步修改
+        TBHBL();//解绑 分单号,国外代理 同步修改
+        //ADEA();//航空公司 启运港 目的港 航班号  同步修改
+        SCN_MH();//委托信息 收货人 发货人 通知人 绑定
+        if (Is_Self) {
+            TBPWVC(1);//件数/毛重/体积/计费重量  同步修改
+            TBHBL(1);//分单号,国外代理 同步修改
+        }
+        else {
+            var $Tab = $("#tt.easyui-tabs");
+            var ArrTab = $Tab.tabs("tabs");//所有页签
+            var TabNum = ArrTab.length;
+            //委托和分单=1:1
+            if (TabNum == 4) {
+                TBPWVC(1);//同步修改
+            }
+        }
+    }
+    //件数/毛重/体积/计费重量 同步修改
+    function TBPWVC(IsTB) {
+        var tf = true;
+        if (typeof (IsTB) === 'undefined' || IsTB == null || IsTB == '')
+            tf = false;
+        for (var i in nameProfixS) {
+            for (var x in PWVC_Types) {
+                var id = nameProfixS[i] + PWVC_Types[x].substr(1);
+                $("input[id='" + id + "']").each(function () {
+                    var data = $(this).data();
+                    if (data) {
+                        var $txt = data.textbox.textbox.find("input.textbox-text");
+                        if (tf)
+                            $txt.on("change.Michael", { id: id }, SetPWVCB);
+                        else
+                            $txt.off("change.Michael");
+                    }
+                });
+            }
+        }
+    }
+    //分单号,国外代理  同步修改
+    function IsSelfAutoSetHBL() {
+        var Is_Self = $("#Is_Self[type='checkbox']").prop("checked");
+        TBHBL();//解绑分单号,国外代理 同步修改
+        if (Is_Self) {
+            TBHBL(1);//分单号,国外代理 同步修改
+        }
+    }
+    //分单号,国外代理 同步修改
+    function TBHBL(IsTB) {
+        var tf = true;
+        if (typeof (IsTB) === 'undefined' || IsTB == null || IsTB == '')
+            tf = false;
+        $("input[id='HBL'],input[id^='FWD_Code']").each(function () {
+            var data = $(this).data();
+            if (data.combogrid) {
+                if (tf) {
+                    var func_onChange = data.combogrid.options.onChange;
+                    data.combogrid.options.onChange = function (newValue, oldValue) {
+                        FWD_Code_Change.call(this, newValue, oldValue);
+                    }
+                    $(this).combogrid("enable");
+                } else {
+                    data.combogrid.options.onChange = null;
+                    $(this).combogrid("disable");
+                }
+            } else {
+                var $txt = data.textbox.textbox.find("input.textbox-text");
+                if (tf)
+                    $txt.on("change.Michael", function (event) {
+                        $("input[id='HBL']").textbox("setValue", $(this).val());
+                    });
+                else
+                    $txt.off("change.Michael");
+            }
+        });
+    }
+    var PWVC_Types = ["_SK", "_DC"];//, "_H", "_M"
+    var nameProfixS = ["Pieces_", "Weight_", "Volume_", "Charge_Weight_"];
+    //修改 件数/毛重/体积/计费重量
+    //nameProfix:Pieces_/Weight_/Volume_/Charge_Weight_
+    //type:_SK/_DC/_M/_H
+    function SetPWVCB(event) {
+        try {
+            var nameProfix = '', type = '';
+            var $this = $(this);
+            var idStr = event.data.id;
+            var idx = idStr.indexOf('_');
+            if (idx > 0) {
+                nameProfix = idStr.substr(0, idx + 1);
+                type = idStr.substr(idx);
+            }
+            if ((typeof (nameProfix) === 'undefined' || nameProfix == null || nameProfix == '') || $.inArray(nameProfix, nameProfixS) < 0) {
+                return false;
+            }
+            if ((typeof (type) === 'undefined' || type == null || type == '') || $.inArray(type, PWVC_Types) < 0) {
+                return false;
+            }
+            var val = $this.val();
+
+            var LastTypeStr = '';
+            switch (type) {
+                case "_SK":
+                    LastTypeStr = "H";
+                    break;
+                case "_DC":
+                    LastTypeStr = "M";
+                    break;
+                case "_M":
+                    LastTypeStr = "DC";
+                    break;
+                case "_H":
+                    LastTypeStr = "SK";
+                    break;
+            }
+            if (typeof (LastTypeStr) === 'undefined' || LastTypeStr == null || LastTypeStr == '') {
+                console.log("SetPWVCB-无法找到后缀类型");
+            }
+            else {
+                var $target = $("#" + nameProfix + LastTypeStr);
+                if ($target.length > 0) {
+                    $target.numberbox('setValue', val);
+                    var data = $target.data();
+                    if (data) {
+                        //var $txt = data.textbox.textbox.find("input.textbox-text");
+                        data.textbox.options.onChange.call($target);
+                    }
+                }
+                //var Charge_Weight = $("#Charge_Weight" + type).numberbox('getValue');
+                //var $Charge_Weight = $("#Charge_Weight_" + LastTypeStr);
+                //if ($target.$Charge_Weight > 0) {
+                //    $Charge_Weight.numberbox('setValue', Charge_Weight);
+                //}
+            }
+        } catch (e) {
+            $.messager.alert("错误", "出现错误：" + e);
+        }
+    }
+    //航空公司 启运港 目的港 航班号 同步绑定
+    var ADEA_Chg = ["Airways_Code", "Depart_Port", "End_Port", "Flight_No"];
+    function ADEA() {
+        for (var i in ADEA_Chg) {
+            var Name = ADEA_Chg[i];
+            var Arrcombg = $("#" + Name);
+            Arrcombg.each(function () {
+                //var $combg = $(this);
+                //var $txt = $combg.textbox('textbox');
+                //$txt.off("change.Michael");
+                //$txt.on("change.Michael", { obj: $combg, Name: Name }, function (event) {
+                //    var obj = event.data.obj;
+                //    var ValStr = $(obj).combogrid('getValue');
+                //    var Name = event.data.Name;
+                //    $("input.easyui-combogrid[id='" + Name+"']").each(function () {
+                //        if ($(this) != obj) {
+                //            $(this).combogrid('setValue', ValStr);
+                //        }
+                //    });
+                //});
+            });
+        }
+    }
+    //委托信息 收货人 发货人 通知人 绑定
+    var SCN_MH_Chg = ["Shipper_M", "Consignee_M", "Notify_Part_M", "Shipper_H", "Consignee_H", "Notify_Part_H"];
+    function SCN_MH() {
+        var $Tab = $("#tt.easyui-tabs");
+        var ArrTab = $Tab.tabs("tabs");//所有页签
+        var $SCN_MH_zdxx1 = ArrTab[0];//总单信息
+        var $SCN_MH_fdxx1 = ArrTab[1];//分单信息
+        var $SCN_MH_wtxx_1 = $("#wtxx_1");//委托信息
+        for (var i in SCN_MH_Chg) {
+            var Name = "#" + SCN_MH_Chg[i];
+            var $itemZD = $(Name, $SCN_MH_zdxx1);
+            var $itemFD = $(Name, $SCN_MH_fdxx1);
+            var $txt;
+            var $obj;
+            if ($itemZD.length > 0) {
+                $txt = $itemZD.textbox('textbox');
+                $obj = $itemZD;
+            }
+            if ($itemFD.length > 0) {
+                var $txt = $itemFD.textbox('textbox');
+                $obj = $itemFD;
+            }
+            $txt.off('blur.Michael');
+            $txt.on('blur.Michael', { obj: $obj, Name: Name }, function (event) {
+                var obj = event.data.obj;
+                var Name = event.data.Name;
+                var ValStr = $(obj).textbox('getValue');
+                $(Name, "#wtxx_1").textbox('setValue', ValStr);
+            });
+            $txt.trigger("blur.Michael", { obj: $obj, Name: Name });
+        }
+    }
+
+    //动态改变列标题名称
+    $.extend($.fn.datagrid.methods, {
+        setColumnTitle: function (jq, option) {
+            if (option.field) {
+                return jq.each(function () {
+                    var $panel = $(this).datagrid("getPanel");
+                    var $field = $('td[field=' + option.field + ']', $panel);
+                    if ($field.length) {
+                        var $span = $("span", $field).eq(0);
+                        $span.html(option.text);
+                    }
+                });
+            }
+        }
+    })
+</script>

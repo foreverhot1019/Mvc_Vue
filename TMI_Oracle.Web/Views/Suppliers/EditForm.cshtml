@@ -1,0 +1,43 @@
+﻿﻿@model TMI.Web.Models.Supplier
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:true,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Code,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Name,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,500]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Remark,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.OperatingPoint, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:0",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+		<!-- output all Scaffold = false Hiden field -->
+	@Html.HiddenFor(model => model.ADDID)
+	@Html.HiddenFor(model => model.ADDWHO)
+	@Html.HiddenFor(model => model.ADDTS)
+	@Html.HiddenFor(model => model.EDITWHO)
+	@Html.HiddenFor(model => model.EDITTS)
+	@Html.HiddenFor(model => model.EDITID)
+		<!--end output all Scaffold = false Hiden field -->
+

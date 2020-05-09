@@ -1,0 +1,147 @@
+﻿@model AirOut.Web.Models.Warehouse_receipt
+@{
+    ViewBag.Title = "Warehouse_receipt | EditWindow";
+    Layout = null;
+    var picture = ViewBag.picture;
+}
+<script>
+    var urlpic = '/Pictures/Upload?ID=' + $("#Id").val();
+    var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");//用于获取所有下拉列表框的值
+    var FromDataWTXX = {
+        "Consign_Code_CK":"@Model.Consign_Code_CK",
+    }
+    FromDataWTXX = $.extend(FromDataWTXX,FormNAMEData);
+    
+</script>
+<script src="~/Scripts/ware.js?v=2019013102"></script>
+<script src="~/Scripts/ware2.js?v=2019013102"></script>
+<script src="~/Scripts/ware3.js?v=2019013102"></script>
+@using (Html.BeginForm())
+{
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <center>
+                        <button class="btn btn-white" type="button" onclick="cencelbutton()">取消</button>
+                        <button class="btn btn-primary" type="button" onclick="savewarehouse()">保存</button>
+                        <button class="btn btn-primary" type="button" onclick="saveandaddwarehouse()">保存并新增</button>
+                        <button class="btn btn-dropbox" type="button" onclick="declareInvalidCurrent()">删除</button>
+                        <button class="btn btn-white" type="button" data-options="iconCls:'icon-print',plain:true" onclick="printCoverUpWarehouseReceipt('edit')">打印进仓单</button>
+                        <button class="btn btn-white" type="button" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportPDFWarehouseReceipt('edit')">导出进仓单PDF</button>
+                        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-print',plain:true" onclick="">导出进仓单PDF</a>*@
+                    </center>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="">
+            <div class="col-lg-12">               
+                @*@Html.AntiForgeryToken()*@
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Partial("EditFormWin")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="div_upload" class="easyui-panel" title="图片上传" style="padding-top:5px; padding-bottom:5px; width:auto;"
+                     data-options="collapsible:true">
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        <label for="DamageUpload_GUID">破损上传：</label>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        @*<input class="easyui-validatebox" type="hidden" id="DamageUpload_GUID" name="DamageUpload_GUID" />*@
+                        <input id="file_upload1" name="file_upload" type="file" multiple="multiple">
+                        <button class="btn btn-white" onclick="deleteEmptyDamagePicture()" type="button">清空</button>
+                        <button class="btn btn-white" onclick="deleteDamagePicture()" type="button">删除</button>
+                        <div id="fileQueue1" class="fileQueue"></div>
+                        <div id="div_files1"></div>
+                        <br />
+                    </div>
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                        @*<a class="example1" id="DamageUploadPic" href="">/a>*@
+                        @foreach (var item in picture)
+                        {
+                            if (item.OperatingPoint == 1)
+                            {
+                                <img src="@item.Address" id="DamageUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                            }
+                        }
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        <label for="DeliveryUpload_GUID">交货上传：</label>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        @*<input class="easyui-validatebox" type="hidden" id="DeliveryUpload_GUID" name="DeliveryUpload_GUID" />*@
+                        <input id="file_upload2" name="file_upload2" type="file" multiple="multiple">
+                        <button class="btn btn-white" onclick="deleteEmptyDeliveryPicture()" type="button">清空</button>
+                        <button class="btn btn-white" onclick="deleteDeliveryPicture()" type="button">删除</button>
+                        <div id="fileQueue2" class="fileQueue"></div>
+                        <div id="div_files2"></div>
+                        <br />
+                    </div>
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                        @*<a class="example1" id="DeliveryUploadPic" href=""></a>*@
+                        @foreach (var item in picture)
+                        {
+                            if (item.OperatingPoint == 2)
+                            {
+                                <img src="@item.Address" id="DeliveryUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                            }
+                        }
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        <label for="EntryUpload_GUID">进仓上传：</label>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        @*<input class="easyui-validatebox" type="hidden" id="EntryUpload_GUID" name="EntryUpload_GUID" />*@
+                        <input id="file_upload3" name="file_upload3" type="file" multiple="multiple">
+                        <button class="btn btn-white" onclick="deleteEmptyEntryPicture()" type="button">清空</button>
+                        <button class="btn btn-white" onclick="deleteEntryPicture()" type="button">删除</button>
+                        <div id="fileQueue3" class="fileQueue"></div>
+                        <div id="div_files3"></div>
+                        <br />
+                    </div>
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                        <a class="example1" id="EntryUploadPic" href="">
+                            @foreach (var item in picture)
+                            {
+                                if (item.OperatingPoint == 3)
+                                {
+                                    <img src="@item.Address" id="EntryUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                                }
+                            }
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+                <div id="pagebottom" class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.ADDWHO, "创建人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", style = "width:100%" } })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.ADDTS, "创建时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", disabled = "disabled", @Value = (Model == null ? "" : Model.ADDTS == null ? "" : ((DateTime)Model.ADDTS).ToString("yyyy-MM-dd HH:mm:ss")), style = "width:100%" } })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.EDITWHO, "修改人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", style = "width:100%" } })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.EDITTS, "修改时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                        @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", disabled = "disabled",  @Value = (Model == null ? "" : Model.EDITTS == null ? "" : ((DateTime)Model.EDITTS).ToString("yyyy-MM-dd HH:mm:ss")), style = "width:100%" } })
+                        
+                        @*@Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datebox", disabled = "disabled", @Value = (Model == null ? "" : Model.EDITTS == null ? "" : ((DateTime)Model.EDITTS).ToString("yyyy-MM-dd")), style = "width:100%" } })*@
+                    </div>
+                </div>
+         </div>
+    </div>
+}
+<!--用于后端 加载dom并且渲染成EasyUI样式-->
+<div id="EasyUIDom" style="height:35px; clear:both; border:0 solid;"></div>

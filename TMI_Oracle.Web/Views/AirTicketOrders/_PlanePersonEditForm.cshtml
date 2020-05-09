@@ -1,0 +1,63 @@
+﻿ 
+
+
+@model TMI.Web.Models.PlanePerson
+
+
+ 
+
+<div class="form-horizontal">
+
+    @Html.Hidden("Id",-1)
+    @*@Html.HiddenFor(model => model.Id)*@ 
+      @*--ForeignKey AirTicketOrderId RelatedMasterModel  ---*@
+      @Html.HiddenFor(model => model.AirTicketOrderId)
+      @*<div class="form-group">
+            @Html.LabelFor(model => model.AirTicketOrderId,  htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.AirTicketOrderId, ViewBag.AirTicketOrderId as List<SelectListItem>,"---Select---", htmlAttributes: new { @class = "form-control" }) 
+                @Html.ValidationMessageFor(model => model.AirTicketOrderId,"" , new { @class = "text-danger" })
+            </div>
+        </div>*@
+       @*--End ForeignKey AirTicketOrderId RelatedMasterModel  ---*@
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NameChs,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.NameChs, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.NameChs,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastNameEng,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.LastNameEng, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.LastNameEng,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstNameEng,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.FirstNameEng, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.FirstNameEng,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.OperatingPoint,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+		<!-- output all Scaffold = false Hiden field -->
+					@Html.HiddenFor(model => model.ADDID)
+					@Html.HiddenFor(model => model.ADDWHO)
+					@Html.HiddenFor(model => model.ADDTS)
+					@Html.HiddenFor(model => model.EDITWHO)
+					@Html.HiddenFor(model => model.EDITTS)
+					@Html.HiddenFor(model => model.EDITID)
+				<!-- end output all Scaffold = false Hiden field -->
+</div>
+
+

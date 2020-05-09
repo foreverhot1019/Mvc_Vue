@@ -1,0 +1,141 @@
+﻿@{
+    ViewBag.Title = "绑定仓库接单数据";
+    //控件排序
+    var Num = 1;
+    var i = ViewData["i"];
+}
+<div class="row" style="width:750px; margin:auto; padding-top:10px; padding-bottom:10px; ">
+    <div class="col-lg-12 col-md-12 col-sm-12" style="margin:auto;">
+        <form id="searchformwarehouse" method="post" class="form-horizontal">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="form-group row">
+                        <label for="_In_Date" class="col-md-4 control-label">进仓日期：</label>
+                        <div class="col-md-8">
+                            <input id="_In_Date" name="_In_Date" tabindex="@(Num++)" data-options="prompt1:'进仓日期'" style="width:100%" class="easyui-datebox" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="form-group row">
+                        <label for="In_Date_" class="col-md-4 control-label">至：</label>
+                        <div class="col-md-8">
+                            <input id="In_Date_" name="In_Date_" tabindex="@(Num++)" data-options="prompt1:'至'" style="width:100%" class="easyui-datebox" type="text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="form-group row">
+                        <label for="Entry_Id_Query" class="col-md-4 control-label">进仓编号：</label>
+                        <div class="col-md-8">
+                            <input id="Entry_Id_Query" name="Entry_Id_Query" tabindex="@(Num++)" data-options="prompt1:'进仓编号'" style="width:100%" class="easyui-textbox" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="form-group row">
+                        <label for="Warehouse_Id_Query" class="col-md-4 control-label">仓库编号：</label>
+                        <div class="col-md-8">
+                            <input id="Warehouse_Id_Query" name="Warehouse_Id_Query" tabindex="@(Num++)" data-options="prompt1:'仓库编号'" style="width:100%" class="easyui-textbox" type="text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <hr />
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="form-group col-md-4">
+                    <label for="name" style="width:80px;">委托方编号:</label>
+                    <label for="name" style="width:80px;" id="Entrustment_Code_warehouse"></label>
+                </div>
+                <div class="form-group col-md-4">
+                    <button id="btn-search-warehouse" class="btn btn-primary" onclick="searchquery()">
+                        查询
+                    </button>
+                    <button id="btn-reset-warehouse" class="btn btn-default" onclick="clearfrom()">
+                        <i class="fa fa-reset"></i>
+                        重置
+                    </button>
+                </div>
+                <div class="form-group col-md-4">
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="warehouse_cargo_size_toolbar_@i" class="col-md-12" style="height:28px; border:#ddd 1px solid; border-bottom:none;">
+        <div id="Relationbinding">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" hidden onclick="Relation(@i)">绑定</a>
+        </div>
+        <div id="Relationsave">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" hidden onclick="Relation(@i)">保存</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-minus',plain:true" hidden onclick="AllRelation(@i)">全部解绑</a>
+        </div>
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+            <label id="totalCount" onclick="totalCount()"></label>*@
+    </div>
+    <table id="Warehouse_receipt_datagrid" class="easyui-datagrid" title="" style="width:100%; height:auto; "
+           data-options="
+        rownumbers:true,
+        checkOnSelect:true,
+        selectOnCheck:true,
+        idField:'Id',
+        sortName:'Id',
+        sortOrder:'desc',
+        remoteFilter: true,
+        singleSelect: false,
+        toolbar: '#',
+        method: 'get',
+        pagination: 'true',
+        onLoadSuccess:onLoadSuccess_binding">
+        <thead>
+            <tr>
+                <th data-options="field:'ck',checkbox:true"></th>
+                <th data-options="field:'Warehouse_Id',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                	type:'textbox',
+                	options:{
+                		required:false
+                	}
+                }">仓库编号</th>
+                <th data-options="field:'Entry_Id',width:100,align:'right',sortable:true,resizable:true,
+                editor:{
+                	type:'textbox',
+                	options:{
+                		required:false
+                	}
+                }">进仓编号</th>
+                <th data-options="field:'Pieces_CK',width:80,align:'right',sortable:true,resizable:true,
+                editor:{
+                	type:'numberbox',
+                	options:{
+                		required:false
+                	}
+                }">实际件数</th>
+                <th data-options="field:'Weight_CK',width:80,align:'right',sortable:true,resizable:true,
+                editor:{
+                	type:'numberbox',
+                	options:{
+                		required:false
+                	}
+                }">实际毛重</th>
+                <th data-options="field:'Volume_CK',width:80,align:'right',sortable:true,resizable:true,
+                editor:{
+                    type:'numberbox',
+                	options:{
+                		required:false,
+                        precision:3
+                	}
+                }">实际体积</th>
+                <th data-options="field:'In_Date',width:120,align:'right',sortable:true,resizable:true,formatter:datetimeformatter">进仓日期</th>
+                <th data-options="field:'Out_Date',width:120,align:'right',sortable:true,resizable:true,formatter:datetimeformatter">出仓日期</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+<script type="text/javascript">
+    $(function () {
+    });
+</script>

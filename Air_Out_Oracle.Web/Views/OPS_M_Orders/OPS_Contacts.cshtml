@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "OPS_Contacts";
+    ////控件排序
+    //var Num = 1;
+    var i = ViewData["i"];   
+}
+<div class="table-responsive">
+    <div id="Contacts_toolbar_@i" style="height:auto;text-align:center;">
+        <label for="name">快速查询(S):</label>
+        <input type="text" class="easyui-textbox" id="QuickQuery" />
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="searchf_C()">查询</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+    </div>
+    <table id="Contacts_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+           data-options="
+			rownumbers:true,
+			checkOnSelect:true,
+			selectOnCheck:true,
+			idField:'Id',
+			sortName:'Id',
+			sortOrder:'desc',
+			remoteFilter: true,
+			toolbar: '#',
+			method: 'get',
+			pagination: 'true',
+			onClickCell: onClickCellContacts,
+            onDblClickRow:onDblClickRowContacts">
+        <thead>
+            <tr>
+                <th data-options="field:'ck',checkbox:true"></th>
+                <th data-options="field:'ContactInfo',width:670,align:'left',sortable:true,resizable:true,
+                formatter:ContactInfoformatter,
+                editor:{
+                	type:'textbox',
+                	options:{
+                		required:false
+                	}
+                }">发货人</th>
+        </thead>
+    </table>
+</div>
+
+<script type="text/javascript">
+    var $Contt_CusBusCode = "";//客商编码
+    var $UpperLevelId = "";//上一级，选项卡的ID
+    var $nowid = "";//点击的控件的ID
+    var $dgwf;
+    var editIndexWTFD = undefined;
+    var ContactType = '';//联系人类型
+    //点击查询按钮时，触发  code是客商信息编码
+    function searchf_C(code, upperLevelId, nowid) {
+        if (!ObjectIsEmpty(code)) {
+            $Contt_CusBusCode = code;
+        }
+        if (!ObjectIsEmpty(upperLevelId)) {
+            $UpperLevelId = upperLevelId;
+        }
+        if (!ObjectIsEmpty(nowid)) {
+            $nowid = nowid;
+            ContactType = $nowid.replace("#",'').toLowerCase();
+        }
+        //UpperLevelIdWTFD = tabsId;
+        $dgwf = $('#Contacts_datagrid');
+        setfilteropts_C();//设置查询条件
+        var opts = $dgwf.datagrid('options');
+        opts.url = '/Contactses/GetData';
+        opts.pageNumber = 1;
+        var pager = $dgwf.datagrid('getPager');
+        pager.pagination('refresh', {
+            pageNumber: 1
+        });
+        $dgwf.datagrid('reload');
+    }
+    //设置查询条件
+    function setfilteropts_C() {
+        var params = [];
+        var opts = $dgwf.datagrid('options');
+        var contactInfo = $("#QuickQuery").textbox("getValue");
+
+        params.push({ "field": "CusBusInfoId", "op": "equal", "value": $Contt_CusBusCode });
+        if (!ObjectIsEmpty(ContactType))
+            params.push({ "field": "ContactType", "op": "equal", "value": ContactType });
+
+        if (!(typeof (contactInfo) === 'undefined' || contactInfo == null || contactInfo == "")) {
+            params.push({ "field": "ContactInfo", "op": "equal", "value": contactInfo });
+        }
+        opts.queryParams = {
+            'filterRules': JSON.stringify(params)
+        };
+    }
+    //收发货人 联系信息 转换
+    function ContactInfoformatter(value, row) {
+        //console.log("value:", value);
+        var a = value.replace(/"/g, "&#34;");
+        var returnstr = '<div style="width:width:600px; overflow:hidden;" title="' + a + '">';
+        var newval = value;
+        if (value != null) {
+            newval = newval.replace(/\\r\\n/g, "<br />");
+            newval = newval.replace(/\n/g, "<br />");
+        }
+        returnstr += newval + '</div>';
+        return returnstr;
+    }
+    //关联选择的仓库接单信息
+    function Relation_C(value) {
+        var item = $dgwf.datagrid("getSelected");
+        if (item == null) {
+            $.messager.alert("提示", "请选择您需要关联的仓库信息！");
+        }
+        bindingWTFD(item.Id);
+        $("#win_bindingWTFD").window('close');
+    }
+    //
+    function getwarehousesize() {
+        if ($dgwf.datagrid('getChanges').length) {
+            var inserted = $dgwf.datagrid('getChanges', "inserted");
+            var deleted = $dgwf.datagrid('getChanges', "deleted");
+            var updated = $dgwf.datagrid('getChanges', "updated");
+            var effectRow = new Object();
+            if (inserted.length) {
+                effectRow.inserted = inserted;
+            }
+            if (deleted.length) {
+                effectRow.deleted = deleted;
+            }
+            if (updated.length) {
+                effectRow.updated = updated;
+            }
+            return effectRow;
+        }
+        return null;
+    }
+    //删除
+    function removeit() {
+        $.messager.confirm('确认', '您确认删除选择的数据！', function (r) {
+            if (r) {
+                var Seltdata = $dgwf.datagrid('getSelections');
+                if (!(typeof editIndexWTFD === 'undefined' || editIndexWTFD == null || isNaN(editIndexWTFD))) {
+                    $dgwf.datagrid('cancelEdit', editIndexWTFD);
+                    editIndexWTFD = undefined;
+                }
+                for (var i = Seltdata.length; i > 0; i--) {
+                    var rowindex = $dgwf.datagrid('getRowIndex', Seltdata[i - 1]);
+                    $dgwf.datagrid('deleteRow', rowindex);
+                }
+                accept();
+            }
+        });
+    }
+    //提交变更集
+    function accept() {
+        if (endEditing()) {
+            if ($dgwf.datagrid('getChanges').length) {
+                var inserted = $dgwf.datagrid('getChanges', "inserted");
+                var deleted = $dgwf.datagrid('getChanges', "deleted");
+                var updated = $dgwf.datagrid('getChanges', "updated");
+                var effectRow = new Object();
+                if (inserted.length) {
+                    effectRow.inserted = inserted;
+                }
+                if (deleted.length) {
+                    effectRow.deleted = deleted;
+                }
+                if (updated.length) {
+                    effectRow.updated = updated;
+                }
+                //console.log(JSON.stringify(effectRow));
+                var url = '/Contactses/SaveData';
+                $.ajax({
+                    type: 'POST',
+                    url: url,//获取数据的函数
+                    async: true,//true 异步，false 同步
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                    beforeSend: function (xhr) {//发送请求前运行的函数
+                        $.messager.progress({
+                            title: '数据处理中',
+                            msg: '数据处理中，请等待...'
+                        });
+                        //验证重复提交时 请加上 这句
+                        AddAjaxActionGuidName(this);
+                    },
+                    success: function (response) {//查询成功,data为返回的数据
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dgwf.datagrid('acceptChanges');
+                            $dgwf.datagrid('reload');
+                        }
+                        else {
+                            var ErrMsgStr = '提交错误了！';
+                            if (!(typeof (response.ErrMsg) === 'undefined' || response.ErrMsg == null || response.ErrMsg == ''))
+                                ErrMsgStr = response.ErrMsg;
+                            $.messager.alert("错误", ErrMsgStr, 'error');
+                        }
+                    },
+                    error: function () {//查询失败
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                    },
+                    complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                        $.messager.progress('close');
+                    }
+                });
+            }
+            //$dg.datagrid('acceptChanges');
+        }
+    }
+    //结束编辑时
+    function endEditing() {
+        if (editIndexWTFD == undefined)
+            return true;
+        if ($dgwf.datagrid('validateRow', editIndexWTFD)) {
+            $dgwf.datagrid('endEdit', editIndexWTFD);
+            editIndexWTFD = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //新增
+    function append() {
+        if (endEditing()) {
+            var NewRow = {};
+            var Columns = $dgwf.datagrid('getColumnFields');
+            for (var column in Columns) {
+                NewRow[Columns[column]] = null;
+            }
+            //动态设置 编辑样式
+            //var byteColumn = $dgwf.datagrid('getColumnOption', 'ADDWHO');
+            //if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+            //    byteColumn.editor = {
+            //        type: 'textbox',
+            //        options: {
+            //            required: false,
+            //            validType: 'length[0,20]'
+            //        }
+            //    };
+            //    byteColumn = $dgwf.datagrid('getColumnOption', 'ADDTS');
+            //    byteColumn.editor = {
+            //        type: 'datebox',
+            //        options: {
+            //            required: false
+            //        }
+            //    };
+            //    byteColumn = $dgwf.datagrid('getColumnOption', 'EDITWHO');
+            //    byteColumn.editor = {};
+            //    byteColumn = $dgwf.datagrid('getColumnOption', 'EDITTS');
+            //    byteColumn.editor = {};
+            //}
+            $dgwf.datagrid('insertRow', { index: 0, row: NewRow });
+            editIndexWTFD = 0;
+            //$dgwf.datagrid('selectRow', editIndexWTFD).datagrid('beginEdit', editIndexWTFD);
+        }
+    }
+    //单击单元格
+    function onClickCellContacts(index, field) {
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndexWTFD != index) {
+            if (endEditing()) {
+                //动态设置 编辑样式
+                //var byteColumn = $dgwf.datagrid('getColumnOption', 'ADDWHO');
+                //if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                //    byteColumn.editor = {};
+                //    byteColumn = $dgwf.datagrid('getColumnOption', 'ADDTS');
+                //    byteColumn.editor = {};
+                //    var byteColumn = $dgwf.datagrid('getColumnOption', 'EDITWHO');
+                //    byteColumn.editor = {
+                //        type: 'textbox',
+                //        options: {
+                //            required: false,
+                //            validType: 'length[0,20]'
+                //        }
+                //    };
+                //    byteColumn = $dgwf.datagrid('getColumnOption', 'EDITTS');
+                //    byteColumn.editor = {
+                //        type: 'datebox',
+                //        options: {
+                //            required: false
+                //        }
+                //    };
+                //}
+
+                //$dgwf.datagrid('selectRow', index).datagrid('beginEdit', index);
+                var ed = $dgwf.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndexWTFD = index;
+            } else {
+                $dgwf.datagrid('selectRow', editIndexWTFD);
+            }
+        }
+    }
+    //双击行
+    function onDblClickRowContacts(index, row) {
+        var row = $dgwf.datagrid('getSelected');
+        var returnstr = '';
+        if (row.ContactInfo != null) {
+            returnstr = row.ContactInfo.replace(/\\r\\n/g, "\r\n")
+        }
+        var $Arrtxt = $("input[textboxname='" + $nowid + "'].easyui-textbox");
+        $.each($Arrtxt, function () {
+            $(this).textbox("setValue", returnstr);
+        });
+        $("#win_contacts").window('close');
+        $dgwf.datagrid('clearSelections');
+    }   
+</script>

@@ -1,0 +1,97 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/docs.css" rel="stylesheet" />
+<link href="~/Content/codemirror.css" rel="stylesheet" />
+<script src="~/Content/codemirror.js"></script>
+<script src="~/Content/edit/matchbrackets.js"></script>
+<link href="~/Content/hint/show-hint.css" rel="stylesheet" />
+<script src="http://localhost:53054/Content/hint/show-hint.js"></script>
+<script src="~/Content/clike.js"></script>
+<style>
+    .CodeMirror {
+        border: 2px inset #dee;
+    }
+</style>
+<br /> <br />
+<div class="row">
+    @using (Html.BeginForm("GetList", "Home", FormMethod.Get))
+    {
+        <div class="col-md-6 col-sm-12">
+            <h2>同步方法</h2>
+            <div>
+                <textarea id="c-code">
+                    public ActionResult GetList()
+                    {
+                    //创建一个秒表来获取执行时间
+                    var watch = new Stopwatch();
+                    watch.Start();
+
+                    var country = GetCountry();
+                    var state = GetState();
+                    var city = GetCity();
+
+                    watch.Stop();
+                    ViewBag.WatchMilliseconds = watch.ElapsedMilliseconds;
+
+                    return View();
+                    }
+                </textarea>
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">Get Excecution Time</button>
+            @if (ViewBag.WatchMilliseconds != null)
+            {
+                <h1 class="label label-danger">@ViewBag.WatchMilliseconds 毫秒</h1>
+            }
+        </div>
+    }
+
+    @using (Html.BeginForm("GetListAsync", "Home", FormMethod.Get))
+    {
+        <div class="col-md-6 col-sm-12">
+            <h2>异步方法</h2>
+            <div>
+                <textarea id="c-code2">
+                    public async Task<actionresult>
+                        GetListAsync()
+                        {
+                        //Create a stopwatch for getting excution time
+                        var watch = new Stopwatch();
+                        watch.Start();
+
+                        var country = GetCountryAsync();
+                        var state = GetStateAsync();
+                        var city = GetCityAsync();
+
+                        var content = await country;
+                        var count = await state;
+                        var name = await city;
+
+                        watch.Stop();
+                        ViewBag.WatchMilliseconds = watch.ElapsedMilliseconds;
+
+                        return View();
+                        }
+                </textarea>
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">获取执行时间</button>
+
+        </div>
+    }
+    <script>
+        var cEditor = CodeMirror.fromTextArea(document.getElementById("c-code"), {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/x-csrc"
+        });
+
+        var cEditor = CodeMirror.fromTextArea(document.getElementById("c-code2"), {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/x-csrc"
+        });
+    </script>
+</div>

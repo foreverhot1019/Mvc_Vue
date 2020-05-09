@@ -1,0 +1,92 @@
+﻿﻿@model TMI.Web.Models.FinanceMoney
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.OrderId, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+	    @Html.DropDownListFor(model => model.OrderId, ViewBag.OrderId as List<SelectListItem>,"---Select---", htmlAttributes: new { @class = "easyui-combogrid",data_options="required:false",tabindex = Num++, style = "width:100%" }) 
+        @*@Html.ValidationMessageFor(model => model.OrderId,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.SupplierName, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.SupplierName, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.SupplierName,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ServiceProject, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ServiceProject, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,50]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ServiceProject,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:2",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Price,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Num, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Num, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:2",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Num,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:2",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TotalAmount,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.RequestAmount, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.RequestAmount, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:2",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.RequestAmount,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ExcessAmount, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ExcessAmount, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:2",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.ExcessAmount,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false,validType:'length[0,500]'",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Remark,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.AuditStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.AuditStatus, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.AuditStatus,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.OperatingPoint, htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:0",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+		<!-- output all Scaffold = false Hiden field -->
+	@Html.HiddenFor(model => model.ADDID)
+	@Html.HiddenFor(model => model.ADDWHO)
+	@Html.HiddenFor(model => model.ADDTS)
+	@Html.HiddenFor(model => model.EDITWHO)
+	@Html.HiddenFor(model => model.EDITTS)
+	@Html.HiddenFor(model => model.EDITID)
+		<!--end output all Scaffold = false Hiden field -->
+

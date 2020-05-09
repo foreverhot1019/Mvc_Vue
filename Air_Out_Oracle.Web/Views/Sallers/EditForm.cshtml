@@ -1,0 +1,117 @@
+﻿﻿@model AirOut.Web.Models.Saller
+@{
+    //控件排序
+    var Num = 1;
+}
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,200]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Company, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Company, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,200]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Company, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @Value = (int)Model.Status, @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADDWHO, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", @readonly = "readonly", data_options = "required:false,validType:'length[0,20]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.ADDWHO, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADDTS, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.ADDTS, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EDITWHO, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", @readonly = "readonly", data_options = "required:false,validType:'length[0,20]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EDITWHO, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EDITTS, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EDITTS, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<!-- output all Scaffold = false Hiden field -->
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDTS)
+@Html.HiddenFor(model => model.OperatingPoint)
+<!--end output all Scaffold = false Hiden field -->
+
+<script type="text/javascript">
+    @{
+        var ArrEnum = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value, TEXT = n.DisplayName });
+    }
+    var dataStatus = @Html.Raw(ArrEnum==null?"[]":Newtonsoft.Json.JsonConvert.SerializeObject(ArrEnum));
+    //渲染所有的combogrid控件
+    function initCombogrid(_FromCache) {
+        if(typeof _FromCache ==='undefined'||_FromCache==null)
+            _FromCache='';
+        //状态
+        $('#Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            remote:"local",
+            data: dataStatus
+        }));
+    }
+    $(function () {
+        initCombogrid("_FromCache");
+        var FromData = @Html.Raw(Model==null?"{}":Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        $("form").attr("id","form1");
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl('form1',null,false,FormNAMEData);
+    });
+</script>

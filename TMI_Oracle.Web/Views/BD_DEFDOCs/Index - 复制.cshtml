@@ -1,0 +1,1033 @@
+﻿@model IEnumerable<TMI.Web.Models.BD_DEFDOC>
+
+@{
+    ViewBag.Title = "枚举管理";
+}
+
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script type="text/javascript" src="~/Scripts/EasyUIDataGrid_ControlNext.js"></script>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+ 
+
+        var opts = $("#navbar-minimalize").NavResize('getOptions');
+        opts.Auto = true;
+        opts.OnNavResizefunc = function () {
+            
+            $(".datagrid-wrap").css('width', "100%");
+            $("#bd_defdoc_datagrid").css('width', "100%");
+            $("#detailtabs").css('width', "100%");
+            $("#bd_defdoc_list").css('width', "100%");
+            $("#bd_defdoc_list_datagrid").css('width', "100%");
+            $(".tabs-header").css('width', "100%");
+            $(".tabs-panels").css('width', "100%");
+            $(".datagrid").css('width', "100%");
+            $(".panel-body").css('width', "100%");
+            $(".panel-body-noheader").css('width', "100%");
+        };
+    });
+
+</script>
+
+
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">枚举管理</a>
+            </li>
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>枚举管理</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <!--
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="table_data_tables.html#">Config option 1</a>
+                            </li>
+                            <li>
+                                <a href="table_data_tables.html#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        -->
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="bd_defdoc_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                               data-options="
+                            rownumbers:true,
+                            checkOnSelect:true,
+                            selectOnCheck:true,
+                            idField:'ID',
+                            sortName:'ID',
+                            sortOrder:'desc',
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#bd_defdoc_toolbar',
+                            url: '/BD_DEFDOCs/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            onSelect:onSelect,
+                            pagination: 'true',
+                            onHeaderContextMenu:onHeaderContextMenu,
+                            onBeginEdit:onBeginEdit">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    @*<th data-options="field:'ID',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ID)</th>*@
+
+                                    <th data-options="field:'DOCCODE',width:140,editor:{type:'textbox',options:{required:true ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.DOCCODE)</th>
+
+                                    <th data-options="field:'DOCNAME',width:140,editor:{type:'textbox',options:{required:true ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.DOCNAME)</th>
+
+                                    <th data-options="field:'REMARK',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.REMARK)</th>
+
+                                    <th data-options="field:'STATUS',width:140,editor:{type:'textbox',options:{required:true ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.STATUS)</th>
+
+                                    <th data-options="field:'ADDWHO',width:140 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+
+                                    <th data-options="field:'ADDTS',width:160,align:'right',sortable:true,resizable:true ,formatter:datetimeformatter  ">@Html.DisplayNameFor(model => model.ADDTS)</th>
+
+                                    <th data-options="field:'EDITWHO',width:140,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+
+                                    <th data-options="field:'EDITTS',width:160,align:'right',sortable:true,resizable:true ,formatter:datetimeformatter">@Html.DisplayNameFor(model => model.EDITTS)</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="bd_defdoc_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            @*@if (Html.IsAuthorize("Import"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                            }*@
+                            @if (Html.IsAuthorize("Export"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                            }
+                            @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>*@
+                        </div>
+                    </div>
+
+                    <!--detail entity tabs -->
+                    <div id="detailtabs" class="easyui-tabs" style="width:auto;height:400px;">
+                        <!--BD_DEFDOC_LIST tab   -->
+                        <div title="枚举信息" id="bd_defdoc_list" style="padding:10px;">
+                            <div class="table-responsive">
+                                <table id="bd_defdoc_list_datagrid" class="easyui-datagrid" title="@Html.DisplayNameFor(model => model.BD_DEFDOC_LIST) DataGrid" style="width:auto;height:auto"
+                                       data-options="
+                                    rownumbers:true,
+                                    remoteFilter: true,
+                                    singleSelect: true,
+                                    toolbar: '#bd_defdoc_list_toolbar',
+                                    url: '/BD_DEFDOC_LISTs/GetData',
+                                    method: 'get',
+                                    onClickCell: bd_defdoc_list_onClickCell,
+                                    pagination: 'true',
+                                    onHeaderContextMenu : onHeaderContextMenuD,
+                                    onBeginEdit: onBeginEdit_bd_defdoc_list
+                                    ">
+                                    <thead>
+                                        <tr>
+                                            @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                            @*<th data-options="field:'ID',width:80"> 行号 </th>*@
+                                            @*<th data-options="field:'DOCID',width:100,
+                                                    formatter:function(value,row){
+                                                            return row.BD_DEFDOCDOCCODE;
+                                                    },
+                                                    editor:{
+                                                            type:'combobox',
+                                                    options:{
+                                                            valueField:'ID',
+                                                            textField:'DOCCODE',
+                                                            method:'get',
+                                                            url:'/BD_DEFDOCs/GetBD_DEFDOC',
+                                                            required:true
+                                                    }
+                                                }">枚举代码</th>*@
+
+                                            <th data-options="field:'LISTCODE',width:140,editor:{type:'textbox',options:{required:true  ,validType:'length[0,50]'} } ">代码</th>
+
+                                            <th data-options="field:'LISTNAME',width:140,editor:{type:'textbox',options:{required:true  ,validType:'length[0,50]'} } ">名称</th>
+
+                                            <th data-options="field:'ListFullName',width:140,editor:{type:'textbox',options:{required:true  ,validType:'length[0,50]'} } ">代码全称</th>
+
+                                            <th data-options="field:'ENAME',width:140,editor:{type:'textbox',options:{required:false  ,validType:'length[0,50]'} } ">英文全称</th>
+
+                                            <th data-options="field:'REMARK',width:140,editor:{type:'textbox',options:{required:false  ,validType:'length[0,50]'} } ">说明</th>
+
+                                            <th data-options="field:'STATUS',width:120,editor: {type:'combogrid'},formatter:Usedformatter">状态</th>
+
+                                           @* <th data-options="field:'R_CODE',width:140,editor:{type:'textbox',options:{required:false  ,validType:'length[0,50]'} } ">关联类别</th>*@
+
+                                            <th data-options="field:'ADDWHO',width:140 ,sortable:true,resizable:true ">建立人</th>
+
+                                            <th data-options="field:'ADDTS',width:160,align:'right',sortable:true,resizable:true ,formatter:datetimeformatter  ">建立时间</th>
+
+                                            <th data-options="field:'EDITWHO',width:140,sortable:true,resizable:true ">修改人</th>
+
+                                            <th data-options="field:'EDITTS',width:160,align:'right',sortable:true,resizable:true ,formatter:datetimeformatter">修改时间</th>
+
+                                            <th data-options="field:'OperatingPoint',width:140,editor:{type:'textbox',options:{required:false  ,validType:'length[0,50]'} } ">操作点</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                <!-- bd_defdoc_list_toolbar -->
+                                <div id="bd_defdoc_list_toolbar" style="height:auto">
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="bd_defdoc_list_append()">新增</a>
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="bd_defdoc_list_removeit()">删除</a>
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="bd_defdoc_list_accept()">保存</a>
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="bd_defdoc_list_reject()">取消</a>
+                                    @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>*@
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="bd_defdoc_list_reload()">刷新</a>
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="bd_defdoc_list_exportexcel()">导出 Excel</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end BD_DEFDOC_LIST tab   -->
+                    </div>
+                    <!--end detail entity tabs -->
+                    <!-- end ibox-content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        //Begin of 右键datagrid列 选择显示的列
+        var cmenu;
+        var cmenuD;
+        function createColumnMenu($datagrid) {
+            cmenu = $('<div/>').appendTo('body');
+            cmenu.menu({
+                onClick: function (item) {
+                    if (item.iconCls == 'icon-ok') {
+                        //$('#bd_defdoc_datagrid').datagrid('hideColumn', item.name);
+                        $datagrid.datagrid('hideColumn', item.name);
+                        cmenu.menu('setIcon', {
+                            target: item.target,
+                            iconCls: 'icon-empty'
+                        });
+                    } else {
+                        //$('#bd_defdoc_datagrid').datagrid('showColumn', item.name);
+                        $datagrid.datagrid('showColumn', item.name);
+                        cmenu.menu('setIcon', {
+                            target: item.target,
+                            iconCls: 'icon-ok'
+                        });
+                    }
+                }
+            });
+            //var fields = $('#bd_defdoc_datagrid').datagrid('getColumnFields');
+            var fields = $datagrid.datagrid('getColumnFields');
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i];
+                var col = $datagrid.datagrid('getColumnOption', field);
+                cmenu.menu('appendItem', {
+                    text: col.title,
+                    name: field,
+                    iconCls: 'icon-ok'
+                });
+            }
+        }
+
+        function createColumnMenuD($datagrid) {
+            cmenuD = $('<div/>').appendTo('body');
+            cmenuD.menu({
+                onClick: function (item) {
+                    if (item.iconCls == 'icon-ok') {
+                        //$('#bd_defdoc_datagrid').datagrid('hideColumn', item.name);
+                        $datagrid.datagrid('hideColumn', item.name);
+                        cmenuD.menu('setIcon', {
+                            target: item.target,
+                            iconCls: 'icon-empty'
+                        });
+                    } else {
+                        //$('#bd_defdoc_datagrid').datagrid('showColumn', item.name);
+                        $datagrid.datagrid('showColumn', item.name);
+                        cmenuD.menu('setIcon', {
+                            target: item.target,
+                            iconCls: 'icon-ok'
+                        });
+                    }
+                }
+            });
+            //var fields = $('#bd_defdoc_datagrid').datagrid('getColumnFields');
+            var fields = $datagrid.datagrid('getColumnFields');
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i];
+                var col = $datagrid.datagrid('getColumnOption', field);
+                cmenuD.menu('appendItem', {
+                    text: col.title,
+                    name: field,
+                    iconCls: 'icon-ok'
+                });
+            }
+        }
+
+        function onHeaderContextMenu(e, field) {
+            e.preventDefault();
+            var szGridId = "#" + this.id;
+            //console.log("-------this.id=" + szGridId);
+            var $masterGrid = $(szGridId);
+            if (!cmenu) {
+                createColumnMenu($masterGrid);
+            }
+            cmenu.menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        }
+
+        function onHeaderContextMenuD(e, field) {
+            e.preventDefault();
+            var szGridId = "#" + this.id;
+            //console.log("-------this.id=" + szGridId);
+            var $masterGrid = $(szGridId);
+            if (!cmenuD) {
+                createColumnMenuD($masterGrid);
+            }
+            cmenuD.menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        }
+
+        // End of 右键datagrid列 选择显示的列
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'BD_DEFDOC' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+                }
+            });
+        });
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        function exportexcel() {
+            var filterRules = JSON.stringify($dg.datagrid('options').filterRules);
+            //console.log(filterRules);
+            $.messager.progress({ title: '正在执行导出！' });
+            var formData = new FormData();
+            formData.append('filterRules', filterRules);
+            formData.append('sort', 'ID');
+            formData.append('order', 'asc');
+            $.postDownload('/BD_DEFDOCs/ExportExcel', formData, function (fileName) {
+                $.messager.progress('close');
+                //console.log(fileName);
+            })
+        }
+
+        var $dg = $('#bd_defdoc_datagrid');
+        var editIndex = undefined;
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            //combogrid 设置信息
+            var combogrid_Settings = {
+            };
+            var num = 0;
+            for (var i in rowData) {
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log(rowData);
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            var OldVal = targetEditor.oldHtml;
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (OldVal != null) {
+                                if (typeof (OldVal) != 'undefined') {
+                                    if (OldVal != '') {
+                                        if (rowData[targetEditor.field])
+                                            $(targetEditor.target).combogrid('setValue', rowData[targetEditor.field]);
+                                        else
+                                            $(targetEditor.target).combogrid('setValue', OldVal);
+
+                                    }
+                                }
+                            }
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                            case "numberbox":
+                                $(targetEditor.target).numberbox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $dg, rowIndex);
+                                        }
+                                    })
+                                });
+                                break;
+                            case "datebox":
+                                $(targetEditor.target).datebox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $dg, rowIndex);
+                                        }
+                                    })
+                                });
+                                break;
+                            case "datetimebox":
+                                $(targetEditor.target).datetimebox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $dg, rowIndex);
+                                        }
+                                    })
+                                });
+                                break;
+                    }
+                }
+            }
+        }
+
+        function reload() {
+            $dg.datagrid('reload');
+        }
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                        @Html.Raw("return;\r\n");
+                    }
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        function append() {
+            if (endEditing()) {
+                var dataColumn = $dg.datagrid('getColumnFields', false);
+                var newrow = { Statuss: 0 };
+                for (var i in dataColumn) {
+                    newrow[dataColumn[i]] = '';
+                }
+
+                $dg.datagrid('insertRow', { index: 0, row: newrow });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+                filterByBD_DEFDOCID("","");
+            }
+        }
+        function removeit() {
+            if (editIndex == undefined) { return }
+            $dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        //var ss = { aa: "", bb: "" };
+                        // ss["cc"] = ss["aa"];
+                        $.each(updated, function (i, elem) {
+                            elem["TestID"] = elem["ID"];
+                        });
+                        for (var i = 0; i < updated.length; i++) {
+                            updated[i].ADDTS = moment(updated[i].ADDTS).format('YYYY-MM-DD HH:mm:ss');
+                        }
+
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/BD_DEFDOCs/SaveData", effectRow, function (response) {
+                        //console.log(response);
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dg.datagrid('acceptChanges');
+                            $dg.datagrid('reload');
+                        }
+                        else
+                            $.messager.alert("错误", response.ErrMsg, 'error');
+                    }, "JSON").error(function (response) {
+                        //console.log(response);
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                        //$dg.datagrid('reload');
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'ADDTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'ADDTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'ADDTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                },
+                {
+                    field: 'EDITTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'EDITTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'EDITTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                }
+            ]);
+        });
+
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+            filterByBD_DEFDOCID(row.ID,row);
+            
+        }
+
+        function filterByBD_DEFDOCID(bd_defdocid, row) {
+            $bd_defdoc_listdg.datagrid('disableFilter');
+            var value = bd_defdocid;
+            if (value != "" && value != null) {
+                if (row!=""&&row.DOCCODE == 'OWNER_CODE') {
+                    var option1 = $bd_defdoc_listdg.datagrid("getColumnOption", "LISTCODE");
+                    option1.title = "物权人代码前7位";
+
+                    var option2 = $bd_defdoc_listdg.datagrid("getColumnOption", "LISTNAME");
+                    option2.title = "供应商代码";
+
+                    var option3 = $bd_defdoc_listdg.datagrid("getColumnOption", "ENAME");
+                    option3.title = "收货人代码前7位";
+
+                    var opt = $bd_defdoc_listdg.datagrid('options');
+                    var columns = opt.columns;
+                   
+                    $bd_defdoc_listdg.datagrid({
+                        columns: columns
+
+                    });
+                   
+                   
+                   // $bd_defdoc_listdg.datagrid('disableFilter');
+                    $bd_defdoc_listdg.datagrid('enableFilter', [
+                    ]);
+                    $bd_defdoc_listdg.datagrid('removeFilterRule', 'DOCID');
+                    $bd_defdoc_listdg.datagrid('addFilterRule', {
+                        field: 'DOCID',
+                        op: 'equal',
+                        value: value
+                    });
+
+                    $bd_defdoc_listdg.datagrid('doFilter');
+                    //$bd_defdoc_listdg.datagrid('enableFilter');
+
+                }
+                else {
+                    var option1 = $bd_defdoc_listdg.datagrid("getColumnOption", "LISTCODE");
+                    option1.title = "代码";
+
+                    var option2 = $bd_defdoc_listdg.datagrid("getColumnOption", "LISTNAME");
+                    option2.title = "名称";
+
+                    var option3 = $bd_defdoc_listdg.datagrid("getColumnOption", "ENAME");
+                    option3.title = "英文名称";
+
+                    var opt = $bd_defdoc_listdg.datagrid('options');
+                    var columns = opt.columns;
+
+                    $bd_defdoc_listdg.datagrid({
+                        columns: columns
+
+                    });
+                    $bd_defdoc_listdg.datagrid('enableFilter', [
+                    ]);
+                    $bd_defdoc_listdg.datagrid('removeFilterRule', 'DOCID');
+                    $bd_defdoc_listdg.datagrid('addFilterRule', {
+                        field: 'DOCID',
+                        op: 'equal',
+                        value: value
+                    });
+                    $bd_defdoc_listdg.datagrid('doFilter');
+                    $bd_defdoc_listdg.datagrid('loadData', { total: 0, rows: [] });
+                }
+               
+                //$bd_defdoc_listdg.datagrid('removeFilterRule', 'DOCID');
+                //$bd_defdoc_listdg.datagrid('addFilterRule', {
+                //    field: 'DOCID',
+                //    op: 'equal',
+                //    value: value
+                //});
+               
+                //$bd_defdoc_listdg.datagrid('doFilter');
+               
+                
+            }
+            else {
+                $bd_defdoc_listdg.datagrid('enableFilter', [
+                ]);
+                $bd_defdoc_listdg.datagrid('removeFilterRule', 'DOCID');
+                $bd_defdoc_listdg.datagrid('addFilterRule', {
+                    field: 'DOCID',
+                    op: 'equal',
+                    value: -1
+                });
+                $bd_defdoc_listdg.datagrid('doFilter');
+                $bd_defdoc_listdg.datagrid('loadData', { total: 0, rows: [] });
+            }
+        }
+        //-----------------------------------------------------------------------
+        // details datagrid functions
+        //-----------------------------------------------------------------------
+        //--------------------------------------------------------------------
+        // #bd_defdoc_list_datagrid functions
+        //--------------------------------------------------------------------
+        var $bd_defdoc_listdg = $('#bd_defdoc_list_datagrid');
+
+        var bd_defdoc_list_editIndex = undefined;
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit_bd_defdoc_list(rowIndex, rowData) {
+            //combogrid 设置信息
+            var combogrid_Settings = {
+                'STATUS': {
+                    required: true,
+                    url: '',
+                    method: 'get',
+                    multiple: false,
+                    panelHeight: 'auto',
+                    data: [{ code: '1', desc: '启用' }, { code: '0', desc: '停用' }],
+                    idField: 'code',
+                    valueField: 'code',
+                    textField: 'desc',
+                    columns: [[
+                        { field: 'code', title: '代码', width: 50 },
+                        { field: 'desc', title: '描述', width: 50 }
+
+                    ]],
+                    keyHandler: {
+                        up: function (e) {
+                            combogrid_upKey(this, e);
+                        },
+                        down: function (e) {
+                            combogrid_downKey(this, e);
+                        },
+                        enter: function (e) {
+                            combogrid_enterKey(this, e, $bd_defdoc_listdg, 'STATUS', bd_defdoc_list_editIndex);
+                        },
+                        query: function (q) {
+                            var opts = $(this).combogrid('options');
+                            var url = opts.url;
+                            var $target = $bd_defdoc_listdg.datagrid('getEditor', { field: 'STATUS', index: bd_defdoc_list_editIndex });
+                            var valstr = $target.target.combogrid('getValue');
+                            //动态搜索
+                            $(this).combogrid('grid').datagrid('reload', q);
+                            if (q == '')
+                                $(this).combogrid('setValue', '');
+                            else {
+                                $(this).combogrid('setValue', q);
+                            }
+                        }
+                    }
+                }
+            };
+            var num = 0;
+            for (var i in rowData) {
+                var targetEditor = $bd_defdoc_listdg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log(rowData);
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (OldVal != null) {
+                                if (typeof (OldVal) != 'undefined') {
+                                    if (OldVal != '') {
+                                        if (rowData[targetEditor.field])
+                                            $(targetEditor.target).combogrid('setValue', rowData[targetEditor.field]);
+                                        else
+                                            $(targetEditor.target).combogrid('setValue', OldVal);
+
+                                    }
+                                }
+                            }
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $bd_defdoc_listdg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                            case "combobox":
+                                var opts = $(targetEditor.target).combobox({
+                                    inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            combobox_keydown(this, event, $bd_defdoc_listdg, rowIndex);
+                                        }
+                                    })
+                                });
+                                break;
+                            case "numberbox":
+                                $(targetEditor.target).numberbox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $bd_defdoc_listdg, rowIndex);
+                                        }
+                                    })
+                                });
+                                break;
+                            case "datebox":
+                                $(targetEditor.target).datebox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $bd_defdoc_listdg, rowIndex);
+                                        }
+                                    })
+                                });
+                                setTargetVal(targetEditor, OldVal);
+                                break;
+                            case "datetimebox":
+                                $(targetEditor.target).datetimebox({
+                                    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                        keydown: function (event) {
+                                            Listtextbox_keydown(this, event, $bd_defdoc_listdg, rowIndex);
+                                        }
+                                    })
+                                });
+                                setTargetVal(targetEditor, OldVal);
+                                break;
+                            case "checkbox":
+                                $(targetEditor.target).keydown(function (e) {
+                                    chk_rdo_keydown(this, e, $dg, rowIndex);
+                                });
+                                setTargetVal(targetEditor, OldVal);
+                                break;
+                            case "radio":
+                                $(targetEditor.target).keydown(function (e) {
+                                    chk_rdo_keydown(this, e, $dg, rowIndex);
+                                });
+                                setTargetVal(targetEditor, OldVal);
+                                break;
+                    }
+                }
+            }
+        }
+
+        function bd_defdoc_list_reload() {
+            $bd_defdoc_listdg.datagrid('reload');
+        }
+
+        function bd_defdoc_list_endEditing() {
+            if (bd_defdoc_list_editIndex == undefined) { return true }
+            if ($bd_defdoc_listdg.datagrid('validateRow', bd_defdoc_list_editIndex)) {
+                //var ed = $bd_defdoc_listdg.datagrid('getEditor', { index: bd_defdoc_list_editIndex, field: 'DOCID' });
+                //var BD_DEFDOCDOCCODE = $(ed.target).combobox('getText');
+                //var BD_DEFDOCID = $(ed.target).combobox('getValue');
+
+                //$bd_defdoc_listdg.datagrid('getRows')[bd_defdoc_list_editIndex]['BD_DEFDOCDOCCODE'] = BD_DEFDOCDOCCODE;
+                //$bd_defdoc_listdg.datagrid('getRows')[bd_defdoc_list_editIndex]['DOCID'] = BD_DEFDOCID;
+
+                $bd_defdoc_listdg.datagrid('endEdit', bd_defdoc_list_editIndex);
+                bd_defdoc_list_editIndex = undefined;
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function bd_defdoc_list_onClickCell(index, field) {
+            if (bd_defdoc_list_editIndex != index) {
+                if (bd_defdoc_list_endEditing()) {
+                    $bd_defdoc_listdg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $bd_defdoc_listdg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    bd_defdoc_list_editIndex = index;
+                } else {
+                    $bd_defdoc_listdg.datagrid('selectRow', bd_defdoc_list_editIndex);
+                }
+            }
+        }
+        function bd_defdoc_list_append() {
+            if (bd_defdoc_list_endEditing()) {
+                var bd_defdoc = $dg.datagrid('getSelected');
+
+                //$bd_defdoc_listdg.datagrid('appendRow', { DOCID: bd_defdoc.ID });
+                //bd_defdoc_listeditIndex = $bd_defdoc_listdg.datagrid('getRows').length - 1;
+                //$bd_defdoc_listdg.datagrid('selectRow', bd_defdoc_list_editIndex)
+                //        .datagrid('beginEdit', bd_defdoc_list_editIndex);
+                if (bd_defdoc.ID != null) {
+                    var dataColumn = $bd_defdoc_listdg.datagrid('getColumnFields', false);
+                    var newrow = { DOCID: bd_defdoc.ID, Statuss: 0 };
+                    for (var i in dataColumn) {
+                        newrow[dataColumn[i]] = '';
+                    }
+                    newrow.STATUS = 1;
+                    $bd_defdoc_listdg.datagrid('insertRow', { index: 0, row: newrow });
+                    bd_defdoc_list_editIndex = 0;
+                    // bd_defdoc_listeditIndex = $bd_defdoc_listdg.datagrid('getRows').length - 1;
+                    $bd_defdoc_listdg.datagrid('selectRow', bd_defdoc_list_editIndex).datagrid('beginEdit', bd_defdoc_list_editIndex);
+                }
+            }
+        }
+        function bd_defdoc_list_removeit() {
+            if (bd_defdoc_list_editIndex == undefined) { return }
+            $bd_defdoc_listdg.datagrid('cancelEdit', bd_defdoc_list_editIndex).datagrid('deleteRow', bd_defdoc_list_editIndex);
+            bd_defdoc_listeditIndex = undefined;
+        }
+
+        function bd_defdoc_list_reject() {
+            $bd_defdoc_listdg.datagrid('rejectChanges');
+            bd_defdoc_list_editIndex = undefined;
+        }
+        function bd_defdoc_list_getChanges() {
+            var rows = $bd_defdoc_listdg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+        function bd_defdoc_list_accept() {
+            if (bd_defdoc_list_endEditing()) {
+                if ($bd_defdoc_listdg.datagrid('getChanges').length) {
+                    var inserted = $bd_defdoc_listdg.datagrid('getChanges', "inserted");
+                    var deleted = $bd_defdoc_listdg.datagrid('getChanges', "deleted");
+                    var updated = $bd_defdoc_listdg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        for (var i = 0; i < updated.length; i++) {
+                            updated[i].ADDTS = moment(updated[i].ADDTS).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/BD_DEFDOC_LISTs/SaveData", effectRow, function (response) {
+                        //console.log('1111' + response);
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $bd_defdoc_listdg.datagrid('acceptChanges');
+                            $bd_defdoc_listdg.datagrid('reload');
+                        }
+                        else
+                            $.messager.alert("错误", response.ErrMsg, 'error');
+
+                    }, "JSON").error(function (response) {
+                        console.log('222' + response);
+                        $.messager.alert("错误", "提交错误了！", 'error');
+
+                    });
+                }
+                //$bd_defdoc_listdg.datagrid('acceptChanges');
+            }
+        }
+
+        $(function () {
+            $bd_defdoc_listdg.datagrid('enableFilter', [
+            ]);
+           // filterByBD_DEFDOCID("","");
+        });
+        function bd_defdoc_list_exportexcel() {
+            var filterRules = JSON.stringify($dg.datagrid('options').filterRules);
+            //console.log(filterRules);
+            $.messager.progress({ title: '正在执行导出！' });
+            var formData = new FormData();
+            formData.append('filterRules', filterRules);
+            formData.append('sort', 'ID');
+            formData.append('order', 'asc');
+            $.postDownload('/BD_DEFDOC_LISTs/ExportExcel', formData, function (fileName) {
+                $.messager.progress('close');
+                //console.log(fileName);
+            });
+        }
+
+    </script>
+}
+

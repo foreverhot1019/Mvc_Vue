@@ -1,0 +1,119 @@
+﻿@model TMI.Web.Models.SetDefaults
+
+@{
+    ViewBag.Title = "设置默认值";
+}
+
+<link href="/Scripts/Chosen/bootstrap-chosen.css" rel="stylesheet" />
+<script src="/Scripts/Chosen/chosen.jquery.js"></script>
+<script src="/Scripts/Chosen/prism.js"></script>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                默认值
+                <small>编辑</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-home"></i>  @Html.ActionLink("Home", "Index", "Home")
+                </li>
+                <li>
+                    <i class="fa fa-folder-open"></i>  @Html.ActionLink("默认值", "Index", "SetDefaults")
+                </li>
+                <li class="active">
+                    <i class="fa fa-file"></i> 编辑
+                </li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="">
+                    @*<h4>设置默认值</h4>
+                    <hr />*@
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    @Html.Partial("EditForm")
+                    <div class="form-group">
+                        <p></p>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-primary" value=" 保存 " />
+                            <input type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal" value=" 删除 " style="display:none;" />
+                            <input id="btngoback" type="button" class="btn btn-default" value="返回" onclick="GoBack();" />
+                            <script>
+                                if (!navigator.cookieEnabled) {
+                                    alert("请打开浏览器Cookie功能，否则返回记忆功能将失效");
+                                    //$("input[id=btngoback]").attr("disabled", "disabled");
+                                }
+                                var CookiePagePath = "/Index";
+                                var PagePath = window.location.pathname;
+                                var PagePathFather = "";
+                                if (PagePath.indexOf("/") == 0) {
+                                    PagePath = PagePath.substr(1);
+                                }
+                                if (PagePath.toLocaleLowerCase().indexOf("/edit") > 0) {
+                                    PagePathFather = "/" + PagePath.substr(0, PagePath.toLocaleLowerCase().indexOf("/edit"));
+                                    CookiePagePath = "/Index";// + window.location.search;
+                                } else {
+                                    if (PagePathFather.indexOf("/") > 0) {
+                                        PagePathFather = "/" + PagePath.substr(0, PagePath.toLocaleLowerCase().indexOf("/"));
+                                        CookiePagePath = "/Index";// + window.location.search;
+                                    } else {
+                                        PagePathFather = "";
+                                        CookiePagePath = "";
+                                    }
+                                }
+                                //console.log("PagePathFather", PagePathFather, CookiePagePath);
+                                if (navigator.cookieEnabled) {
+                                    $.cookie((PagePathFather + CookiePagePath + '_' + "EditReturn"), '1', { expires: 7, path: '/' });
+                                }
+                                function GoBack() {
+                                    self.location.href = PagePathFather + CookiePagePath + window.location.search;
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">警告 !!</h4>
+            </div>
+            <div class="modal-body">
+                您确定要删除此条记录吗 ?
+            </div>
+            <div class="modal-footer">
+                @using (Html.BeginForm("Delete", "SetDefaultses", new { TableName = Model.TableName, ColumnName = Model.ColumnName }))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-default" data-dismiss="modal"> 取消 </button>
+                    <button type="submit" class="btn btn-warning"> 确定 </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        
+        $(function () {
+        });
+    </script>
+
+}

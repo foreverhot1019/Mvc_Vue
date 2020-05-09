@@ -1,0 +1,288 @@
+﻿@model AirOut.Web.Models.Warehouse_receipt
+@{
+    ViewBag.Title = "仓库接单 | 创建";
+    Layout = null;
+    var picture = ViewBag.picture;
+}
+<script>
+    var urlpic = '/Pictures/Upload?ID=' + $("#Id").val();
+</script>
+<script src="~/Scripts/ware.js?v=20181114"></script>
+<script src="~/Scripts/ware2.js?v=20181226"></script>
+<script src="~/Scripts/ware3.js?v=20181114"></script>
+<!--上传-->
+<script async defer src="~/Scripts/uploadify/jquery.uploadify.js"></script>
+
+<script async defer type="text/javascript">
+	//表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+	 $(document).ready(function () {
+		initJcdt(); //初始化基础数据
+        initPage();//初始化页面
+	});
+	//初始化基础数据
+    function initJcdt() {
+        Data_Unit = @Html.Raw(ViewData["Data_Unit"] ?? "[]");
+        Data_Currency = @Html.Raw(ViewData["Data_Currency"] ?? "[]");
+        Data_Country = @Html.Raw(ViewData["Data_Country"] ?? "[]");
+    }
+	//初始化页面
+    function initPage() {
+		//////账册号
+        ////$("#BOOKSNO").combogrid({
+        ////    panelWidth: comgridWidth,
+        ////    //panelHeight: 'auto',
+        ////    fitColumns:true,
+        ////    mode: 'remote',
+        ////    idField: 'EMS_NO',
+        ////    valueField: 'EMS_NO',
+        ////    textField: 'EMS_NO',
+        ////    url: '/EMS_HEADs/GetEMS_NOS',
+        ////    columns: [[
+        ////        { field: 'EMS_NO', title: '账册号', width: comfiledWidth },
+        ////        { field: 'EMS_TYPE', title: '账册类型', width: comfiledWidth }
+        ////    ]]
+        ////});
+	}
+	//加载成功
+    function onLoadSuccess(rowdata) {
+        //行号自适应宽度
+        $(this).datagrid("fixRownumber");
+    }
+	//自适应页面大小
+    function MyNavResize() {
+        //var opts = $("#navbar-minimalize").NavResize('getOptions');
+        //opts.Auto = false;
+        //opts.OnNavResizefunc = function () {
+        //    
+        //};
+    }
+	//异步获取 提取 借用账册 强行提取 选择框
+    var ArrIsLoadWin ={
+        //IsLoadMyWin1 : false,//提取
+        //IsLoadMyWin2 : false,//借用账册
+        //IsLoadMyWin3 : false,//强行提取
+        //IsLoadAlertWin : false,//料号归并-项号未找到
+        //IsLoadMyWin_Err : false,//项号比对异常明细
+        //IsLoadImportWin : false//导入数据框
+    };
+    function AsyncGetMyWin(url,IsLoadMyWin,InitMyWinFucName,Async_Load){
+        var AsyncLoad = false;
+        if(!(typeof(Async_Load)==='undefined' || Async_Load==null ||Async_Load=="")){
+            if(Async_Load)
+                AsyncLoad = true;
+        }
+        if (!ArrIsLoadWin[IsLoadMyWin]) {
+            $.messager.progress({
+                text: '正在加载数据......'
+            });
+            var TabIndexMax = $("input[tabindex]:not([id^='_easyui']):last");
+            var postObj = {};
+            if(TabIndexMax.length>0){
+                postObj.Num = TabIndexMax.attr('tabindex');
+            }
+            var retTF = true;
+            $.ajax({
+                type: "POST",
+                datatype: "html",
+                async: false,
+                data: postObj,
+                url: url,
+                success: function (data) {
+                    ArrIsLoadWin[IsLoadMyWin] = true;
+                    var docm = $("#EasyUIDom");
+                    if (data) {
+                        docm.append(data);
+                        $.parser.parse(docm);
+                        //InitMyWinFuc();
+                        eval(InitMyWinFucName);//js 方式
+                        //$(this)[InitMyWinFucName](); //jquery方式$(this).trigger(InitMyWinFucName)
+                    }
+                    else
+                        retTF = false;
+                    $.messager.progress('close');
+                },
+                error: function () {
+                    retTF = false;
+                    $.messager.progress('close');
+                }
+            });
+            return retTF;
+        }
+        else{
+            return true;
+        }
+    }
+	//导入
+    function importexcel() {
+        //异步获取 提取 借用账册 强行提取 选择框
+        var retTF = AsyncGetMyWin('/ORDERS_SECLINE_HEADS/Get_ImportWinDialog','IsLoadImportWin',"InitImportWin()");
+        if(!retTF)
+            return;
+        var OrderId = getQueryString("id");
+        $('#file_upload_pmByhand').data('uploadifive').settings.formData = { 'ID': OrderId, 'modelType': 'ORDERS_SECLINE_PRODUCT' };
+        $('#importwindow_pmByhand').window('open');
+        $('#importwindow_pmByhand').window('center');
+    }
+	//导出
+    function exportexcel() {
+        //$.messager.progress({ title: '正在执行导出！' });
+        //var inserted_product = $('#ProductNameMerge').datagrid('getRows');
+        //if (inserted_product.length > 0) {
+        //    var postdata = { orders_secline_productStr: JSON.stringify(inserted_product) };
+        //    var url = '/ORDERS_SECLINE_HEADs/ExportExcelProduct';
+        //    $.DownLoadProgress({
+        //        url: url,         //下载文件的url
+        //        method: 'Post',   //链接打开方式
+        //        data: postdata,         //要发送的数据
+        //        downLoadInfo: '下载文件', //下载界面文字
+        //        closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+        //        callbackFuc: function () {
+        //            $.messager.progress('close');
+        //        }
+        //    });
+        //} else {
+        //    $.messager.alert('提示！', '没有可以导出的数据。');
+        //}
+    }
+</script>
+@using (Html.BeginForm()) 
+{
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="form-group">
+            <div class="col-lg-12">
+                <center>
+                    <button class="btn btn-white" type="button" onclick="cencelbutton()">取消</button>
+                    <button class="btn btn-primary" type="button" onclick="savewarehouse()">保存</button>
+                    <button class="btn btn-primary" type="button" onclick="saveandaddwarehouse()">保存并新增</button>
+                </center>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-lg-12">
+			<div id="div_Warehouse" class="easyui-panel" title="" style="padding-top:5px; padding-bottom:5px; width:auto; "
+             data-options="collapsible:true">
+				    @*@Html.AntiForgeryToken()*@
+					@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					@Html.Partial("EditFormWin")
+                    <!--表单唯一值，防止重复提交-->
+                    @Html.Hidden("ActionGuidName", ViewData["ActionGuidName"] ?? "")
+                    @Html.Hidden("ActionGuid", ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="div_upload" class="easyui-panel" title="图片上传" style="padding-top:5px; padding-bottom:5px; width:auto;"
+                 data-options="collapsible:true">
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label for="DamageUpload_GUID">破损上传：</label>
+                </div>
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    @*<input class="easyui-validatebox" type="hidden" id="DamageUpload_GUID" name="DamageUpload_GUID" />*@
+                    <input id="file_upload1" name="file_upload" type="file" multiple="multiple">
+                    <button class="btn btn-white" onclick="deleteEmptyDamagePicture()" type="button">清空</button>
+                    <button class="btn btn-white" onclick="deleteDamagePicture()" type="button">删除</button>
+                    <div id="fileQueue1" class="fileQueue"></div>
+                    <div id="div_files1"></div>
+                    <br />
+                </div>
+                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                    @*<a class="example1" id="DamageUploadPic" href="">/a>*@
+                    @foreach (var item in picture)
+                    {
+                        if (item.OperatingPoint == 1)
+                        {
+                            <img src="@item.Address" id="DamageUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                        }
+                    }
+                </div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+
+                </div>
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label for="DeliveryUpload_GUID">交货上传：</label>
+                </div>
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    @*<input class="easyui-validatebox" type="hidden" id="DeliveryUpload_GUID" name="DeliveryUpload_GUID" />*@
+                    <input id="file_upload2" name="file_upload2" type="file" multiple="multiple">
+                    <button class="btn btn-white" onclick="deleteEmptyDeliveryPicture()" type="button">清空</button>
+                    <button class="btn btn-white" onclick="deleteDeliveryPicture()" type="button">删除</button>
+                    <div id="fileQueue2" class="fileQueue"></div>
+                    <div id="div_files2"></div>
+                    <br />
+                </div>
+                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                    @*<a class="example1" id="DeliveryUploadPic" href=""></a>*@
+                    @foreach (var item in picture)
+                    {
+                        if (item.OperatingPoint == 2)
+                        {
+                            <img src="@item.Address" id="DeliveryUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                        }
+                    }
+                </div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+
+                </div>
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label for="EntryUpload_GUID">进仓上传：</label>
+                </div>
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    @*<input class="easyui-validatebox" type="hidden" id="EntryUpload_GUID" name="EntryUpload_GUID" />*@
+                    <input id="file_upload3" name="file_upload3" type="file" multiple="multiple">
+                    <button class="btn btn-white" onclick="deleteEmptyEntryPicture()" type="button">清空</button>
+                    <button class="btn btn-white" onclick="deleteEntryPicture()" type="button">删除</button>
+                    <div id="fileQueue3" class="fileQueue"></div>
+                    <div id="div_files3"></div>
+                    <br />
+                </div>
+                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                    <a class="example1" id="EntryUploadPic" href="">
+                        @foreach (var item in picture)
+                        {
+                            if (item.OperatingPoint == 3)
+                            {
+                                <img src="@item.Address" id="EntryUpload_@item.Id" alt="图片" style="max-height:200px;max-width:500px" />
+                            }
+                        }
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="pagebottom" class="form-group col-lg-12 col-md-12 col-sm-12">
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                @Html.LabelFor(model => model.ADDWHO, "创建人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", style = "width:100%" } })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                @Html.LabelFor(model => model.ADDTS, "创建时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datebox", disabled = "disabled", @Value = (Model == null ? "" : Model.ADDTS == null ? "" : ((DateTime)Model.ADDTS).ToString("yyyy-MM-dd")), style = "width:100%" } })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                @Html.LabelFor(model => model.EDITWHO, "修改人", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", disabled = "disabled", style = "width:100%" } })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                @Html.LabelFor(model => model.EDITTS, "修改时间", htmlAttributes: new { @class = "control-label ", style = "width:100px;" })
+                @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", disabled = "disabled", @Value = (Model == null ? "" : Model.EDITTS == null ? "" : ((DateTime)Model.EDITTS).ToString("yyyy-MM-dd hh:mm:ss")), style = "width:100%" } })
+            </div>
+        </div>
+    </div>
+</div>
+}
+<!--用于后端 加载dom并且渲染成EasyUI样式-->
+<div id="EasyUIDom" style="height:35px; clear:both; border:0 solid;"></div>
+

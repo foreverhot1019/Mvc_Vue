@@ -1,0 +1,249 @@
+﻿@{
+    ViewBag.Title = "Warehouse_receipt";
+    //控件排序
+    var Num = 1;
+}
+    <div class="table-responsive">
+        <table id="Warehouse_receipt_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+               data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: true,
+							toolbar: '#warehouse_cargo_size_toolbar',
+							method: 'get',
+							pagination: 'true',
+							onClickCell: onClickCell">
+            <thead>
+                <tr>
+                    <th data-options="field:'ck',checkbox:true"></th>
+                    <th data-options="field:'Warehouse_Id',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false
+										}
+								}">仓库编号</th>
+                    <th data-options="field:'Entry_Id',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false
+										}
+								}">进仓编号</th>
+                    <th data-options="field:'Pieces_CK',width:80,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">实际件数</th>
+                    <th data-options="field:'Pieces_CK',width:80,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">实际毛重</th>
+                    <th data-options="field:'Volume_CK',width:80,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            precision:3
+										}
+								}">实际体积</th>
+                </tr>
+            </thead>
+        </table>
+
+
+    <div id="warehouse_cargo_size_toolbar" style="height:auto">
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="Relation()">绑定</a>
+
+        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+    <label id="totalCount" onclick="totalCount()"></label>*@
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        //searchf_M();
+    });
+    var $dgw = $('#Warehouse_receipt_datagrid');
+    var editIndex = undefined;
+    var UpperLevel = "";//上一级，选项卡的ID
+
+    //点击查询按钮时，触发
+    function searchf_M() {
+        setfilteropts();//设置查询条件
+            var opts = $dgw.datagrid('options');
+            opts.url = '/Warehouse_receipts/GetData';
+            opts.pageNumber = 1;
+            var pager = $dgw.datagrid('getPager');
+            pager.pagination('refresh', {
+                pageNumber: 1
+            });
+            $dgw.datagrid('reload');
+    }
+    //设置查询条件
+    function setfilteropts() {
+        var params = [];
+        var opts = $dgw.datagrid('options');
+
+        params.push({ "field": "Is_Binding", "op": "equal", "value": false });
+        params.push({ "field": "Status", "op": "equal", "value": "0" });
+
+        opts.queryParams = {
+            'filterRules': JSON.stringify(params)
+        };
+
+    }
+    //关联选择的仓库接单信息
+    function Relation() {
+        var item = $dgw.datagrid("getSelected");
+        if (item == null) {
+            $.messager.alert("提示", "请选择您需要关联的仓库信息！");
+        }
+        $("#Pieces_Fact", "#wtxx").numberbox("setValue", item.Pieces_CK);
+        $("#Weight_Fact", "#wtxx").numberbox("setValue", item.Weight_CK);
+        $("#Volume_Fact", "#wtxx").numberbox("setValue", item.Volume_CK);
+        $("#win").window('close');
+        is_binding = item.Id;
+    }
+
+    function getwarehousesize() {
+        if ($dgw.datagrid('getChanges').length) {
+            var inserted = $dgw.datagrid('getChanges', "inserted");
+            var deleted = $dgw.datagrid('getChanges', "deleted");
+            var updated = $dgw.datagrid('getChanges', "updated");
+            var effectRow = new Object();
+
+            if (inserted.length) {
+                effectRow.inserted = inserted;
+            }
+            if (deleted.length) {
+                effectRow.deleted = deleted;
+            }
+            if (updated.length) {
+                effectRow.updated = updated;
+            }
+            return effectRow;
+        }
+        return null;
+        //var list = $dgw.datagrid("getChanges");
+        //return list;
+    }
+    function removeit() {
+        var Seltdata = $dgw.datagrid('getSelections');
+        if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+            $dgw.datagrid('cancelEdit', editIndex);
+            editIndex = undefined;
+        }
+        for (var i = Seltdata.length; i > 0; i--) {
+            var rowindex = $dgw.datagrid('getRowIndex', Seltdata[i - 1]);
+            $dgw.datagrid('deleteRow', rowindex);
+        }
+    }
+
+
+    function endEditing() {
+        if (editIndex == undefined)
+            return true;
+        if ($dgw.datagrid('validateRow', editIndex)) {
+            $dgw.datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function append() {
+        if (endEditing()) {
+            var NewRow = {};
+            var Columns = $dgw.datagrid('getColumnFields');
+            for (var column in Columns) {
+                NewRow[Columns[column]] = null;
+            }
+        	//动态设置 编辑样式
+            var byteColumn = $dgw.datagrid('getColumnOption', 'ADDWHO');
+        	if(!(typeof(byteColumn)==='undefined'||byteColumn==null||byteColumn=='')){
+        		byteColumn.editor = {
+        		    type: 'textbox',
+        		    options: {
+        		        required: false,
+        		        validType: 'length[0,20]'
+        		    }
+        		};
+        		byteColumn = $dgw.datagrid('getColumnOption', 'ADDTS');
+        		byteColumn.editor = {
+        		    type: 'datebox',
+        		    options: {
+        		        required: false
+        		    }
+        		};
+        		byteColumn = $dgw.datagrid('getColumnOption', 'EDITWHO');
+        		byteColumn.editor = {};
+        		byteColumn = $dgw.datagrid('getColumnOption', 'EDITTS');
+        		byteColumn.editor = {};
+        	}
+        	$dgw.datagrid('insertRow', { index: 0, row: NewRow });
+        	editIndex = 0 ;
+            //$dgw.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+        }
+    }
+
+    function onClickCell(index, field) {
+        var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+        if ($.inArray(field, _operates) >= 0) {
+            return;
+        }
+        if (editIndex != index) {
+            if (endEditing()) {
+                @if (!Html.IsAuthorize("WarehouseSize", "Index", "Edit"))
+                {
+                    @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                    @Html.Raw("return;\r\n");
+                }
+                //动态设置 编辑样式
+                var byteColumn = $dgw.datagrid('getColumnOption', 'ADDWHO');
+                if(!(typeof(byteColumn)==='undefined'||byteColumn==null||byteColumn=='')){
+                    byteColumn.editor = {};
+                    byteColumn = $dgw.datagrid('getColumnOption', 'ADDTS');
+                    byteColumn.editor = {};
+                    var byteColumn = $dgw.datagrid('getColumnOption', 'EDITWHO');
+                    byteColumn.editor = {
+                        type: 'textbox',
+                        options: {
+                            required: false,
+                            validType: 'length[0,20]'
+                        }
+                    };
+                    byteColumn = $dgw.datagrid('getColumnOption', 'EDITTS');
+                    byteColumn.editor = {
+                        type: 'datebox',
+                        options: {
+                            required: false
+                        }
+                    };
+                }
+
+                //$dgw.datagrid('selectRow', index).datagrid('beginEdit', index);
+                var ed = $dgw.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                editIndex = index;
+            } else {
+                $dgw.datagrid('selectRow', editIndex);
+            }
+        }
+    }
+</script>

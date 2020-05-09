@@ -1,0 +1,75 @@
+﻿ 
+
+
+@model AirOut.Web.Models.Message
+
+
+ 
+
+<div class="form-horizontal">
+
+    @Html.Hidden("Id",-1)
+    @*@Html.HiddenFor(model => model.Id)*@ 
+        <div class="form-group">
+            @Html.LabelFor(model => model.Subject,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Subject, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Subject,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Content,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Content, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Content,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Type,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Type, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Type,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewDate,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.NewDate, "Date" ,new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.NewDate,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsSended,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.IsSended, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.IsSended,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.SendDate,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.SendDate, "Date" ,new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.SendDate,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+      @*--ForeignKey NotificationId RelatedMasterModel  ---*@
+      @Html.HiddenFor(model => model.NotificationId)
+      @*<div class="form-group">
+            @Html.LabelFor(model => model.NotificationId,  htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.NotificationId, ViewBag.NotificationId as List<SelectListItem>,"---Select---", htmlAttributes: new { @class = "form-control" }) 
+                @Html.ValidationMessageFor(model => model.NotificationId,"" , new { @class = "text-danger" })
+            </div>
+        </div>*@
+       @*--End ForeignKey NotificationId RelatedMasterModel  ---*@
+
+
+		<!-- output all Scaffold = false Hiden field -->
+					@Html.HiddenFor(model => model.CreatedDate)
+					@Html.HiddenFor(model => model.ModifiedDate)
+					@Html.HiddenFor(model => model.CreatedBy)
+					@Html.HiddenFor(model => model.ModifiedBy)
+				<!-- end output all Scaffold = false Hiden field -->
+</div>
+
+

@@ -1,0 +1,457 @@
+﻿@*ace-admin引入库(*.css/*.min.css、*.js/*.min.js)简要概述:
+    ace-admin Doc:http://acquacleanpiscinas.com.br/public/docs/#changes.v2
+    1.===================== *.css/*.min.css库简述===============================
+        bootstrap.min.css
+        font-awesome.css---------------ace small icon 图标
+        ace.min.css--------------------按钮样式必须与bootstrap.min.css联合使用
+
+        IE6/IE7/IE8还有很大一部分用户，为了让网站浏览者都能正常的访问HTML5网站，于是有如下方案:
+        html5shiv.min.js----------------------解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。
+        respond.min.js------------------------让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。
+
+    2.=====================*.js/*.min.js库简述===================================
+        jquery.1.11.1.min.js-----------jQuery库
+        bootstrap-contextmenu.js-------右键菜单
+        jquery.cookie.js---------------验证登陆是否超时,cookie
+        jquery.mobile.custom.min.js----app-Touch功能
+        jquery-ui.min.js---------------ui.dialog 交互
+        moment.min.js------------------一个轻量级的 JavaScript 解析、验证、操作和展示日期库http://momentjs.cn/
+        bootstrap-datetimepicker.min.js------------------ bootstrap日期插件datetimepicker
+        bootstrap-datetimepicker.zh-CN.js----------------日期控件汉化
+        layer.js
+        laypage.js---------------------------------------分页
+        template.js--------------------------------------artTemplate解析、渲染返回json数据
+        sea.js-------------------------------------------管理依赖模块seaJs
+        ace-elements.min.js/ace.min.js-------------------联合使用<菜单点击、选中 />展开效果>*@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="description" content="overview &amp; stats" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    @{
+        System.Net.IPHostEntry OIPHost;
+        string WebHostStr = "";
+        int WebHostIndex = -1;
+        string WebSiteName = "MVC网站";
+        string jsVersion = (string)CacheHelper.GetCache("jsVersion");//先取缓存，没有再取配置文件
+        try
+        {
+            if (string.IsNullOrEmpty(jsVersion)) { 
+                jsVersion = (System.Configuration.ConfigurationManager.AppSettings["jsVersion"] ?? DateTime.Today.ToFileTimeUtc().ToString());
+                CacheHelper.SetCache("jsVersion", jsVersion);
+            }
+            //加锁 防止 多人同时 登录时引发 Cache 对象已具有相同键值
+            lock (TMI.Web.Extensions.Common.lockCacheNoQxValid)
+            {
+                if (HttpContext.Current.Cache == null || HttpContext.Current.Cache["WebHostStr"] == null)
+                {
+                    string hostname = System.Net.Dns.GetHostName();//得到本机名
+                    System.Net.IPHostEntry localhost = System.Net.Dns.GetHostByName(hostname);//方法已过期，只得到IPv4的地址
+                    //System.Net.IPHostEntry localhost = System.Net.Dns.GetHostEntry(hostname);//得到IPv4和IPv6的地址
+                    //System.Net.IPAddress localaddr = localhost.AddressList[0];
+                    HttpContext.Current.Cache["WebHostStr"] = localhost;
+                }
+                WebSiteName = System.Configuration.ConfigurationManager.AppSettings["WebSiteName"] ?? "MVC网站";
+                ViewData["WebSiteName"] = WebSiteName;
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+
+        OIPHost = HttpContext.Current.Cache["WebHostStr"] == null ? null : (System.Net.IPHostEntry)Cache["WebHostStr"];
+        WebHostStr = OIPHost == null ? "" : (OIPHost.AddressList.Any() ? OIPHost.AddressList.Select(x => x.ToString()).OrderBy(x => x).FirstOrDefault() : "");
+        WebHostIndex = WebHostStr.LastIndexOf('.');
+    }
+    <title>@Html.Raw((WebHostIndex > 0 ? WebHostStr.Substring(WebHostIndex + 1) + "-" : "") + ViewBag.Title) | @WebSiteName</title>
+
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    @*<link rel="stylesheet" href="/assets/font-awesome/4.5.0/css/font-awesome.min.css" />*@    
+    @Styles.Render("~/font-awesome/css")
+
+    <!-- page specific plugin styles -->
+    <!-- text fonts -->
+    <link rel="stylesheet" href="/assets/css/fonts.googleapis.com.css" />
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+    <![endif]-->
+    <link rel="stylesheet" href="/assets/css/ace-skins.min.css" />
+    <link rel="stylesheet" href="/assets/css/ace-rtl.min.css" />
+
+    <!--[if lte IE 9]>
+      <link rel="stylesheet" href="/assets/css/ace-ie.min.css" />
+    <![endif]-->
+    <!-- inline styles related to this page -->
+    <!-- ace settings handler -->
+    <script src="/assets/js/ace-extra.min.js"></script>
+
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="/assets/js/html5shiv.min.js"></script>
+    <script src="/assets/js/respond.min.js"></script>
+    <![endif]-->    
+    
+    <!-- basic scripts -->
+    <!--[if !IE]> -->
+    <script src="/assets/js/jquery-2.1.4.min.js"></script>
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script src="/assets/js/jquery-1.11.3.min.js"></script>
+    <![endif]-->
+    <style>
+        /*底部浮动时，样式，原生样式不匹配
+        .footer.footer-fixed .footer-inner .footer-content {
+            left: -1px;
+            right: -1px;
+            bottom: 0px;    
+            border-top: 3px double #E5E5E5;
+            background-color: #F2F2F2;
+        }*/
+        .el-upload__input {
+            display: none !important;
+        }/*与bootstrp 样式冲突*/
+    </style>
+    <script src="~/Scripts/moment-with-locales.js"></script>
+    <!--ElementUI.Vue-->
+    @*<link href="~/Content/ElementUI/element-ui.css" rel="stylesheet" />
+    <script src="~/Scripts/vue.min.js"></script>
+    <script src="~/Scripts/vue-resource.min.js"></script>
+    <script src="~/Scripts/ElementUI/element-ui.js"></script>*@
+</head>
+<body class="no-skin">    
+    @Html.Partial("_TopNavbarAce")
+    <!-- /.main-container -->
+    <div class="main-container ace-save-state" id="main-container">
+        <script type="text/javascript">
+            try { ace.settings.loadState('main-container') } catch (e) { }
+        </script>
+        @Html.Partial("_NavigationAce")
+        <!-- /.main-content -->
+        <div class="main-content">
+            <div class="main-content-inner">
+                <!--main -top Menu Index-->
+                <div class="breadcrumbs ace-save-state" id="breadcrumbs">
+                    <!-- .breadcrumb -->
+                    <ul class="breadcrumb">
+                        @{
+                            TMI.Web.Models.MenuItem CurrMenuItem = null;
+                            int seltMenu = 0;
+                            var Coki_seltMenu = Response.Cookies["SeltMenuId"];
+                            if (Coki_seltMenu != null)
+                            {
+                                int.TryParse(Coki_seltMenu.Value, out seltMenu);
+                            }
+                            if (seltMenu <= 0)
+                            {
+                                <li>
+                                    <i class="ace-icon fa fa-home home-icon"></i>
+                                    <a href="/Home/Index">主页</a>
+                                </li>
+                            }
+                            else
+                            {
+                                var SLMenuItem = HttpContext.Current.Session["Login_MenuItem"];
+                                if (SLMenuItem == null)
+                                {
+                                    <li>
+                                        <i class="ace-icon fa fa-home home-icon"></i>
+                                        <a href="/Home/Index">主页</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    var userMenuItem = (List<TMI.Web.Models.MenuItem>)SLMenuItem;
+                                    var ArrBreadCrumbs = new List<TMI.Web.Models.MenuItem>();
+                                    var OMenuItem = CurrMenuItem = userMenuItem.Where(x => x.Id == seltMenu).FirstOrDefault();
+                                    if (OMenuItem != null)
+                                    {
+                                        ArrBreadCrumbs.Add(OMenuItem);
+                                        while (OMenuItem.ParentId.HasValue && OMenuItem.ParentId > 0)
+                                        {
+                                            OMenuItem = userMenuItem.Where(x => x.Id == OMenuItem.ParentId).FirstOrDefault();
+                                            if (OMenuItem != null)
+                                            {
+                                                ArrBreadCrumbs.Add(OMenuItem);
+                                            }
+                                            else
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        ArrBreadCrumbs.Reverse();
+                                        var len = ArrBreadCrumbs.Count();
+                                        for (var i = 0; i < len; i++)
+                                        {
+                                            var item = ArrBreadCrumbs[i];
+                                            if (i == 0)
+                                            {
+                                                <li>
+                                                    <i class="ace-icon fa fa-home home-icon"></i>
+                                                    <a href="/Home/Index">主页</a>
+                                                </li>
+                                            }
+                                            if(i==len-1){
+                                                <li>
+                                                    @if (string.IsNullOrEmpty(item.Url) || item.Url.Trim() == "#")
+                                                    {
+                                                        @Html.Raw(item.Title)
+                                                    }
+                                                    else {
+                                                        <a href="@(i == len - 1 ? "" : item.Url)">@item.Title</a>
+                                                    }
+                                                </li>
+                                            }else{
+                                                <li>
+                                                    @if (string.IsNullOrEmpty(item.Url) || item.Url.Trim() == "#")
+                                                    {
+                                                        @Html.Raw(item.Title)
+                                                    }
+                                                    else {
+                                                        <a href="@(i == len - 1 ? "" : item.Url)">@item.Title</a>
+                                                    }
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <i class="ace-icon fa fa-home home-icon"></i>
+                                            <a href="/Home/Index">主页</a>
+                                        </li>
+                                    }
+                                }
+                            }
+                        }
+                        @*<li>
+                            <i class="ace-icon fa fa-home home-icon"></i>
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="active">Dashboard</li>*@
+                    </ul><!-- /.breadcrumb -->
+                    <script type="text/javascript">
+                        try { ace.settings.loadState('main-container') } catch (e) { }
+                    </script>
+                    <!-- .nav-search -->
+                    <div class="nav-search" id="nav-search">
+                        <form class="form-search">
+                            <span class="input-icon">
+                                <input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+                                <i class="ace-icon fa fa-search nav-search-icon"></i>
+                            </span>
+                        </form>
+                    </div><!-- /.nav-search -->
+                </div>
+                <!--page-content-->
+                <div class="page-content">
+                    <!-- ace-settings-container -->
+                    <div class="ace-settings-container" id="ace-settings-container">
+                        <!--设置按钮-->
+                        <div class="btn btn-app btn-xs btn-warning ace-settings-btn" id="ace-settings-btn">
+                            <i class="ace-icon fa fa-cog bigger-130"></i>
+                        </div>
+                        <div class="ace-settings-box clearfix" id="ace-settings-box">
+                            <div class="pull-left width-50">
+                                <div class="ace-settings-item">
+                                    <div class="pull-left">
+                                        <select id="skin-colorpicker" class="hide">
+                                            <option data-skin="no-skin" value="#438EB9">#438EB9</option>
+                                            <option data-skin="skin-1" value="#222A2D">#222A2D</option>
+                                            <option data-skin="skin-2" value="#C6487E">#C6487E</option>
+                                            <option data-skin="skin-3" value="#D0D0D0">#D0D0D0</option>
+                                        </select>
+                                    </div>
+                                    <span>&nbsp; Choose Skin</span>
+                                </div><!--颜色设置-->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2 ace-save-state" id="ace-settings-navbar" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-navbar"> Fixed Navbar</label>
+                                </div><!--头部固定-->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2 ace-save-state" id="ace-settings-sidebar" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-sidebar"> Fixed Sidebar</label>
+                                </div><!--左侧菜单 固定-->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2 ace-save-state" id="ace-settings-breadcrumbs" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-breadcrumbs"> Fixed Breadcrumbs</label>
+                                </div><!--面包屑 固定-->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-rtl" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-rtl"> Right To Left (rtl)</label>
+                                </div><!--左右反转 -->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2 ace-save-state" id="ace-settings-add-container" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-add-container">
+                                        Inside
+                                        <b>.container</b>
+                                    </label>
+                                </div><!--内容内缩 -->
+                            </div><!-- /.pull-left -->
+
+                            <div class="pull-left width-50">
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-hover" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-hover"> Submenu on Hover</label>
+                                </div><!-- 子菜单移上显示 -->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-compact" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-compact"> Compact Sidebar</label>
+                                </div><!-- 图标菜单 -->
+
+                                <div class="ace-settings-item">
+                                    <input type="checkbox" class="ace ace-checkbox-2 ace-save-state" id="ace-settings-highlight" autocomplete="off" />
+                                    <label class="lbl" for="ace-settings-highlight"> Alt. Active Item</label>
+                                </div><!--高亮菜单 -->
+                            </div><!-- /.pull-left -->
+                        </div><!-- /.ace-settings-box -->
+                    </div><!-- /.ace-settings-container -->
+                    <!-- page-header -->
+                    <div class="page-header">
+                        <h1>
+                            @(CurrMenuItem == null ? "主页" : CurrMenuItem.Title)
+                            @{
+                                if (!(this.ViewContext == null || this.ViewContext.RouteData == null || !this.ViewContext.RouteData.Values.Any()))
+                                {
+                                    var actionName = this.ViewContext.RouteData.Values["action"] ?? "";
+                                    var Title = (ViewData["Title"] ?? "").ToString();
+                                    var PageTitle = (ViewData["PageTitle"] ?? "").ToString();
+                                    if (string.IsNullOrEmpty(PageTitle)) { 
+                                        PageTitle = Title;
+                                    }
+                                    if (string.IsNullOrEmpty(PageTitle))
+                                    {
+                                        string action = actionName.ToString().ToLower().Trim();
+                                        switch (action)
+                                        {
+                                            case "create":
+                                                PageTitle = "创建";
+                                                break;
+                                            case "edit":
+                                                PageTitle = "编辑";
+                                                break;
+                                            case "audit":
+                                                PageTitle = "审核";
+                                                break;
+                                            case "index":
+                                            default:
+                                                PageTitle = "列表";
+                                                break;
+                                        }
+                                    }
+                                    if (!string.IsNullOrEmpty(PageTitle))
+                                    {
+                                        <small>
+                                            <i class="ace-icon fa fa-angle-double-right"></i>
+                                            @PageTitle
+                                        </small>
+                                    }
+                                }
+                            }
+                        </h1>
+                    </div><!-- /.page-header -->
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <!-- PAGE CONTENT BEGINS -->
+                            <!-- Main view  -->
+                            <style>
+                                /*
+                                    Vue 这个指令保持在元素上直到关联实例结束编译
+                                    防止Vue渲染dom时产生闪烁，可用来 显示加载中等处理
+                                */
+                                [v-cloak] {
+                                    display: none !important;
+                                }
+                            </style>
+                            <div id="div_Loading" class="el-dialog__wrapper" style="z-index: 9999;">
+                                <div class="el-loading-mask" style="background-color: rgba(40,40,40,.9);">
+                                    <div class="el-loading-spinner">
+                                        <svg viewBox="25 25 50 50" class="circular">
+                                            <circle cx="50" cy="50" r="20" fill="none" class="path"></circle>
+                                        </svg><!---->
+                                    </div>
+                                </div>
+                            </div>
+                            @RenderBody()
+                            <!-- PAGE CONTENT ENDS -->
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+                </div><!-- /.page-content -->
+            </div>
+        </div>
+        <!-- Footer -->
+        @Html.Partial("_FooterAce")
+        <!-- goto Top -->
+        <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+            <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+        </a>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    //手机访问时
+    if ('ontouchstart' in document.documentElement) document.write("<script src='/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    var jsVersion = '@(!string.IsNullOrEmpty(jsVersion) ? "date=" + jsVersion: "")';//js文件，版本号
+</script>
+@Scripts.Render("~/bundles/bootstrap")
+<!-- ace scripts -->
+@*<script src="/assets/js/ace-elements.min.js"></script>
+<script src="/assets/js/ace.min.js"></script>*@
+
+<!-- page specific plugin scripts -->
+<!--[if lte IE 8]>
+  <script src="/assets/js/excanvas.min.js"></script>
+<![endif]-->
+<script src="/assets/js/jquery-ui.custom.min.js"></script>
+<script src="/assets/js/jquery.ui.touch-punch.min.js"></script>
+
+<!-- page specific plugin scripts -->
+@*<script src="/assets/js/jquery.easypiechart.min.js"></script>
+<script src="/assets/js/jquery.sparkline.index.min.js"></script>
+<script src="/assets/js/jquery.flot.min.js"></script>
+<script src="/assets/js/jquery.flot.pie.min.js"></script>
+<script src="/assets/js/jquery.flot.resize.min.js"></script>*@<!--必须放在最后 加载require.js-->
+<script src="~/Scripts/requireJs/require.js"></script>
+<script src="~/Scripts/requireJs/requireJsConfig.js@(!string.IsNullOrEmpty(jsVersion) ? "?date=" + jsVersion +"": "")"></script>
+<script>
+    var SeltMenuId = ace.cookie.get('SeltMenuId');
+    if (!(typeof (SeltMenuId) === undefined || SeltMenuId == null || SeltMenuId == '')) {
+        ace.openNav(SeltMenuId);//打开菜单
+    }
+    //使用requireJs时，Ace-admin-ace.min.js中初始化配置 不会自动执行
+    require(['ace'], function (Ace)
+    {
+        for (var b in Ace.demo.functions) Ace.demo.functions.hasOwnProperty(b) && Ace.demo.functions[b]()
+    });
+    //相互依赖必须 一层层嵌套 或者 使用 require.js-config-shim参数配置
+    //require(['easyui'], function (easyui, jquery_edatagrid)
+    //{
+    //    console.log($.easyui);
+    //    require(['datagrid_filter'], function () {
+    //        require(['jquery_edatagrid', 'easyui_lang_zh_CN', 'jsext'], function (jquery_edatagrid, easyui_lang_zh_CN,jsext)
+    //        {
+    //            console.log(m);
+    //        });
+    //    });
+    //});
+    //直接 require-shim 中的模块
+    //require(['_jsext', 'element_ui'], function (jsext, element_ui_vue)
+    //{
+    //    //localBackbone undefined.
+    //    console.log(jsext, element_ui_vue);
+    //});
+</script>
+<!-- main page section Scripts do script in page end -->
+@RenderSection("Scripts", required: false)

@@ -1,0 +1,288 @@
+﻿@{
+    var NumStr = ViewData["Num"] ?? "0";
+    int Num = 0;
+    if(!int.TryParse(NumStr.ToString(), out Num))
+    {
+        Num = 1;
+    }
+}
+<form id="searchform" method="post" style="padding-bottom:10px; width:auto">
+    <div id="div_search" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="查询条件"
+         data-options="collapsible:true">
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">费用代码:</label>
+            <input id="FeeCodeQuery" name="FeeCodeQuery" tabindex="@(Num++)" data-options="prompt1:'费用代码'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">费用名称:</label>
+            <input id="FeeNameQuery" name="FeeNameQuery" tabindex="@(Num++)" data-options="prompt1:'费用名称'" style="width:*" class="easyui-textbox" type="text" />
+        </div>
+        @*<div class="form-group col-md-4">
+            <label for="name" style="width:100px">BSA:</label>
+            <input id="BSAQuery" name="BSAQuery" tabindex="@(Num++)" data-options="prompt1:'BSA'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">代操作:</label>
+            <input id="ProxyOperatorQuery" name="ProxyOperatorQuery" tabindex="@(Num++)" data-options="prompt1:'代操作'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>*@
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">目的地:</label>
+            <input id="EndPlaceQuery" name="EndPlaceQuery" tabindex="@(Num++)" data-options="prompt1:'目的地'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">订舱方:</label>
+            <input id="WHBuyerQuery" name="WHBuyerQuery" tabindex="@(Num++)" data-options="prompt1:'订舱方'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">航空公司:</label>
+            <input id="AirLineCoQuery" name="AirLineCoQuery" tabindex="@(Num++)" data-options="prompt1:'航空公司'" style="width:*" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">使用状态:</label>
+            <input id="StatusQuery" name="StatusQuery" tabindex="@(Num++)" data-options="prompt1:'使用状态'" style="width:*" value="1" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">建档日期:</label>
+            <input id="ADDTSQuery1" name="ADDTSQuery1" tabindex="@(Num++)" data-options="prompt1:'建档日期'" style="width:*" class="easyui-datebox" type="text" />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="name" style="width:100px">至:</label>
+            <input id="ADDTSQuery2" name="ADDTSQuery2" tabindex="@(Num++)" data-options="prompt1:'至'" style="width:*" class="easyui-datebox" type="text" />
+        </div>
+        @*<div class="form-group col-md-4">
+                <label for="name" style="width:100px">起始地:</label>
+                <input id="StartPlaceQuery" name="StartPlaceQuery" tabindex="@(Num++)" data-options="prompt1:'起始点'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">中转地:</label>
+                <input id="TransitPlaceQuery" name="TransitPlaceQuery" tabindex="@(Num++)" data-options="prompt1:'中转地'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">开始日期起:</label>
+                <input id="StartDateQuery1" name="StartDateQuery1" tabindex="@(Num++)" data-options="prompt1:'接单日期起'" style="width:*" class="easyui-datebox" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">至:</label>
+                <input id="StartDateQuery2" name="StartDateQuery2" tabindex="@(Num++)" data-options="prompt1:'接单日期讫'" style="width:*" class="easyui-datebox" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">结束日期:</label>
+                <input id="EndDateQuery1" name="EndDateQuery1" tabindex="@(Num++)" data-options="prompt1:'结束日期'" style="width:*" class="easyui-datebox" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">至:</label>
+                <input id="EndDateQuery2" name="EndDateQuery2" tabindex="@(Num++)" data-options="prompt1:'至'" style="width:*" class="easyui-datebox" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">航班号:</label>
+                <input id="AirLineNoQuery" name="AirLineNoQuery" tabindex="@(Num++)" data-options="prompt1:'航班号'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">审批状态:</label>
+                <input id="AuditStatusQuery" name="AuditStatusQuery" tabindex="@(Num++)" data-options="prompt1:'审批状态'" style="width:*" class="easyui-combogrid" value="0" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">记录号:</label>
+                <input id="SerialNoQuery" name="SerialNoQuery" tabindex="@(Num++)" data-options="prompt1:'记录号'" style="width:*" class="easyui-textbox" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">报关方式:</label>
+                <input id="CustomsTypeQuery" name="CustomsTypeQuery" tabindex="@(Num++)" data-options="prompt1:'报关方式'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">商检标志:</label>
+                <input id="InspectMarkQuery" name="InspectMarkQuery" tabindex="@(Num++)" data-options="prompt1:'商检标志'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>
+            <div class="form-group col-md-4">
+                <label for="name" style="width:100px">取单标志:</label>
+                <input id="GetOrdMarkQuery" name="GetOrdMarkQuery" tabindex="@(Num++)" data-options="prompt1:'取单标志'" style="width:*" class="easyui-combogrid" type="text" />
+            </div>*@
+        <div class="form-group col-md-12" style="text-align:center;">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="searchf()">查询</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="clearfrom()">重置</a>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    //初始化页面
+    function initSearchCombogrid(_FromCache,ID) {
+        var FromCache = ""
+        if (!(typeof (_FromCache) === 'undefined' || _FromCache == null || _FromCache == ''))
+            FromCache = "_FromCache";
+        if (!(typeof (ID) === 'undefined' || ID == null || ID == '')) {
+            if (typeof (ID) != "object") {
+                if (ID.indexOf("#") != 0)
+                    ID = '#' + ID;
+            }
+        } else
+            ID = '';
+        //费用代码
+        var $FeeCodeQuery = $("#FeeCodeQuery", ID);
+        if ($FeeCodeQuery.length > 0) {
+            $FeeCodeQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+                textField: 'IDTEXT',
+                url1: '/FeeTypes/GetPagerFeeTypes' + FromCache,
+                onChange: function (newValue, oldValue) {
+                    //var data = $("#FeeCodeQuery").combogrid("grid").datagrid("getSelected");
+                    //if (data != null) {//费用代码存在时，自动填写费用名称
+                    //    $('#FeeNameQuery').textbox("setValue", data.TEXT);
+                    //} else {//清空费用名称
+                    //    $('#FeeNameQuery').textbox("setValue", "");
+                    //}
+                }
+            }));
+            //keyup事件 小写转大写
+            $FeeCodeQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        }
+        ////BSA
+        //var $BSAQuery = $("#BSAQuery", ID);
+        //if ($BSAQuery.length > 0) {
+        //    $BSAQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        mode: 'local',
+        //        pagination: false,
+        //        data: ArrUseStatus
+        //    }));
+        //}
+        ////结算方，获取的客商信息
+        //var $SettleAccountQuery = $("#SettleAccountQuery", ID);
+        //if ($SettleAccountQuery.length > 0) {
+        //    $SettleAccountQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        textField: 'IDTEXT',
+        //        url1: '/CusBusInfos/GetPagerCusBusInfos' + FromCache
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $SettleAccountQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        //}
+        //目的地
+        var $EndPlaceQuery = $("#EndPlaceQuery", ID);
+        if ($EndPlaceQuery.length > 0) {
+            $EndPlaceQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+                url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+            }));
+            //keyup事件 小写转大写
+            $EndPlaceQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        }
+        //订舱方
+        var $WHBuyerQuery = $("#WHBuyerQuery", ID);
+        if ($WHBuyerQuery.length > 0) {
+            $WHBuyerQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+                textField: 'IDTEXT',
+                url1: '/CusBusInfos/GetPagerCusBusInfos' + FromCache
+            }));
+            //keyup事件 小写转大写
+            $WHBuyerQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        }
+        //航空公司
+        var $AirLineCoQuery = $("#AirLineCoQuery", ID);
+        if ($AirLineCoQuery.length > 0) {
+            $AirLineCoQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+                textField: 'IDTEXT',
+                url1: '/CusBusInfos/GetPagerCusBusInfos' + FromCache
+            }));
+            //keyup事件 小写转大写
+            $AirLineCoQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        }
+        ////航班号
+        //var $AirLineNoQuery = $("#AirLineNoQuery", ID);
+        //if ($AirLineNoQuery.length > 0) {
+        //    $AirLineNoQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        url1: '/PARA_AirLines/GetPagerAirLine' + FromCache,
+        //        columns: [[
+        //            { field: 'ID', title: '代码', width: 220 }
+        //        ]],
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $AirLineNoQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        //}
+        //使用状态
+        var $StatusQuery = $("#StatusQuery", ID);
+        if ($StatusQuery.length > 0) {
+            $StatusQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+                mode: 'loacl',
+                pagination: false,
+                data: ArrStatus
+            }));
+        }
+        //var $StartPlaceQuery = $("#StartPlaceQuery", ID);
+        //if ($StartPlaceQuery.length > 0) {
+        //    //起始地
+        //    $StartPlaceQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $StartPlaceQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        //}
+        ////中转地
+        //var $TransitPlaceQuery = $("#TransitPlaceQuery", ID);
+        //if ($TransitPlaceQuery.length > 0) {
+        //    $TransitPlaceQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $TransitPlaceQuery.combogrid("textbox").bind('keyup', keyupToUpper);
+        //}
+        ////代操作
+        //var $ProxyOperatorQuery = $("#ProxyOperatorQuery", ID);
+        //if ($ProxyOperatorQuery.length > 0) {
+        //    $ProxyOperatorQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        mode: 'local',
+        //        pagination: false,
+        //        data: ArrUseStatus
+        //    }));
+        //}
+        ////审批状态
+        //var $AuditStatusQuery = $("#AuditStatusQuery", ID);
+        //if ($AuditStatusQuery.length > 0) {
+        //    $AuditStatusQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        mode: 'loacl',
+        //        pagination: false,
+        //        data: ArrAuditStatus
+        //    }));
+        //}
+        ////报关方式
+        //var $CustomsTypeQuery = $("#CustomsTypeQuery", ID);
+        //if ($CustomsTypeQuery.length > 0) {
+        //    $CustomsTypeQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        url1: '/BD_DEFDOC_LISTs/GetPager_DEFDOC_DICT' + FromCache + '?DOCCODE=DeclCustom'
+        //    }));
+        //}
+        ////商检标志
+        //var $InspectMarkQuery = $("#InspectMarkQuery", ID);
+        //if ($InspectMarkQuery.length > 0) {
+        //    $InspectMarkQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        mode: 'local',
+        //        pagination: false,
+        //        data: ArrUseStatus
+        //    }));
+        //}
+        ////取单标志
+        //var $GetOrdMarkQuery = $("#GetOrdMarkQuery", ID);
+        //if ($GetOrdMarkQuery.length > 0) {
+        //    $GetOrdMarkQuery.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        mode: 'local',
+        //        pagination: false,
+        //        data: ArrUseStatus
+        //    }));
+        //}
+    }
+    //获取搜索条件Json
+    function getrSearchParam() {
+        var QueryProfix = 'Query';
+        var params = [];
+        var searchData = getFormSerializeJson("#searchform");
+        for (var i in searchData) {
+            var data = searchData[i];
+            if (!(typeof (data) === 'undefined' || data == null || data == "")) {
+                if (i.indexOf("Query1") > 0) {
+                    params.push({ "field": "_" + i.replace('Query1', ''), "op": "equal", "value": data });
+                } else if (i.indexOf("Query2") > 0) {
+                    params.push({ "field": i.replace('Query2', '') + "_", "op": "equal", "value": data });
+                }
+                else if (i.indexOf(QueryProfix) > 0) {
+                    params.push({ "field": i.replace('Query', ''), "op": "equal", "value": data });
+                }
+            }
+        }
+        return params;
+    }
+</script>

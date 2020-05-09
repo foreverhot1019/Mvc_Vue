@@ -1,0 +1,287 @@
+﻿@model CCBWebApi.Models.Loanapplbook
+
+@{
+    ViewBag.Title = "FTP解析";
+}
+<div id="app" v-cloak>
+    <!--搜索条件-->
+    <!--工具条-->
+    <el-row style="background-color: #eee; padding:10px 0px 0px 10px">
+        <el-col>
+            <el-form v-bind:inline="true" v-bind:model="filters.filterRules" size="mini" ref="tb_search">
+                <el-form-item v-for="field in ArrSearchField"
+                              v-if="!field.IsKey && field.SearchShow"
+                              v-bind:label-width="formLabelWidth"
+                              v-bind:label="field.DisplayName"
+                              v-bind:prop="field.Name"
+                              v-bind:rules="el_FormFieldRules(field,true)">
+                    <component v-if="!field.IsForeignKey" v-model="filters.filterRules[field.Name]"
+                               v-bind:is="el_inputType(field)"
+                               v-bind:prop="field.Name"
+                               v-bind:type="el_inputProtoType(field,true)"
+                               v-bind:precision="field.Precision"
+                               value-format="yyyy-MM-dd"
+                               range-separator="至"
+                               start-placeholder="日期起"
+                               end-placeholder="日期讫">
+                        <i slot="suffix" class="el-input__icon fa"
+                           v-show="field.Name.toLowerCase().indexOf('password')>=0"
+                           v-on:click="pswView(field)"
+                           v-bind:class="el_inputClass(field)"></i>
+                    </component>
+                    <el-select v-else v-model="filters.filterRules[field.Name]"
+                               reserve-keyword clearable
+                               v-bind:remote-method="q=>el_remoteMethod(q,field,'search')"
+                               v-bind:loading="el_selt.el_selt_loading">
+                        <template v-if="el_selt[field.Name+'_search']">
+                            <el-option v-for="item in el_selt[field.Name+'_search'].ArrOption"
+                                       v-bind:key="item.ID"
+                                       v-bind:label="item.TEXT"
+                                       v-bind:value="item.ID">
+                                @*<div class="row">
+                                        <div class="col-md-6">{{ item.TEXT }}</div>
+                                        <div class="col-md-6" style="float: right; color: #8492a6; font-size: 13px;">{{ item.ID }}</div>
+                                    </div>*@
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
+                <br>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button type="primary" icon="el-icon-search" v-on:click="search" v-bind:loading="tbLoading">查询</el-button>
+                </el-form-item>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button icon="el-icon-refresh" v-on:click="resetFilter('tb_search')" v-bind:disabled="tbLoading">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row>
+    <!--按钮组-->
+    <el-row style="padding: 3px 10px 3px 10px;">
+        <el-col>
+            <el-button-group>
+                <el-button type="primary" icon="el-icon-plus" size="small" v-bind:disabled="!UserRoles.Create" v-on:click="handleAddRow">新增</el-button>
+                <el-button icon="el-icon-download" size="small" v-bind:disabled="!UserRoles.Export" v-on:click="ExportXls(tableData,'Excel导入配置')">导出</el-button>
+                <el-button icon="el-icon-upload" size="small" v-bind:disabled="!UserRoles.Import" v-on:click="ImportXls">导入</el-button>
+            </el-button-group>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col>
+            <el-table ref="Mytb" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                      v-bind:default-sort="{prop:'Id',order:'descending'}"
+                      v-bind:data="tableData"
+                      v-loading="tbLoading"                     
+                      v-on:selection-change="handleSelectionChange"
+                      v-on:sort-change="tbSortChange">
+                <el-table-column fixed type="selection" width="36"></el-table-column>
+                <template>
+                    <el-table-column show-overflow-tooltip prop="Unn_Soc_Cr_Cd" label="统一社会信用代码" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Unn_Soc_Cr_Cd'})" width="180px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="AcctBeginDate" label="签约日期" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'AcctBeginDate'})" width="140px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="CustName" label="借款客户名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustName'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="AR_Lmt" label="签约额度" sortable="custom" v-bind:formatter="formatter({Type: 'number2', Name: 'AR_Lmt'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Lmt_ExDat" label="额度到期日期" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'Lmt_ExDat'})" width="140px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="LoanBal" label="贷款余额" sortable="custom" v-bind:formatter="formatter({Type: 'number2', Name: 'LoanBal'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Rfnd_AccNo" label="回款账号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Rfnd_AccNo'})" width="200px"></el-table-column>
+                </template>
+                <el-table-column fixed="right" label="操作" width="47" v-if="UserRoles.Delete">
+                    <template slot-scope="sp">
+                        @*<el-tooltip content="查看" placement="top" effect="light">
+                                <el-button type="primary" size="mini" icon="el-icon-view" circle v-on:click="handleViewClick(scope.row)"></el-button>
+                            </el-tooltip>*@
+                        <el-tooltip content="删除" placement="top" effect="light">
+                            <el-button type="danger" size="mini" icon="el-icon-delete" circle v-bind:disabled="!UserRoles.Delete" v-on:click.native.prevent="deleteRow(sp.$index, sp.row)"></el-button>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!--工具条-->
+            <el-row style="padding-top: 10px;">
+                <el-col v-bind:span="8">
+                    <el-button type="danger" size="small" v-on:click="handledelSeltRow" v-bind:disabled="(UserRoles.Delete ? selctRows.length===0 : true)">批量删除</el-button>
+                </el-col>
+                <el-col v-bind:span="16">
+                    <el-pagination v-model="pagiNation" style="float:right;"
+                                   v-on:size-change="pageSizeChange"
+                                   v-on:current-change="pageCurrentChange"
+                                   v-on:prev-click="PrevPage"
+                                   v-on:next-click="NextPage"
+                                   v-bind:current-page="pagiNation.currentPage"
+                                   v-bind:page-sizes="pagiNation.pageSizes"
+                                   v-bind:page-size="pagiNation.pageSize"
+                                   v-bind:layout="pagiNation.layout"
+                                   v-bind:total="pagiNation.total">
+                    </el-pagination>
+                </el-col>
+            </el-row>
+        </el-col>
+    </el-row>
+    <!--弹出框-->
+    <el-dialog v-bind:title="dgTitle" ref="MyDialog" width="60%" center v-dialogdrag @*:fullscreen="true" rules="rules" *@
+               v-bind:visible.sync="centerDialogVisible"
+               v-loading="dlgLoading"
+               v-on:close="dlgClose">
+        <el-form ref="MyForm" v-bind:model="curr_rowdata" label-position="right" inline size="small">
+            <el-form-item v-for="field in ArrFormField"
+                          v-if="!field.IsKey && field.FormShow"
+                          v-bind:label-width="formLabelWidth"
+                          v-bind:label="field.DisplayName"
+                          v-bind:prop="field.Name"
+                          v-bind:rules="el_FormFieldRules(field)">
+                <component v-if="!field.IsForeignKey && field.FormShow" v-bind:is="el_inputType(field)"
+                           v-bind:disabled="field.IsKey || (!field.Editable&&curr_rowdata.Id>0)"
+                           v-model="curr_rowdata[field.Name]"
+                           v-bind:prop="field.Name"
+                           v-bind:type="el_inputProtoType(field)"
+                           v-bind:precision="field.Precision"
+                           v-bind:clearable="true"
+                           v-bind:style="{'width':field.Width_input+'px'}">
+                    @*<i class="el-icon-edit el-input__icon"
+                           slot="prefix">
+                        </i>*@
+                    <i slot="suffix" class="el-input__icon fa"
+                       v-show="field.Name.toLowerCase().indexOf('password')>=0"
+                       v-on:click="pswView(field)"
+                       v-bind:class="el_inputClass(field)"></i>
+                </component>
+                <el-select v-else v-model="curr_rowdata[field.Name]"
+                           reserve-keyword clearable
+                           v-bind:remote-method="q=>el_remoteMethod(q,field,'form')"
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{'width':field.Width_input+'px'}">
+                    <template v-if="el_selt[field.Name+'_form']">
+                        <el-option v-for="item in el_selt[field.Name+'_form'].ArrOption"
+                                   v-bind:key="item.ID"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID">
+                            @*<div class="row">
+                                    <div class="col-md-5">{{ item.Title }}</div>
+                                    <div class="col-md-5">{{ item.Code }}</div>
+                                    <div class="col-md-2" style="float: right; color: #8492a6; font-size: 13px;">{{ item.Id }}</div>
+                                </div>*@
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button v-on:click="centerDialogVisible = false">取 消</el-button>
+            <el-button type="primary" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+
+@section Scripts {
+    <!--
+        import是异步加载的，<script>-type 必须是modual
+        import commonFiltes from "/Scripts/Vue/VueFilters.js
+
+        已通过requireJs 异步加载 Vue-ElementUI+Vue自定义扩展
+
+        dialogDrag:el-dialog拖动全屏扩展
+        formatter:字段格式化Vue.$formmatter
+        validtors:el-input 自定义验证Vue.$Validtors
+        VueFilters:vue全局filter v-bind:id="rawId | formatId" |前面字段后面过滤器 注：v-bind有效，v-Model 无效
+    -->
+    <script type="text/javascript">
+        const Edit = false,//编辑权限
+            Create = false, //新增权限
+            Delete = false,//删除权限
+            Import = false,//导入权限
+            Export = false;//导出权限
+        //自定义列数据
+        var CustomerFields = {};
+        var BaseArrField = @Html.Raw(Html.RenderVue_ModelJson());
+        //设置自定义列
+        Object.keys(CustomerFields).forEach(function(item,index){
+            let OField= BaseArrField.ArrField.filter(function(val){
+                return val.Name == item;
+            });
+            if(OField.length>0){
+                OField = OField[0];
+                let CusField = CustomerFields[item];
+                Object.assign(OField,CusField);
+            }
+        });
+        if(BaseArrField.IsListOrder){
+            var ArrField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.ListOrder==b.ListOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.ListOrder-b.ListOrder;
+            });
+        }else
+            var ArrField =BaseArrField.ArrField;
+        if(BaseArrField.IsSearchOrder){
+            var ArrSearchField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.SearchOrder==b.SearchOrder)
+                    return a.Name-b.Name;
+                else
+                    return b.SearchOrder-a.SearchOrder;
+            });
+        }else
+            var ArrSearchField =BaseArrField.ArrField;
+        if(BaseArrField.IsFormOrder){
+            var ArrFormField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.FormOrder==b.FormOrder)
+                    return a.Name-b.Name;
+                else
+                    return b.FormOrder-a.FormOrder;
+            });
+        }else
+            var ArrFormField =BaseArrField.ArrField;
+        /*
+        自定义列数据 table-searchForm-editForm 通过此配置渲染；说明：
+        Name //名称
+        DisplayName //显示名称
+        Editable //可编辑
+        FormShow //Form中展示
+
+        Sortable //是否可排序
+        Width_List //列表-列宽度 <=0 默认*，>0 此宽度为准
+        Width_input //Form-input宽度 <=0 默认*，>0 此宽度为准
+        Type  //"datetime/number/string/boolean";//类型
+        Precision //Type为number时，可设置小数位
+        inputType  //"password/datetime/text";//form中的input类型
+        Required //必填
+        IsKey //主键
+        MaxLength //最大长度
+        MinLength //最小长度
+        SearchShow //搜索中展示
+        ListShow //列表展示
+        ListOrder //列表排序
+        SearchOrder //搜索排序
+        FormOrder //Form排序
+        IsForeignKey //外键
+        ForeignKeyGetListUrl //获取外键数据Url
+        */
+
+        //requireJs 按需加载 js
+        require(['vue', '_vue_resource','ELEMENT','IndexBaseMixin'],function(Vue,Vue_Resource,ELEMENT,myMixin){
+            Vue.use(ELEMENT);
+            Vue.use(Vue_Resource);
+            var vue_tb = new Vue({
+                el: '#app',
+                directives:{},// 注册局部指令
+                mixins: [myMixin],//混入相当于extend
+                created: function () {
+                },//数据初始化，还未渲染dom,在此处设置的数据 不受响应
+                data:function(){//混入的data 会与此data 合并，相同名字会被此data覆盖
+                    return {
+                        tbUrl: {
+                            controller: '/Loanapplbook/',
+                            getdata: 'GetData',//获取数据 action
+                            batchSave: 'SaveData',//批量操作 action
+                            exportExcel: 'ExportExcel',//导出Excel action
+                            importExcel: '/FileUpload/Upload?modelType=Company',//导入Excel action
+                        },
+                    }
+                },
+                methods:{
+                    //自定义方法会覆盖 混入的 methods
+                },
+            });
+        });
+    </script>
+}
+

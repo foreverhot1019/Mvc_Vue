@@ -1,0 +1,292 @@
+﻿﻿
+
+
+
+@model TMI.Web.Models.Notification
+
+
+ @*@Html.HiddenFor(model => model.Id)*@
+
+
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Name,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Description,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Type,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Type, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Type,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Sender,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Sender, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Sender,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Receiver,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Receiver, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Receiver,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Schedule,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Schedule, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Schedule,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Disabled,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Disabled, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Disabled,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AuthUser,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.AuthUser, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.AuthUser,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AuthPassword,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.AuthPassword, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.AuthPassword,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Host,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Host, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Host,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+				 
+		<!-- output all Scaffold = false Hiden field -->
+					@Html.HiddenFor(model => model.CreatedDate)
+					@Html.HiddenFor(model => model.ModifiedDate)
+					@Html.HiddenFor(model => model.CreatedBy)
+					@Html.HiddenFor(model => model.ModifiedBy)
+				<!--end output all Scaffold = false Hiden field -->
+		   
+
+ 
+
+
+     <!-- details tabs -->
+    <div class="tabs-container">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+								<li class="active"><a data-toggle="tab" href="#tab-messages"> Messages</a></li>
+								        
+			 
+   
+		 </ul>
+		 <!-- Tab panes -->
+         <div class="tab-content">
+		  		  <div id="tab-messages" class="tab-pane active">
+
+            <div class="panel-body">
+
+                <div class="table-responsive">
+				<table id="messages_datagrid" class="easyui-datagrid" title="Messages DataGrid" style="width:auto;height:400px"
+                       data-options="
+                            rownumbers:true,
+                            iconCls: 'fa fa-list',
+                            remoteFilter: false,
+                            singleSelect: true,
+                            toolbar: '#messages_toolbar',
+                            method: 'get',
+                            onClickCell: messages_onClickCell,
+                            pagination: 'true'
+                    " >
+                    <thead>
+                        <tr>
+						@*<th data-options="field:'ck',checkbox:true"></th>*@
+				        
+														<th data-options="field:'Id',width:80"> Id </th>
+											
+						
+															<th data-options="field:'Subject',width:140,editor:{type:'textbox',options:{required:false} } "> 主题</th>
+							
+											
+						
+															<th data-options="field:'Content',width:140,editor:{type:'textbox',options:{required:false} } "> 内容</th>
+							
+											
+						
+															<th data-options="field:'Type',width:140,editor:{type:'textbox',options:{required:false} } "> 类型</th>
+							
+											
+						
+															<th data-options="field:'NewDate',width:160,align:'right',editor:{type:'datebox',options:{required:true}} ,formatter:dateformatter"> 创建日期</th>
+							
+											
+						
+															<th data-options="field:'IsSended',width:120,editor: {type:'combobox'
+                                                ,options:{
+                                                panelHeight: 'auto',
+                                                data: [ { value: 'true', text: 'true' },{ value: 'false', text: 'false' }],
+                                                required:true}}">是否已发送</th>
+							
+											
+						
+															<th data-options="field:'SendDate',width:160,align:'right',editor:{type:'datebox',options:{required:true}} ,formatter:dateformatter"> 发送日期</th>
+							
+											
+														<th data-options="field:'NotificationId',width:100,
+												formatter:function(value,row){
+													return row.NotificationName;
+												},
+												editor:{
+													type:'combobox',
+													options:{
+														valueField:'Id',
+														textField:'Name',
+														method:'get',
+														url:'/Notifications/GetNotifications',
+														required:false
+														}
+												}"> 通知 </th>
+
+           
+											                           
+                        </tr>
+                    </thead>
+                </table>
+
+				<div id="messages_toolbar" style="height:auto">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="messages_append()">Append</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="messages_removeit()">Remove</a>
+                    @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="messages_accept()">Accept</a>*@
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="messages_reject()">Reject</a>
+                    @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="messages_getChanges()">GetChanges</a>*@
+                </div>
+
+                </div>
+            </div>
+
+		  	</div>
+	</div>
+	</div>
+<!--end details tabs -->
+ 
+
+ <script type="text/javascript">
+	
+	    
+	var messageseditIndex = undefined;
+    function messages_endEditing() {
+        if ( messageseditIndex == undefined) { return true }
+        if ($messagesdatagrid.datagrid('validateRow', messageseditIndex)) {
+			            var ed = $messagesdatagrid.datagrid('getEditor', { index: messageseditIndex, field: 'NotificationId' });
+            var NotificationName = $(ed.target).combobox('getText');
+            var NotificationId = $(ed.target).combobox('getValue');
+          
+            $messagesdatagrid.datagrid('getRows')[messageseditIndex]['NotificationName'] = NotificationName;
+            $messagesdatagrid.datagrid('getRows')[messageseditIndex]['NotificationId'] = NotificationId;
+            
+            
+						$messagesdatagrid.datagrid('endEdit', messageseditIndex);
+            messageseditIndex = undefined;
+
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function messages_onClickCell(index, field) {
+        if (messageseditIndex != index) {
+            if (messages_endEditing()) {
+                $messagesdatagrid.datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                var ed = $messagesdatagrid.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                messageseditIndex  = index;
+            } else {
+                $messagesdatagrid.datagrid('selectRow', messageseditIndex);
+            }
+        }
+    }
+    function messages_append() {
+        if (messages_endEditing()) {
+            $messagesdatagrid.datagrid('appendRow', { Status:0   });
+            messageseditIndex = $messagesdatagrid.datagrid('getRows').length - 1;
+            $messagesdatagrid.datagrid('selectRow', messageseditIndex )
+                    .datagrid('beginEdit', messageseditIndex);
+        }
+    }
+    function messages_removeit() {
+        if (messageseditIndex  == undefined) { return }
+        $messagesdatagrid.datagrid('cancelEdit', messageseditIndex )
+                .datagrid('deleteRow', messageseditIndex );
+        messageseditIndex = undefined;
+    }
+   
+    function messages_reject() {
+        $messagesdatagrid.datagrid('rejectChanges');
+        messageseditIndex  = undefined;
+    }
+    function messages_getChanges() {
+        var rows = $messagesdatagrid.datagrid('getChanges');
+        alert(rows.length + ' rows are changed!');
+    }
+
+
+	  
+	$(function () {
+	
+		$.get('/Notifications/GetMessagesByNotificationId/' + @Model.Id,function(data){
+            //console.log(data);
+            $messagesdatagrid.datagrid('loadData',data);
+        
+        })
+
+
+	
+	});
+</script>
+
+
+

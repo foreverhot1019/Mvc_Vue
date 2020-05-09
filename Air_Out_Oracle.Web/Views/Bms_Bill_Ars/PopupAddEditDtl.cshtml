@@ -1,0 +1,50 @@
+﻿@model AirOut.Web.Models.Ar_ApDetl
+@{
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+    //int FTParentId = ViewData["FTParentId"] == null ? 0 : (int)ViewData["FTParentId"];
+    var readOnly = ViewData["readOnly"] ?? "";
+}
+@Html.HiddenFor(model => model.DtlId)
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Charge_Code, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Charge_Code, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Charge_Code, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Charge_Desc, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Charge_Desc, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,readonly:true,validType:'length[0,100]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Charge_Desc, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Unitprice2, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Unitprice2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2,validType:'length[0,50]'" + readOnly, @Value = (Model.Unitprice2>0?Model.Unitprice2.ToString("#0.00"):""), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Unitprice2, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Qty, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Qty, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'" + readOnly, @Value = (Model.Qty > 0 ? Model.Qty.ToString("#0.00") : ""), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Qty, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Account2, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Account2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,readonly:true,precision:2,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Account2, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Summary, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Summary, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Summary, "", new { @class = "text-danger" })
+</div>
+@if(Model.DtlId<=0){
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    <label class="control-label" for="btnAddDtl" style="width:100%;padding-bottom:2px;">&nbsp;</label>
+    <button id="btnAddDtl" class="info">保存(S)</button>
+    <button id="btnDelDtl" class="warning">删除(D)</button>
+</div>
+}
+@*@Html.HiddenFor(x => x.Create_Status)
+@Html.HiddenFor(x => x.Status, new { @Value = (int)Model.Status })*@
+@{
+    TempData["Num"] = Num;
+    ViewData["Num"] = Num;
+}

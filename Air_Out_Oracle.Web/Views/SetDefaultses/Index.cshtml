@@ -1,0 +1,856 @@
+﻿@model IEnumerable<AirOut.Web.Models.SetDefaults>
+@{
+    ViewBag.Title = "设置默认值";
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script async defer type="text/javascript" src="~/Scripts/EasyUIDataGrid_ControlNext.js"></script>
+
+<!-- Page Heading -->
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">设置默认值</a>
+            </li>
+        </ol>
+    </div>
+</div>
+<!-- /.row -->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="setdefaults-table" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                               data-options="
+							   rownumbers:true,
+							   checkOnSelect:true,
+							   selectOnCheck:true,
+							   idField:'ID',
+							   sortName:'ID',
+							   sortOrder:'desc',
+							   remoteFilter: true,
+							   singleSelect: true,
+							   toolbar: '#para_area_toolbar',
+							   url: '/SetDefaultses/PageList',
+							   method: 'get',
+							   onClickCell: onClickCell,
+							   onSelect:onSelect,
+							   pagination: 'true',
+                               onBeginEdit:onBeginEdit">
+                            <thead>
+                                <tr>
+                                    <th data-options="field:'ck',checkbox: true ">选择</th>
+                                    <th data-options="field:'TableName',width:180,sortable:true,resizable:true,
+                                         editor: {
+										        type:'combobox',
+										        options:{
+										        panelHeight: 'auto',
+                                                valueField: 'Value',
+                                                textField: 'Text',
+                                                method:'get',
+                                                url:'/SetDefaultses/getXMLDefaultTablesData',
+                                                required:true,//将编辑禁用
+                                                onChange: function (rec) {
+                                                   SetColumnNameChs(rec);
+                                                }
+                                           }
+                                        },
+                                        formatter:function(value,row){
+                                            return row.TableNameChs;
+                                        }
+                                    ">@Html.DisplayNameFor(model => model.TableName)</th>
+                                    <th data-options="field:'ColumnName',width:180,sortable:true,resizable:true,
+							            editor:{
+								            type:'combobox',
+								            options:{
+                                                valueField: 'Value',
+                                                textField: 'Text',
+									            required:true,
+                                                validType:'length[0,50]',
+                                                onSelect: function (rec) {
+                                                    SetDefaultValue(rec);
+                                                }
+                                            }
+                                        },
+                                        formatter:function(value,row){
+                                            return row.ColumnNameChs;
+                                        }
+                                    ">@Html.DisplayNameFor(model => model.ColumnName)</th>
+                                    <th data-options="field:'DefaultValue',width:180,sortable:true,resizable:true,
+							            editor:{
+								            type:'textbox',
+								            options:{
+									            required:true ,validType:'length[0,50]'
+								            }
+                                        }
+                                    ">@Html.DisplayNameFor(model => model.DefaultValue)</th>
+
+                                    <th data-options="field:'DataType',width:180,sortable:true,resizable:true,
+							            editor:{
+								            type:'textbox',
+								            options:{
+									            required:true ,disabled: true,validType:'length[0,50]'
+								            }
+                                        }
+                                    ">@Html.DisplayNameFor(model => model.DataType)</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="para_area_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            @if (Html.IsAuthorize("Edit"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            }
+                            @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>*@
+                            @if (Html.IsAuthorize("Import"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var $dg = $('#setdefaults-table');
+        var editIndex = undefined;
+        var $deletesetdefaultsbutton = $('#deletesetdefaultsbutton');
+
+        //combogrid 设置信息（onBeginEdit时,使用）
+        var combogrid_Settings = {
+        };
+
+        function reload() {
+            reject();//回滚所有变更
+            $dg.datagrid('reload');
+        }
+
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+
+        function endEditing() {
+            if (typeof (editIndex) === 'undefined' || isNaN(editIndex))
+                return true;
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                if (!valadateDefaultValue(editIndex)) {
+                    $dg.datagrid('selectRow', editIndex);
+                    $dg.datagrid('beginEdit', editIndex);
+                    return false;
+                }
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            var num = 0;
+            var regx = /^\/Date\([0-9]+(\)\/)$/g;
+            for (var i in rowData) {
+                if (regx.test(rowData[i])) {
+                    rowData[i] = datetimeformatter(rowData[i]);
+                }
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (!(typeof (OldVal) === 'undefined' || OldVal == null || OldVal == '')) {
+                                if (rowData[targetEditor.field]) {
+                                    OldVal = rowData[targetEditor.field];
+                                }
+                                $(targetEditor.target).combogrid('setValue', OldVal);
+                                var opts = $(targetEditor.target).combogrid('options');
+                                var url = opts.url;
+                                //设置查询参数
+                                var queryParams = {
+                                    page: 1,
+                                    rows: opts.pageSize,
+                                    q: OldVal
+                                };
+                                $(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                            }
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            if (!(typeof (OldVal) === 'undefined' || OldVal == null || OldVal == '')) {
+                                if (rowData[targetEditor.field]) {
+                                    OldVal = rowData[targetEditor.field];
+                                }
+                                var opts = $(targetEditor.target).combobox('options');
+                                var url = opts.url;
+                                if (!(typeof (url) === 'undefined' || url == null || url == '')) {
+                                    //设置查询参数
+                                    var queryParams = {
+                                        page: 1,
+                                        rows: opts.pageSize,
+                                        q: OldVal
+                                    };
+                                    $(targetEditor.target).combobox('reload');
+                                    $(targetEditor.target).combobox('setValue', OldVal);
+                                }
+                                else
+                                    $(targetEditor.target).combobox('setValue', OldVal);
+                            }
+                            //setTargetVal(targetEditor, OldVal);
+                            //console.log("combobox",OldVal)
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "numberbox":
+                            $(targetEditor.target).numberbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "datebox":
+                            $(targetEditor.target).datebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "datetimebox":
+                            $(targetEditor.target).datetimebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "checkbox":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "radio":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                    }
+                }
+            }
+        }
+
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("SetDefaultses", "Index", "Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                        @Html.Raw("return;\r\n");
+                    }
+                    //动态设置 编辑样式
+                    var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+                    if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                        byteColumn.editor = {};
+                        byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+                        byteColumn.editor = {};
+                        var byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+                        byteColumn.editor = {
+                            type: 'textbox',
+                            options: {
+                                required: false,
+                                validType: 'length[0,20]'
+                            }
+                        };
+                        byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+                        byteColumn.editor = {
+                            type: 'datebox',
+                            options: {
+                                required: false
+                            }
+                        };
+                    }
+                    byteColumn = $dg.datagrid('getColumnOption', 'TableName');
+                    byteColumn.editor = {};
+                    byteColumn = $dg.datagrid('getColumnOption', 'ColumnName');
+                    byteColumn.editor = {};
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+
+        //加载成功
+        function onLoadSuccess(rowdata) {
+            //行号自适应宽度
+            $(this).datagrid("fixRownumber");
+        }
+
+        function append() {
+            if (endEditing()) {
+                var NewRow = {};
+                var Columns = $dg.datagrid('getColumnFields');
+                for (var column in Columns) {
+                    NewRow[Columns[column]] = null;
+                }
+                //console.log(Columns);
+                //动态设置 编辑样式 TableName ColumnName);
+                byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+                if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                    byteColumn.editor = {
+                        type: 'textbox',
+                        options: {
+                            required: false,
+                            validType: 'length[0,20]'
+                        }
+                    };
+                    byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+                    byteColumn.editor = {
+                        type: 'datebox',
+                        options: {
+                            required: false
+                        }
+                    };
+                    byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+                    byteColumn.editor = {};
+                    byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+                    byteColumn.editor = {};
+                }
+                byteColumn = $dg.datagrid('getColumnOption', 'TableName');
+                if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                    byteColumn.editor = {
+                        type: 'combobox',
+                        options: {
+                            panelHeight: 'auto',
+                            valueField: 'Value',
+                            textField: 'Text',
+                            method: 'get',
+                            url: '/SetDefaultses/getXMLDefaultTablesData',
+                            required: true,
+                            disabled: false,//将编辑禁用
+                            onChange: function (rec) {
+                                SetColumnNameChs(rec);
+                            }
+                        }
+                    };
+                    byteColumn.formatter = function (value, row) {
+                        return row.TableNameChs;
+                    };
+                    byteColumn = $dg.datagrid('getColumnOption', 'ColumnName');
+                    byteColumn.editor = {
+                        type: 'combobox',
+                        options: {
+                            valueField: 'Value',
+                            textField: 'Text',
+                            required: true,
+                            disabled: false,
+                            validType: 'length[0,50]',
+                            onSelect: function (rec) {
+                                SetDefaultValue(rec);
+                            }
+                        }
+                    };
+                    byteColumn.formatter = function (value, row) {
+                        return row.ColumnNameChs;
+                    };
+                }
+                $dg.datagrid('insertRow', { index: 0, row: NewRow });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+                var ed = $dg.datagrid('getEditor', { index: editIndex, field: 'ID' });
+            }
+        }
+
+        function removeit() {
+            var Seltdata = $dg.datagrid('getSelections');
+            if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+                $dg.datagrid('cancelEdit', editIndex);
+                editIndex = undefined;
+            }
+            for (var i = Seltdata.length; i > 0; i--) {
+                var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+                $dg.datagrid('deleteRow', rowindex);
+            }
+        }
+
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    var url = ""
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                        url = '/SetDefaultses/Create';
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                        url = '/SetDefaultses/Edit';
+                    }
+                    var setDefaults = $dg.datagrid('getSelected');
+                    //var url = '/SetDefaultses/Edit';
+                    $.ajax({
+                        type: 'POST',
+                        url: url,//获取数据的函数
+                        async: true,//true 异步，false 同步
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(setDefaults),//查询条件JSON.stringify()
+                        //data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                        beforeSend: function (xhr) {//发送请求前运行的函数
+                            //console.log('beforeSend');
+                        },
+                        success: function (data) {//查询成功,data为返回的数据
+                            //console.log(data);
+                            if (data.Success) {
+                                $.messager.alert("提示", "提交成功！");
+                                $dg.datagrid('acceptChanges');
+                                $dg.datagrid('reload');
+                            }
+                            else {
+                                var ErrMsgStr = '提交错误了！';
+                                if (!(typeof (data.ErrMsg) === 'undefined' || data.ErrMsg == null || data.ErrMsg == ''))
+                                    ErrMsgStr = data.ErrMsg;
+                                $.messager.alert("错误", ErrMsgStr, 'error');
+                            }
+                        },
+                        error: function () {//查询失败
+                            $.messager.alert("错误", "提交错误了！", 'error');
+                        },
+                        complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                        }
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+        //当表名称修改时，动态的给字段栏位的下拉框重新绑定数据源
+        function SetColumnNameChs(value) {
+            var rowData = $dg.datagrid('getSelected');
+            rowData.TableName = value;
+            if($dg.datagrid('getEditor', { 'index': editIndex, 'field': 'TableName' }))
+                rowData.TableNameChs = $dg.datagrid('getEditor', { 'index': editIndex, 'field': 'TableName' }).target.combobox('getText');
+            
+            $.ajax({
+                type: 'GET',
+                url: "/SetDefaultses/GetTableColumnByTableNameData",//获取数据的函数
+                async: true,//使用同步的方式,true为异步方式
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: { TableName: value },//查询条件JSON.stringify()
+                beforeSend: function () {//回发前
+                    //console.log('beforeSend_SetDefaults_EditForm');
+                },
+                error: function () {//查询失败
+                    //console.log('error_SetDefaults_EditForm');
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    //console.log(rowData);
+                    var rowIndex = editIndex;//获取行号  
+
+                    var targetEditor = $dg.datagrid('getEditor', { 'index': editIndex, 'field': 'ColumnName' });
+                    if (targetEditor) {
+                        var target = targetEditor.target;
+                        target.combobox('clear');
+                        target.combobox('loadData', data);
+                    }
+
+                    var targetval = getTargetVal(targetEditor);
+                    if ((typeof targetval === 'undefined' || targetval == null || targetval == '') || (typeof rowData.ID === 'undefined' || rowData.ID == null || rowData.ID == 0 || rowData.ID == ''))
+                        setTargetVal(targetEditor, rowData.ColumnName);
+                },
+                complete: function () {//执行以后
+                    //console.log('complete_SetDefaults_EditForm');
+                }
+            });
+        }
+
+        function SetDefaultValue(rec) {
+            console.log("rec", rec);
+            var rowData = $dg.datagrid('getSelected');
+            rowData.ColumnNameChs = rec.Text;
+            //var rowIndex = $dg.datagrid('getRowIndex', row);//获取行号  
+            var targetEditor = $dg.datagrid('getEditor', { 'index': editIndex, 'field': 'TableName' });
+            var thisTarget = targetEditor.target;
+            var value = thisTarget.combobox('getValue');
+            $.ajax({
+                type: 'GET',
+                url: "/SetDefaultses/GetDataType_Table_Column",//获取数据的函数
+                async: true,//使用同步的方式,true为异步方式
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: { TableName: value, ColumnName: rec.Value },//查询条件JSON.stringify()
+                beforeSend: function () {//回发前
+                    //console.log('beforeSend_SetDefaults_EditForm');
+                },
+                error: function () {//查询失败
+                    //console.log('error_SetDefaults_EditForm');
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    var thisTarget = $dg.datagrid('getEditor', { 'index': editIndex, 'field': 'DataType' }).target;
+                    if (data.Success) {
+                        thisTarget.textbox('setValue', data.DataTypeStr.toLowerCase());
+                    } else {
+                        thisTarget.textbox('setValue', '');
+                    }
+                }
+            });
+
+        }
+
+        function valadateDefaultValue(rowindex) {
+            var row = $dg.datagrid('getData').rows[rowindex];
+            switch (row.DataType.toLowerCase()) {
+                case "string":
+                    //验证数据类型为字符
+                    if (!(typeof row.DefaultValue == "string")) {
+                        $.messager.alert('提示', "默认值非字符串，请重新输入字符串！"); 
+                        return false
+                    }
+                    break;
+                case "int":
+                    //验证数据类型为数值
+                    var regex = new RegExp("^[0-9]*$");
+                    if (!regex.test(row.DefaultValue)) {
+                        $.messager.alert('提示', "默认值非数值型，请重新输入int型数字！");
+                        return false
+                    }
+                    break;
+                case "int32":
+                    //验证数据类型为数值
+                    var regex = new RegExp("^[0-9]*$");
+                    if(!regex.test(row.DefaultValue)){
+                        $.messager.alert('提示', "默认值非数值型，请重新输入int32型数字！");
+                        return false
+                    }
+                    break; 
+                case "decimal":
+                    //验证数据类型为数值
+                    if (isNaN(row.DefaultValue)) {
+                        $.messager.alert('提示', "默认值非数值型，请重新输入decimal型数字！");
+                        return false
+                    }
+                    break;
+                case "datetime":
+                    //验证数据类型为数值
+                    var reg = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\s+(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d$/;
+                    var regex = new RegExp(reg);
+                    if (!regex.test(row.DefaultValue)) {
+                        $.messager.alert('提示', "默认值非日期型，请重新输入DateTime型,如：2014-01-01 12:00:00  ！");
+                        //dateValue = "";
+                        //this.focus();
+                        return false
+                    }
+                    break;
+                case "date":
+                    //验证数据类型为数值
+                    var regex = new RegExp("^(?:(?:([0-9]{4}(-|\/)(?:(?:0?[1,3-9]|1[0-2])(-|\/)(?:29|30)|((?:0?[13578]|1[02])(-|\/)31)))|([0-9]{4}(-|\/)(?:0?[1-9]|1[0-2])(-|\/)(?:0?[1-9]|1\\d|2[0-8]))|(((?:(\\d\\d(?:0[48]|[2468][048]|[13579][26]))|(?:0[48]00|[2468][048]00|[13579][26]00))(-|\/)0?2(-|\/)29))))$");
+                    if (!regex.test(row.DefaultValue)) {
+                        $.messager.alert('提示', "默认值非日期型，请重新输入DateTime型,如：'2018-04-11'！");
+                        //dateValue = "";
+                        //this.focus();
+                        return false
+                    }
+                    break;
+                case "boolean":
+                    //验证数据类型为布尔型
+                    if (row.DefaultValue != "true" && row.DefaultValue != "false") {
+                        $.messager.alert('提示', "默认值非布尔型，请重新输入true或false！");
+                        return false
+                    }
+                    break;
+            }
+            return true;
+        }
+
+        $(document).ready(function (e) {
+            //$dg = $('#setdefaults-table').datagrid({
+            //    queryParams: function (p) {
+            //        return {
+            //            TableNameChs: "",
+            //            ColumnNameChs: "",
+            //            DefaultValue: "",
+            //            DataType: "",
+            //            search: p.search,
+            //            sort: p.sort,
+            //            order: p.order,
+            //            limit: p.limit,
+            //            offset: p.offset
+            //        };
+            //    }
+            //});
+            //
+            //$dg.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
+            //    $deletesetdefaultsbutton.prop('disabled', !$dg.datagrid('getSelections').length);
+            //});
+            //
+            //$('#newsetdefaultsbutton').on('click', function () {
+            //    $(location).attr('href', "/SetDefaultses/Create");
+            //});
+            //
+            //$('#deletesetdefaultsbutton').on('click', function () {
+            //    var selected = $dg.datagrid('getSelections');
+            //    if (selected.length > 0) {
+            //        deleteSetDefaults(selected);
+            //    }
+            //});
+            //
+            //$('#popupsearchbutton').on('click', function () {
+            //    $('#popupsearchModal').modal('toggle');
+            //});
+            //
+            //$('#popupsearchOKbutton').click(function () {
+            //    //para = $('#para').val();
+            //    $('#popupsearchModal').modal('toggle');
+            //    $dg.datagrid('refresh');
+            //});
+        });
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+        }
+        function SetColumnNameRule(value) {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'ColumnName',
+                    type: 'combogrid',
+                    options: {
+                        url: '/SetDefaultses/GetTableColumnByTableNameDataQ',
+                        idField: 'Value',
+                        textField: 'Text',
+                        queryParams: { q: value },
+                        method: 'get',
+                        columns: [[
+                                { field: 'Text', title: '中文字段名', width: 90 },
+                                { field: 'Value', title: '英文字段名', width: 90 },
+                        ]],
+                        onChange: function (value) {
+                            var opts = $("#setdefaults-table").datagrid('options');
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'ColumnName');
+                                opts.queryParams.ColumnName = value;
+                            } else {
+                                opts.queryParams.ColumnName = value;
+                            }
+                            var dgPager = $dg.datagrid("getPager");
+                            if (dgPager) {
+                                dgPager.pagination('select', 1);
+                            }
+                            else {
+                                opts.queryParams.page = 1;
+                                $dg.datagrid("reload");
+                            }
+                        }
+                    }
+                },
+            ]);
+        }
+
+        $(function () {
+            var opts = $("#setdefaults-table").datagrid('options');
+            $dg.datagrid('enableFilter', [
+                
+                 {
+                     field: 'TableName',
+                     type: 'combogrid',
+                     options: {
+                         url: '/SetDefaultses/getXMLDefaultTablesData',
+                         idField: 'Value',
+                         textField: 'Text',
+                         queryParams: { q: 'combogrid' },
+                         method: 'get',
+                         columns:[[     
+                                 { field: 'Text', title: '中文表名', width: 90 },
+                                 { field: 'Value', title: '英文表名', width: 90 },
+                             ]],
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'TableName');
+                                 opts.queryParams.TableName = value;
+                                 opts.queryParams.ColumnName = "";
+                             } else {
+                                 opts.queryParams.TableName = value;
+                             }
+                             SetColumnNameRule(value);
+                             var dgPager = $dg.datagrid("getPager");
+                             if (dgPager) {
+                                 dgPager.pagination('select', 1);
+                             }
+                             else {
+                                 opts.queryParams.page = 1;
+                                 $dg.datagrid("reload");
+                             }
+                            
+                         }
+                     }
+                 },
+                 {
+                     field: 'DefaultValue',
+                     type: 'textbox',
+                     options: {
+                         onChange: function (value) {
+                            // var opts = $("#setdefaults-table").datagrid('options');
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'DefaultValue');
+                                 opts.queryParams.DefaultValue = value;
+                             } else {
+                                 opts.queryParams.DefaultValue = value;
+                             }
+                             var dgPager = $dg.datagrid("getPager");
+                             if (dgPager) {
+                                 dgPager.pagination('select', 1);
+                             }
+                             else {
+                                 opts.queryParams.page = 1;
+                                 $dg.datagrid("reload");
+                             }
+                             //$dg.datagrid('doFilter');
+                         }
+                     }
+                 },
+                   {
+                       field: 'DataType',
+                       type: 'combobox',
+                       options: {
+                           panelHeight: 'auto',
+                           data: [
+                               { value: 'string', text: 'string' },
+                               { value: 'int', text: 'int' },
+                               { value: 'int32', text: 'int32' },
+                               { value: 'Decimal', text: 'Decimal' },
+                               { value: 'DateTime', text: 'DateTime' },
+                               { value: 'Boolean', text: 'Boolean' },
+                           ],
+                           onChange: function (value) {
+                              // var opts = $("#setdefaults-table").datagrid('options');
+                               if (value == '') {
+                                   $dg.datagrid('removeFilterRule', 'DataType');
+                                   opts.queryParams.DataType = value;
+                               } else {
+                                   $dg.datagrid('addFilterRule', {
+                                       field: 'DataType',
+                                       op: 'equal',
+                                       value: value
+                                   });
+                                   opts.queryParams.DataType = value;
+                               }
+                               var dgPager = $dg.datagrid("getPager");
+                               if (dgPager) {
+                                   dgPager.pagination('select', 1);
+                               }
+                               else {
+                                   opts.queryParams.page = 1;
+                                   $dg.datagrid("reload");
+                               }
+                               //自动添加 textbox 或 text的值
+                               //AutoAddFilterRule($dg);
+                               //$dg.datagrid('doFilter');
+                           }
+                       }
+                   },
+            ]);
+            //开启 回车搜索
+            //var Columns = $dg_.datagrid('getColumnFields');
+            //if (Columns) {
+            //    for (var item in Columns) {
+            //        var Filterobj = $dg_.datagrid('getFilterComponent', Columns[item]);
+            //        if (($(Filterobj).hasClass('datagrid-editable-input') && $(Filterobj).hasClass('datagrid-filter')) || $(Filterobj).data("datebox") || $(Filterobj).data("datetimebox")) {
+            //            $(Filterobj).unbind("keydown.filter");
+            //            $(Filterobj).bind("keydown.filter", function (e) {
+            //                //console.log(this,$(this));
+            //                var t = $(this);
+            //                if (this.timer) {
+            //                    clearTimeout(this.timer);
+            //                }
+            //                if (e.keyCode == 13) {
+            //                    //自动添加 textbox 或 text的值
+            //                    AutoAddFilterRule($dg_);
+            //                    $dg_.datagrid('doFilter');
+            //                }
+            //                //else {
+            //                //    this.timer = setTimeout(function () {
+            //                //        _doFilter();
+            //                //    }, opts.filterDelay);
+            //                //}
+            //            });
+            //        }
+            //    }
+            //}
+        });
+    </script>
+}

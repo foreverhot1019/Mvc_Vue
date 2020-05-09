@@ -1,0 +1,102 @@
+﻿﻿@model AirOut.Web.Models.DealArticle
+@{
+	//控件排序
+	var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group">
+    @Html.LabelFor(model => model.DealArticleCode,"成交条款代码", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.DealArticleCode, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.DealArticleCode,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.DealArticleName,"成交条款名称", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.DealArticleName, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.DealArticleName,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.TransArticle,"运输条款", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.TransArticle, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.TransArticle,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Description,"成交条款描述", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @*@Html.ValidationMessageFor(model => model.Description,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.Status,"使用状态", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "formatter:UsedformatterByArrStatus", tabindex = Num++, style = "width:100%",value=(int)Model.Status } })
+        @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+    </div>
+</div>
+@*<div class="form-group">
+    @Html.LabelFor(model => model.OperatingPoint,"操作点", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox",tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDWHO,"新增人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.ADDWHO,"" , new { @class = "text-danger" }
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.ADDTS,"新增时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.ADDTS,"" , new { @class = "text-danger" })
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITWHO,"修改人", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox",tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.EDITWHO,"" , new { @class = "text-danger" })
+    </div>
+</div>
+<div class="form-group">
+    @Html.LabelFor(model => model.EDITTS,"修改时间", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+		@Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox",tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.EDITTS,"" , new { @class = "text-danger" })
+    </div>
+</div>*@
+
+<script type="text/javascript">
+    var ArrStatus = JSON.parse('@(Html.Raw(ViewData["ArrStatus"]??"[]"))');
+    function initCombogrid() {
+        $('#Status').combogrid({
+            panelHeight: 'auto',
+            data: ArrStatus,
+            required: true,
+            delay: 100,
+            multiple: false,
+            idField: 'Value',
+            valueField: 'Value',
+            textField: 'DisplayName',
+            columns: [[
+                { field: 'Value', title: '代码', width: 120 },
+                { field: 'DisplayName', title: '名称', width: 120 }
+            ]]
+        });
+    }
+    $(function () {
+        initCombogrid();
+        $("#Status").combogrid("setValue", '@((int)Model.Status)');
+        console.log(@((int)Model.Status));
+    });
+</script>
+

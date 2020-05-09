@@ -1,0 +1,215 @@
+﻿@model AirOut.Web.Models.CustomerQuotedPrice
+<table id="customerquotedprice_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto;min-height:300px;"
+       data-options="
+	    rownumbers:true,
+	    checkOnSelect:true,
+	    selectOnCheck:true,
+	    idField:'Id',
+	    sortName:'Id',
+	    sortOrder:'desc',
+	    remoteFilter: true,
+	    singleSelect: false,
+	    method: 'get',
+	    toolbar: '#customerquotedprice_toolbar',
+	    //url: '/CustomerQuotedPrices/GetData',
+	    //onClickCell: onClickCell,
+        //onDblClickRow:onDblClickRow,
+	    //onSelect:onSelect,
+        //onBeginEdit:onBeginEdit,
+	    pagination: 'true'">
+    <thead>
+        <tr>
+            <th data-options="field:'ck',checkbox:true"></th>
+            @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+            <th data-options="field:'SerialNo',width:100,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:true,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.SerialNo)</th>
+            @*<th data-options="field:'BusinessType',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.BusinessType)</th>*@
+            <th data-options="field:'CustomerCode',width:120,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.CustomerCode)</th>
+            <th data-options="field:'EndPlace',width:100,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.EndPlace)</th>
+            <th data-options="field:'Status',width:100,sortable:true,resizable:true,
+            formatter:UsedformatterByArrStatus,
+            editor: {
+            	type:'combogrid',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.Status)</th>
+            <th data-options="field:'AuditStatus',width:100,sortable:true,resizable:true,
+            formatter:UsedformatterByArrAuditStatus,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.AuditStatus)</th>
+            <th data-options="field:'ADDWHO',width:100,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+            <th data-options="field:'ADDTS',width:120,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.ADDTS)</th>
+            <th data-options="field:'StartDate',width:100,align:'right',sortable:true,resizable:true,
+            formatter:dateformatter,
+            editor:{
+            	type:'datebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.StartDate)</th>
+            <th data-options="field:'EndDate',width:100,align:'right',sortable:true,resizable:true,
+            formatter:dateformatter,
+            editor:{
+            	type:'datebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.EndDate)</th>
+            <th data-options="field:'Description',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Description)</th>
+            <th data-options="field:'EDITWHO',width:100,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+            <th data-options="field:'EDITTS',width:120,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.EDITTS)</th>
+            @*<th data-options="field:'LocalWHMark',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.LocalWHMark)</th>
+            <th data-options="field:'StartPlace',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.StartPlace)</th>
+            <th data-options="field:'TransitPlace',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.TransitPlace)</th>
+            <th data-options="field:'ProxyOperator',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.ProxyOperator)</th>
+            <th data-options="field:'CusDefinition',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.CusDefinition)</th>
+            <th data-options="field:'Receiver',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Receiver)</th>
+            <th data-options="field:'Shipper',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Shipper)</th>
+            <th data-options="field:'Contact',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Contact)</th>
+            <th data-options="field:'QuotedPricePolicy',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.QuotedPricePolicy)</th>
+            <th data-options="field:'Seller',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Seller)</th>*@
+        </tr>
+    </thead>
+</table>

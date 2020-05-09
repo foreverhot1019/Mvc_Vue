@@ -1,0 +1,238 @@
+﻿@{
+    int Num = 0;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="ArApEdit_PopupWin" class="easyui-dialog" title="编辑账单类型/结算方" style="width:500px; height:200px"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            //dg_reload();
+            if(!(typeof(keydownEvent)==='undefined'||keydownEvent==null))
+                $(document).unbind('keydown',keydownEvent);
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存(Q)',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },
+     {
+         text:'关闭(C)',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#ArApEdit_PopupWin').window('close');
+            return false;
+         }
+     }]">
+    <div id="div_BmsBillArApEditFrom" class="row" style="width:500px; padding-left:10px; padding-top:11px;">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <form id="formEdit" class="form-horizontal">
+                <div id="EditPanel" class="easyui-panel" title="" style="width:100%; padding-top:5px; padding-bottom:5px;  background:#fafafa;"
+                     data-options="fit:false,iconCls:'icon-save',closable:false,collapsible:false,minimizable:false,maximizable:false">
+                    <div class="form-group col-md-12">
+                        <label for="firstname" class="col-md-4 control-label">账单类型:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="easyui-combogrid" id="Bill_Type" name="Bill_Type" placeholder="请输入账单类型" data-options="required:false,validType:'length[0,50]'" tabindex=@(Num++) style="width:100%" />
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="firstname" class="col-md-4 control-label">结算方:</label>
+                        <div class="col-md-8">
+                            <input type="text" class="easyui-combogrid" id="SettleAccout" name="SettleAccout" placeholder="请输入结算方" data-options="required:false,validType:'length[0,50]'" tabindex=@(Num++) style="width:100%" />
+                            <input type="hidden" id="SettleAccoutName" name="SettleAccoutName">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script id="ArApEdit_PopupWin_js">
+    const TopDiv ='#ArApEdit_PopupWin';//最外层div，防止id名相同
+    function InitPopupEditWinFuc() {
+        //console.log('InitAddEdit_PopupWinFuc---------------');
+        initEasyUIControl('div_BmsBillArApEditFrom');
+        initPageWin();
+        AddkeydownListen();//设置 键盘监控事件
+    }
+    //初始化页面
+    function initPageWin() {
+        initCombogrid('_FromCache');
+        var FromData = "{}";
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl(TopDiv, null, false, FormNAMEData);
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        //账单类型
+        var $Bill_Type =$('#Bill_Type',TopDiv);
+        if($Bill_Type.length>0){
+            $Bill_Type.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required: true,
+                mode: 'loacl',
+                pagination: false,
+                data:ArrBill_Type,
+                onChange: function () {
+                    CheckRequired();
+                }
+            }));
+            //账单类型 keyup事件 小写转大写
+            $Bill_Type.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        function SettleAccoutSleted(Selted){
+            if (Selted) {
+                var NameVal = Selted['CHNName'];
+                if (!(typeof NameVal === 'undefined' || NameVal == null)) {
+                    $("#SettleAccoutName",TopDiv).val(NameVal);
+                }
+            }
+        }
+        //结算方代码
+        var $SettleAccout =$('#SettleAccout',TopDiv);
+        if($SettleAccout.length>0){
+            $SettleAccout.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+_FromCache,
+                onChange: function () {
+                    var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                    SettleAccoutSleted(Selted);
+                    CheckRequired();
+                }
+            }));
+            //结算方代码 keyup事件 小写转大写
+            $Bill_Type.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+    }
+    //检测必填
+    function CheckRequired(){
+        var Bill_TypeVal= $("input[name='Bill_Type'][type='hidden']",TopDiv).val();
+        var SettleAccoutVal= $("input[name='SettleAccout'][type='hidden']",TopDiv).val();
+        if((typeof(Bill_TypeVal)==='undefined'||Bill_TypeVal==null||Bill_TypeVal=='') || (typeof(SettleAccoutVal)==='undefined'||SettleAccoutVal==null||SettleAccoutVal=='')){
+            if((typeof(Bill_TypeVal)==='undefined'||Bill_TypeVal==null||Bill_TypeVal=='') || (typeof(SettleAccoutVal)==='undefined'||SettleAccoutVal==null||SettleAccoutVal=='')){
+                setComboRequired($("#Bill_Type",TopDiv));
+                setComboRequired($("#SettleAccout",TopDiv));
+            }else{
+                if(typeof(Bill_TypeVal)==='undefined'||Bill_TypeVal==null||Bill_TypeVal=='')
+                    setComboRequired($("#Bill_Type",TopDiv),false);
+                if(typeof(SettleAccoutVal)==='undefined'||SettleAccoutVal==null||SettleAccoutVal=='')
+                    setComboRequired($("#SettleAccout",TopDiv),false);
+            }
+        }
+    }
+    //刷新 父界面 datagrid
+    function dg_reload(){
+        var $dgHead = $("table.easyui-datagrid:not([id$='_dtl_datagrid'])");
+        if($dgHead.length>0)
+            $dgHead.datagrid('reload');
+    }
+    //提交数据
+    function Form_Submit() {
+        var postObj = {};
+        var formHead = $($('#formEdit', TopDiv)[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid){
+            return false;
+        }
+        var fromhedddata = getFormSerializeJson(formHead);
+        var url = "/Finances/SaveArApEdit_PopupWin";
+        var ArrChecked = $dg.datagrid("getChecked");
+        if(typeof ArrChecked==='undefined'||ArrChecked == null||ArrChecked.length<1){
+            $.messager.alert("警告","至少需要选中一条数据，才能操作");
+            return false;
+        }
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        fromhedddata["ArrFinance"] =ArrChecked;
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify(fromhedddata),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        $(TopDiv).window('close');
+                        if(data.data){
+                            for(var i in ArrChecked){
+                                var item =ArrChecked[i];
+                                var rowIndex = $dg.datagrid("getRowIndex",item);
+                                $.extend(item,data.data);
+                                $dg.datagrid("refreshRow",rowIndex);
+                            }
+                        }
+                    } else{
+                        $.messager.alert('警告', data.ErrMsg);
+                    }
+                }
+                else{
+                    $.messager.alert('警告', '未知错误');
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $.messager.alert('警告', '数据处理中,出现网络错误');
+            }
+        });
+    }
+    //监控 键盘事件
+    function AddkeydownListen(){
+        //监控 键盘事件
+        $(document).bind("keydown",keydownEvent);
+    }
+    var keydownEvent =function (event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        var keyCode = e.which || e.keyCode;
+        if(e.altKey){
+            PressCtrl=true;
+            //C	67 关闭
+            if (keyCode == 67) {
+                $(TopDiv).window('close');
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+            //Q	81 保存
+            if (keyCode == 81) {
+                $(TopDiv).window("panel").find("div.dialog-button span.l-btn-icon.icon-ok").parent().parent().click();
+                //Form_Submit();
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+        }
+    };
+</script>

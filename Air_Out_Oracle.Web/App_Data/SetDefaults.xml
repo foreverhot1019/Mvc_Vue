@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebSettings>
+  <DefaultTables>
+    <table name="Employee" value="员工表" />
+    <table name="Order" value="订单表" />
+    <table name="Vehicle" value="车辆表" />
+    <table name="PARA_Area" value="区域表" />
+  </DefaultTables>
+  <table name="Employee" value="员工表">
+    <AutoSet colum="UserName" value="dog13" name="姓名" type="string" />
+    <AutoSet colum="Password" value="passowrd" name="密码" type="string" />
+    <AutoSet colum="Sex" value="sex" name="性别" type="string" />
+    <AutoSet colum="DepartmentId" value="1234" name="部门" type="int" />
+    <AutoSet colum="Group" value="group" name="角色" type="string" />
+    <AutoSet colum="PhoneNumber" value="57" name="电话号码" type="string" />
+    <AutoSet colum="MobilePhone" value="133" name="手机号码" type="string" />
+  </table>
+  <table name="Vehicle" value="车辆表">
+    <AutoSet colum="PlateNumber" value="苏EZ" name="车牌号" type="String" />
+    <AutoSet colum="VehStatus" value="停用" name="车辆状态" type="String" />
+    <AutoSet colum="PlateNumberPosition" value="车挂" name="车头/挂车" type="String" />
+    <AutoSet colum="ExistVehTailBoard" value="false" name="车辆尾板" type="Boolean" />
+    <AutoSet colum="DepartmentId" value="4" name="使用部门" type="Int32" />
+  </table>
+  <table name="Order" value="订单表">
+    <AutoSet colum="Volume" value="10" name="体积(立方)" type="Decimal" />
+  </table>
+  <table name="PARA_Area" value="区域表">
+    <AutoSet colum="AreaCode" value="发生发射点发" name="国内地区代码" type="string" />
+    <AutoSet colum="AreaName" value="分公司公司ssd" name="国内地区名称" type="String" />
+    <AutoSet colum="Status" value="广百股份" name="使用状态" type="" />
+    <AutoSet colum="ADDWHO" value="userf" name="新增人" type="string" />
+    <AutoSet colum="EDITWHO" value="gdfg" name="修改人" type="string" />
+    <AutoSet colum="ADDTS" value="2018-04-17" name="新增时间" type="datetime" />
+  </table>
+</WebSettings>

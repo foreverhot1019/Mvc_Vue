@@ -1,0 +1,431 @@
+﻿﻿@model AirOut.Web.Models.QuotedPrice
+@{
+    //控件排序
+    var Num = 1;
+}
+<script async defer src="~/Scripts/jquery.validate.min.js"></script>
+<script async defer src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+<style>
+    input[type="text"]:read-only {
+        background-color: #ccc;
+        opacity: 0.6;
+    }
+</style>
+@*<div class="row">*@
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.SerialNo, "记录号", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.SerialNo, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:false,readonly:true,validType:'length[0,20]'" } })
+    @Html.ValidationMessageFor(model => model.SerialNo, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.FeeCode, "费用代码", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.FeeCode, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.FeeName, "费用名称", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeName, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true,readonly:true,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.FeeName, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.EndPlace, "目的地", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EndPlace, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.EndPlace, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.WHBuyer, "订舱方", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.WHBuyer, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.WHBuyer, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.AirLineCo, "航空公司", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AirLineCo, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.AirLineCo, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.CustomsType, "报关方式", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.CustomsType, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.CustomsType, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Status, "使用状态", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @Value = ((int)Model.Status), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,20]'" } })
+    @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.ADDTS, "建档日期", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", tabindex = Num++, style = "width:100%", data_options = "formatter:datetimeformatter,readonly:true", @Value = ((Model == null || Model.ADDTS == null) ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") : Model.ADDTS.Value.ToString("yyyy-MM-dd HH:mm:ss")) } })
+    @Html.ValidationMessageFor(model => model.ADDTS, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.CurrencyCode, "币别", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.CurrencyCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.CurrencyCode, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.AuditStatus, "审批状态", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AuditStatus, new { htmlAttributes = new { @Value = ((int)Model.AuditStatus), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true,readonly:true,validType:'length[0,20]'" } })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.BillingUnit, "计费单位", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.BillingUnit, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.BillingUnit, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Price, "单价", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%", data_options = "required:true,precision:2" } })
+    @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.FeeConditionVal1, "计费条件值1", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeConditionVal1, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%", data_options = "precision:2" } })
+    @Html.ValidationMessageFor(model => model.FeeConditionVal1, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.CalcSign1, "计费条件1", htmlAttributes: new { @class = "control-label " })<br />
+    @Html.EditorFor(model => model.CalcSign1, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.CalcSign1, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.FeeCondition, "计费单位", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeCondition, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.FeeCondition, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.CalcSign2, "计费条件2", htmlAttributes: new { @class = "control-label " })<br />
+    @Html.EditorFor(model => model.CalcSign2, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.CalcSign2, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.FeeConditionVal2, "计费条件值2", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeConditionVal2, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%", data_options = "precision:2" } })
+    @Html.ValidationMessageFor(model => model.FeeConditionVal2, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.CalcFormula, "计算公式", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.CalcFormula, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.CalcFormula, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.FeeMin, "费用MIN", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeMin, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%", data_options = "precision:2" } })
+    @Html.ValidationMessageFor(model => model.FeeMin, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.FeeMax, "费用MAX", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.FeeMax, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%", data_options = "precision:2" } })
+    @Html.ValidationMessageFor(model => model.FeeMax, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-8 col-md-8 col-sm-8">
+    @Html.LabelFor(model => model.Description, "描述", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+</div>
+<!------------------ hidden start-------------->
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.StartDate, "开始日期", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "easyui-datebox", tabindex = Num++, style = "width:100%", @Value = ((Model == null || Model.StartDate == null) ? "" : (Model.StartDate.Value.ToString("yyyy-MM-dd"))), data_options = "required:false ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.EndDate, "结束日期", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @class = "easyui-datebox", tabindex = Num++, style = "width:100%", data_options = "required:false ,validType:'length[0,50]'" } })
+    @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.MoorLevel, "靠级", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.MoorLevel, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.MoorLevel, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.SettleAccount, "结算方", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.SettleAccount, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.BSA, "BSA", htmlAttributes: new { @class = "control-label " })
+    @Html.TextBoxFor(model => model.BSA, new { @Value = (Model.BSA ? 1 : 0), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" })
+    @Html.ValidationMessageFor(model => model.BSA, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.StartPlace, "起始地", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.StartPlace, new { htmlAttributes = new { @class = "easyui-combogrid", @Value = ((Model == null || Model.StartPlace == null) ? "PVG" : Model.StartPlace), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.StartPlace, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.TransitPlace, "中转地", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.TransitPlace, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.TransitPlace, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.AirLineNo, "航班号", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AirLineNo, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.AirLineNo, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.DealWithArticle, "成交条款", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.DealWithArticle, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.DealWithArticle, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.ProxyOperator, "代操作", htmlAttributes: new { @class = "control-label " })
+    @Html.TextBoxFor(model => model.ProxyOperator, new { @Value = (Model.BSA ? 1 : 0), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" })
+    @Html.ValidationMessageFor(model => model.ProxyOperator, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.InspectMark, "商检标志", htmlAttributes: new { @class = "control-label " })
+    @Html.TextBoxFor(model => model.InspectMark, new { @Value = (Model.BSA ? 1 : 0), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" })
+    @Html.ValidationMessageFor(model => model.InspectMark, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4" hidden>
+    @Html.LabelFor(model => model.GetOrdMark, "取单标志", htmlAttributes: new { @class = "control-label " })
+    @Html.TextBoxFor(model => model.GetOrdMark, new { @Value = (Model.BSA ? 1 : 0), @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" })
+    @Html.ValidationMessageFor(model => model.GetOrdMark, "", new { @class = "text-danger" })
+</div>
+<!------------------------- hidden end -------------------------->
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDID)
+@Html.HiddenFor(model => model.OperatingPoint)
+@*</div>*@
+
+<script type="text/javascript" id="js_EditForm">
+    $(function () {
+    });
+    function InitEditFormCombogrid(obj) {
+        initCombogrid("_FromCache",obj);
+        var FromData = @Html.Raw(Model == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl(obj,null,false,FormNAMEData);
+    }
+    function noEdit(obj,force) {
+        //console.log(obj,force);
+        var Force =false;
+        if (typeof obj === 'undefined' || obj == null ||obj=='')
+            obj='';
+        if (!(typeof force === 'undefined' || force == null ||force==''))
+            Force = true;
+        var auditstatus = $("#AuditStatus",obj).combogrid("getValue");
+        if (auditstatus == 'Auditing' || auditstatus == 'AuditSuccess' || Force) {
+            $("input.easyui-combogrid.text-box").combogrid("readonly",true);
+            $("input.textbox-text.validatebox-text").attr("readonly", "readonly");
+            $("a.textbox-icon.combo-arrow").addClass("textbox-icon-disabled");
+            $("input[type='checkbox']").attr("disabled", "disabled");
+            $("#EndDate").datebox("readonly",false);
+            $("#Status").combogrid("readonly",false);
+        }
+    }
+    //渲染所有的combogrid控件
+    function initCombogrid(_FromCache,obj) {
+        var FromCache ="";
+        if (!(typeof _FromCache === 'undefined' || _FromCache == null ||_FromCache==''))
+            FromCache= '_FromCache';
+        //费用代码
+        var $FeeCode = $("#FeeCode",obj);
+        if($FeeCode.length>0){
+            $FeeCode.combogrid($.extend({},combogrid_DefaultSettings,{
+                required:true,
+                textField: 'ID',
+                url1: '/FeeTypes/GetPagerFeeTypes'+FromCache,
+                onChange: function (newValue, oldValue) {
+                    var data = $("#FeeCode").combogrid("grid").datagrid("getSelected");
+                    if (data != null) {//费用代码存在时，自动填写费用名称
+                        $('#FeeName').textbox("setValue", data.TEXT);
+                    } else {//清空费用名称
+                        $('#FeeName').textbox("setValue", "");
+                    }
+                }
+            }));
+            //keyup事件 小写转大写
+            $FeeCode.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //结算方，获取的客商信息
+        var $SettleAccount = $("#SettleAccount",obj);
+        if($SettleAccount.length>0){
+            $SettleAccount.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+FromCache
+            }));
+            //keyup事件 小写转大写
+            $SettleAccount.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //订舱方
+        var $WHBuyer = $("#WHBuyer",obj);
+        if($WHBuyer.length>0){
+            $WHBuyer.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+FromCache
+            }));
+            //keyup事件 小写转大写
+            $WHBuyer.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //成交条款
+        var $DealWithArticle = $("#DealWithArticle",obj);
+        if($DealWithArticle.length>0){
+            $DealWithArticle.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/DealArticles/GetPagerDealArticle'+FromCache
+            }));
+            //keyup事件 小写转大写
+            $DealWithArticle.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        ////起始地
+        //var $StartPlace = $("#StartPlace");
+        //if($StartPlace.length>0){
+        //    $StartPlace.combogrid($.extend({},combogrid_DefaultSettings,{
+        //        url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $StartPlace.combogrid("textbox").bind('keyup',keyupToUpper);
+        //}
+        ////中转地
+        //var $TransitPlace = $("#TransitPlace");
+        //if($TransitPlace.length>0){
+        //    $TransitPlace.combogrid($.extend({},combogrid_DefaultSettings,{
+        //        url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $TransitPlace.combogrid("textbox").bind('keyup',keyupToUpper);
+        //}
+        //目的地
+        var $EndPlace = $("#EndPlace",obj);
+        if($EndPlace.length>0){
+            $EndPlace.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/PARA_AirPorts/GetPARA_AirPorts' + FromCache
+            }));
+            //keyup事件 小写转大写
+            $EndPlace.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //航空公司
+        var $AirLineCo = $("#AirLineCo",obj);
+        if($AirLineCo.length>0){
+            $AirLineCo.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+FromCache
+            }));
+            //keyup事件 小写转大写
+            $AirLineCo.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //BSA
+        $("#BSA",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+            mode: 'local',
+            pagination: false,
+            data: ArrUseStatus
+        }));
+        //使用状态
+        $("#Status",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrStatus
+        }));
+        //报关方式
+        var $CustomsType = $("#CustomsType",obj);
+        if($CustomsType.length>0){
+            $CustomsType.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/BD_DEFDOC_LISTs/GetPager_DEFDOC_DICT'+FromCache+'?DOCCODE=CusType',
+            }));
+            //keyup事件 小写转大写
+            $CustomsType.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //币制
+        var $CurrencyCode = $("#CurrencyCode",obj);
+        if($CurrencyCode.length>0){
+            $CurrencyCode.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/PARA_CURRs/GetPagerPARA_CURR'+FromCache
+            }));
+            //keyup事件 小写转大写
+            $CurrencyCode.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //计费单位
+        var $BillingUnit = $("#BillingUnit",obj);
+        if($BillingUnit.length>0){
+            $BillingUnit.combogrid($.extend({},combogrid_DefaultSettings,{
+                url1: '/FeeUnits/GetPagerFeeUnits'+FromCache,
+            }));
+            //keyup事件 小写转大写
+            $BillingUnit.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //审批状态
+        $("#AuditStatus",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            mode: 'loacl',
+            readonly: true,
+            pagination: false,
+            data:ArrAuditStatus
+        }));
+        ////航班号
+        //$("#AirLineNo",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+        //    url1: '/PARA_AirLines/GetPagerAirLine'+FromCache
+        //}));
+        ////代操作
+        //$("#ProxyOperator",obj).combogrid($.extend({}, combogrid_DefaultSettings, {
+        //    mode: 'local',
+        //    pagination: false,
+        //    data: ArrUseStatus
+        //}));
+        ////靠级
+        //var $MoorLevel = $("#MoorLevel",obj);
+        //if($MoorLevel.length>0){
+        //    $MoorLevel.combogrid($.extend({}, combogrid_DefaultSettings, {
+        //        url1: '/BD_DEFDOC_LISTs/Get_DEFDOC_DICT'+FromCache+'?DOCCODE=MoorLevel'
+        //    }));
+        //    //keyup事件 小写转大写
+        //    $MoorLevel.combogrid("textbox").bind('keyup',keyupToUpper);
+        //}
+        ////商检标志
+        //$("#InspectMark",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+        //    mode: 'local',
+        //    pagination: false,
+        //    data: ArrUseStatus,
+        //}));
+        ////取单标志
+        //$("#GetOrdMark",obj).combogrid($.extend({}, combogrid_DefaultSettings, {
+        //    mode: 'local',
+        //    pagination: false,
+        //    data: ArrUseStatus,
+        //}));
+        //计费公式
+        var $CalcFormula = $("#CalcFormula",obj);
+        if($CalcFormula.length>0){
+            $CalcFormula.combogrid($.extend({}, combogrid_DefaultSettings, {
+                mode: 'local',
+                pagination: false,
+                data: ArrBillFormula
+            }));
+            //keyup事件 小写转大写
+            $CalcFormula.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //计费运算符1
+        $("#CalcSign1",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+            mode: 'local',
+            idField: 'TEXT',
+            valueField: 'TEXT',
+            pagination: false,
+            data: ArrUseCalcSign
+        }));
+        //计算单位
+        var $FeeCondition = $("#FeeCondition",obj);
+        if($FeeCondition.length>0){
+            $FeeCondition.combogrid($.extend({}, combogrid_DefaultSettings, {
+                url1: '/BD_DEFDOC_LISTs/GetPager_DEFDOC_DICT'+FromCache+'?DOCCODE=FeeConditionAr',
+            }));
+            //keyup事件 小写转大写
+            $FeeCondition.combogrid("textbox").bind('keyup',keyupToUpper);
+        }
+        //计费运算符2
+        $("#CalcSign2",obj).combogrid($.extend({},combogrid_DefaultSettings,{
+            mode: 'local',
+            idField: 'TEXT',
+            valueField: 'TEXT',
+            pagination: false,
+            data:ArrUseCalcSign
+        }));
+    }
+    //复制新增
+    function copyAdd() {
+        var id = $("#Id").val();
+        if (typeof id === 'undefined' || id == null || id <= 0) {
+            $.messager.alert("Warning", "必须新增后才可以复制新增！")
+        } else
+            $(location).attr('href', "/QuotedPrices/Create?id=" + id);
+    }
+</script>

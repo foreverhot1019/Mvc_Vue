@@ -1,0 +1,184 @@
+﻿<!--明细数据-->
+<div id="div_DtlContent" class="col-lg-12 col-md-12 col-sm-12">
+    @Html.Partial("../CusQuotedPriceDtls/ListView", new AirOut.Web.Models.CusQuotedPriceDtl(), ViewData)
+    <div id="cusquotedpricedtl_toolbar" style="height:auto">
+        @if (Html.IsAuthorize("Create"))
+        {
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append.call(this)">新增</a>
+        }
+        @if (Html.IsAuthorize("Delete"))
+        {
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit.call(this)">删除</a>
+        }
+        @if (Html.IsAuthorize("Edit"))
+        {
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept.call(this)">保存</a>
+        }
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload.call(this)">刷新</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject.call(this)">取消</a>
+    </div>
+</div>
+<script type="text/javascript">
+    //明细编辑权限
+    const Editable = '@Html.IsAuthorize("CusQuotedPriceDtls", "Index", "Edit")';
+    //设置 选择报价 弹出框 确定按钮 事件
+    function SetSeltdBtnClick(){
+        var ArrbtnSeltQP = $("#div_QPSeltd").parent().find("#SeltdQP");
+        ArrbtnSeltQP.click(function () {
+            var ArrSeltRow = $dgQP.datagrid('getSelections');
+            if (ArrSeltRow.length > 0) {
+                for (var i in ArrSeltRow) {
+                    var newRow = $.extend({},ArrSeltRow[i]);
+                    newRow["CusQPId"] = $("#Id").val();
+                    newRow["CusQPSerialNo"] = $("#SerialNo").textbox('getValue');
+                    newRow["QPId"] = ArrSeltRow[i].Id;
+                    newRow["QPSerialNo"] = ArrSeltRow[i].SerialNo;
+                    newRow["StartDate"] = $("#StartDate").datebox('getValue');
+                    newRow["EndDate"] = $("#EndDate").datebox('getValue');
+                    newRow["EndPlace"] = $("#EndPlace").combogrid('getValue');
+                    newRow.Id = 0;
+                    newRow.SerialNo='';
+                    //$dg.datagrid('appendRow',ArrSeltRow[i]);
+                    $dg.datagrid('insertRow', { index: 0, row: newRow });
+                    editIndex = 0;
+                }
+            }
+            $("#div_QPSeltd").dialog('close');
+        });
+    }
+    /* datagrid - start*/
+    var $dg = $('#cusquotedpricedtl_datagrid');
+    var editIndex = undefined;
+    //刷新
+    function reload() {
+        reject();//回滚所有变更
+        $dg.datagrid('reload');
+    }
+    //新增
+    function append() {
+        if(!ArrIsLoadWin.IsLoadQuotedPrice){
+            AsyncGetMyWin('/QuotedPrices/GetQPSeltdView', 'IsLoadQuotedPrice', "SetSeltdBtnClick();InitQPSeltd();", true);
+        }
+        var $dialog = $("#div_QPSeltd");
+        if($dialog.length>0){
+            var opts = $dialog.dialog('options');
+            if(opts.closed){
+                $dialog.dialog('open');
+            }
+        }
+    }
+    //删除
+    function removeit() {
+        var Seltdata = $dg.datagrid('getSelections');
+        if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+            $dg.datagrid('cancelEdit', editIndex);
+            editIndex = undefined;
+        }
+        for (var i = Seltdata.length; i > 0; i--) {
+            var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+            //console.log(rowindex);
+            $dg.datagrid('deleteRow', rowindex);
+        }
+    }
+    //提交保存
+    function accept() {
+        if ($dg.datagrid('getChanges').length) {
+            var inserted = $dg.datagrid('getChanges', "inserted");
+            var deleted = $dg.datagrid('getChanges', "deleted");
+            var updated = $dg.datagrid('getChanges', "updated");
+            var effectRow = new Object();
+            if (inserted.length) {
+                effectRow.inserted = inserted;
+            }
+            if (deleted.length) {
+                effectRow.deleted = deleted;
+            }
+            if (updated.length) {
+                effectRow.updated = updated;
+            }
+            var url = '/CusQuotedPriceDtls/SaveData';
+            $.ajax({
+                type: 'POST',
+                url: url,//获取数据的函数
+                async: true,//true 异步，false 同步
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                beforeSend: function (xhr) {//发送请求前运行的函数
+                    $.messager.progress({
+                        title: '数据处理中',
+                        msg: '数据处理中，请等待...'
+                    });
+                    //验证重复提交时 请加上 这句
+                    AddAjaxActionGuidName(this);
+                },
+                success: function (response) {//查询成功,data为返回的数据
+                    if (response.Success) {
+                        $.messager.alert("提示", "提交成功！");
+                        $dg.datagrid('acceptChanges');
+                        $dg.datagrid('reload');
+                    }
+                    else {
+                        var ErrMsgStr = '提交错误了！';
+                        if (!(typeof (response.ErrMsg) === 'undefined' || response.ErrMsg == null || response.ErrMsg == ''))
+                            ErrMsgStr = response.ErrMsg;
+                        $.messager.alert("错误", ErrMsgStr, 'error');
+                    }
+                },
+                error: function () {//查询失败
+                    $.messager.alert("错误", "提交错误了！", 'error');
+                },
+                complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                    $.messager.progress('close');
+                }
+            });
+        }
+    }
+    //回滚变更
+    function reject() {
+        $dg.datagrid('rejectChanges');
+        editIndex = undefined;
+    }
+    //双击行
+    function onDblClickRow(index, row){
+        if($("#div_QPFormView")){
+            $("#div_QPFormView").window("destroy").remove();
+            $("#js_EditForm").remove();
+        } 
+        $.parser.onComplete =function(){};
+        var url = '/QuotedPrices/GetQPEditFormView?QPId='+row.QPId;
+        url = '/QuotedPrices/GetCusQPEditFormView?CusQPDtlId='+row.Id;
+        ArrIsLoadWin.IsLoadQPEditForm = false;
+        AsyncGetMyWin(url, 'IsLoadQPEditForm', "InitEditFormCombogrid('#div_QPFormView');noEdit('#div_QPFormView',1);", true);
+        if($("#div_QPFormView")){
+            $("#div_QPFormView").window("open");
+        }
+    }
+    //
+    $(function () {
+        /* datagrid - end*/
+        if($("#Id").val()>0){
+            //设置明细数据url
+            var opts = $dg.datagrid('options');
+            opts.url = '/CusQuotedPriceDtls/GetData';
+            opts.onDblClickRow = onDblClickRow;
+            var qParams ={},filterRules =[];
+            filterRules.push({field:'CusQPId',op:'equals',value:@Model.Id});
+            qParams.filterRules = JSON.stringify(filterRules);
+            opts.queryParams=qParams;
+            var $Panel = $dg.datagrid('getPanel');
+            var p_opts = $Panel.panel('options');
+            var pdata = $Panel.data("panel");
+            var $header = $Panel.panel('header');
+            var title ='明细数据';
+            if($header.length<=0){
+                $("<div class=\"panel-header\" ><div class=\"panel-title\"></div><div class=\"panel-tool\"></div></div>").prependTo($(pdata.panel));
+                $Panel.removeClass("panel-body-noheader");
+            }
+            $Panel.panel('setTitle',title);
+            p_opts.title = title;
+            opts.title= title;
+            $dg.datagrid('reload');
+        }
+    });
+</script>

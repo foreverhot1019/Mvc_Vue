@@ -1,0 +1,213 @@
+﻿﻿@model AirOut.Web.Models.Warehouse_receipt
+@{
+    //控件排序
+    var Num = 12;
+}
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.MBLId)
+@*<div class="row">*@
+@*<style>
+    input[type="text"]:read-only,
+    input[type="datetime"]:read-only {
+        background-color: #ccc;
+        opacity: 0.6;
+    }
+</style>*@
+
+<div id="div_Warehouse_receipts" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="仓库接单"
+     data-options="collapsible:true">
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Warehouse_Id, htmlAttributes: new { @class = "control-label ", style = "width:90px;" })
+            @Html.EditorFor(model => model.Warehouse_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,20]'", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Entry_Id, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Entry_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,20]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Warehouse_Code, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Warehouse_Code, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,20]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Pieces_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Pieces_CK, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Weight_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Weight_CK, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Volume_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Volume_CK, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,precision:3,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Packing, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Packing, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,20]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.CHARGE_WEIGHT_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.CHARGE_WEIGHT_CK, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Bulk_Weight_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Bulk_Weight_CK, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.CheckBoxFor(model => model.Damaged_CK, new { @class = "easyui-checkbox", data_options = "disabled:disabled", style = "width:16px;" })
+            @Html.LabelFor(model => model.Damaged_CK, htmlAttributes: new { @class = "control-label ", data_options = "disabled:disabled",style = "width:70px;" })
+            @Html.EditorFor(model => model.Damaged_Num, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.CheckBoxFor(model => model.Dampness_CK, new { @class = "easyui-checkbox", style = "width:16px;" })
+            @Html.LabelFor(model => model.Dampness_CK, htmlAttributes: new { @class = "control-label ", style = "width:70px;" })
+            @Html.EditorFor(model => model.Dampness_Num, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.CheckBoxFor(model => model.Deformation, new { @class = "easyui-checkbox", style = "width:16px;" })
+            @Html.LabelFor(model => model.Deformation, htmlAttributes: new { @class = "control-label ", style = "width:70px" })
+            @Html.EditorFor(model => model.Deformation_Num, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.CheckBoxFor(model => model.Is_GF, new { @class = "easyui-checkbox", style = "width:16px;" })
+            @Html.LabelFor(model => model.Is_GF, htmlAttributes: new { @class = "control-label ", style = "width:70px" })
+            @*<lable>/</lable>@Html.LabelFor(model => model.Closure_Remark, htmlAttributes: new { @class = "control-label ", style = "width:38px;" })*@
+            @Html.EditorFor(model => model.Closure_Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.CheckBoxFor(model => model.Is_QG, new { @class = "easyui-checkbox", style = "width:16px;" })
+            @Html.LabelFor(model => model.Is_QG, htmlAttributes: new { @class = "control-label ", style = "width:70px;" })
+            @*<lable>/</lable> @Html.LabelFor(model => model.Warehouse_Remark, htmlAttributes: new { @class = "control-label ", style = "width:52px;" })*@
+            @Html.EditorFor(model => model.Warehouse_Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Consign_Code_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Consign_Code_CK, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]',disabled:'disabled'", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.MBL, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.MBL, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,20]',disabled:'disabled'", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.HBL, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.HBL, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,20]',disabled:'disabled'", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Flight_Date_Want, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Flight_Date_Want, new { htmlAttributes = new { @class = "easyui-datebox", data_options = "disabled:'disabled'", @Value = (Model == null ? "" : (Model.Flight_Date_Want == null ? "" : ((DateTime)Model.Flight_Date_Want).ToString("yyyy-MM-dd"))), tabindex = Num++, style = "width:49%" } })
+            @*<input id="Flight_Date_Want" type="text" value="@Model.Flight_Date_Want">*@
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.FLIGHT_No, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.FLIGHT_No, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,20]',disabled:'disabled'", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.End_Port, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.End_Port, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]',disabled:'disabled'", tabindex = Num++, style = "width:49%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Driver, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Driver, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,20]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.In_Date, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.In_Date, new { htmlAttributes = new { @class = "easyui-datebox", data_options = "readonly:true", @Value = (Model == null ? DateTime.Now.ToString("yyyy-MM-dd") : (Model.In_Date == null ? DateTime.Now.ToString("yyyy-MM-dd") : ((DateTime)Model.In_Date).ToString("yyyy-MM-dd"))), tabindex = Num++, style = "width:29%" } })
+            @Html.EditorFor(model => model.In_Time, new { htmlAttributes = new { @class = "easyui-timespinner",data_options = "readonly:true", @Vlaue = (Model == null ? DateTime.Now.ToString("HH:mm") : string.IsNullOrEmpty(Model.In_Time) ? DateTime.Now.ToString("HH:mm") : Model.In_Time), tabindex = Num++, style = "width:19%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Out_Date, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Out_Date, new { htmlAttributes = new { @class = "easyui-datebox", data_options = "readonly:true", @Value = (Model == null ? "" : (Model.Out_Date == null ? "" : ((DateTime)Model.Out_Date).ToString("yyyy-MM-dd"))), tabindex = Num++, style = "width:29%" } })
+            @Html.EditorFor(model => model.Out_Time, new { htmlAttributes = new { @class = "easyui-timespinner", data_options = "readonly:true", @Vlaue = (Model == null ? "" : string.IsNullOrEmpty(Model.Out_Time) ? "" : Model.Out_Time), tabindex = Num++, style = "width:19%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.CH_Name_CK, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.CH_Name_CK, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-1 col-md-1 col-sm-1">
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+            @Html.LabelFor(model => model.Is_CustomerReturn, htmlAttributes: new { @class = "control-label ", style = "width:50px" })
+            @Html.CheckBoxFor(model => model.Is_CustomerReturn, new { @class = "easyui-checkbox", data_options = "readonly:true", tabindex = Num++, style = "width:40px;" })
+            @Html.LabelFor(model => model.Is_MyReturn, htmlAttributes: new { @class = "control-label ", style = "width:50px" })
+            @Html.CheckBoxFor(model => model.Is_MyReturn, new { @class = "easyui-checkbox", data_options = "readonly:true", tabindex = Num++, style = "width:40px;" })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Truck_Id, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Truck_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,20]',readonly:true", tabindex = Num++, style = "width:49%" } })
+        </div>
+    </div>
+    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+            @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label ", style = "width:90px" })
+            @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,500]',multiline:true,readonly:true", tabindex = Num++, style = "width:90%" } })
+        </div>
+    </div>
+</div>
+@Html.Partial("WarehouseSizeWin")
+@*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Is_DamageUpload, htmlAttributes: new { @class = "control-label " })
+        @Html.CheckBoxFor(model => model.Is_DamageUpload, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Is_DeliveryUpload, htmlAttributes: new { @class = "control-label " })
+        @Html.CheckBoxFor(model => model.Is_DeliveryUpload, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Is_EntryUpload, htmlAttributes: new { @class = "control-label " })
+        @Html.CheckBoxFor(model => model.Is_EntryUpload, new { @class = "easyui-checkbox",tabindex = Num++, style = "width:100%" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @class = "easyui-textbox",data_options="required:false",tabindex = Num++, style = "width:100%" } })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.OperatingPoint, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox",data_options="required:true,precision:0",tabindex = Num++, style = "width:100%" } })
+    </div>*@
+@*</div>*@
+<!-- output all Scaffold = false Hiden field -->
+@Html.HiddenFor(model => model.Is_Binding)
+@Html.HiddenFor(model => model.Status)
+@Html.HiddenFor(model => model.ADDID)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDTS)
+@Html.HiddenFor(model => model.EDITWHO)
+@Html.HiddenFor(model => model.EDITTS)
+@Html.HiddenFor(model => model.EDITID)
+<!--end output all Scaffold = false Hiden field -->
+<script type="text/javascript">
+    function InitEditWin(){
+            initbindcombogriddata_H();
+            if(@Model.Id > 0){
+                $("#Id").val(@Model.Id);
+            }
+
+            if(FormNAMEData.ADDWHONAME){
+                $('#ADDWHO',"#pagebottom").textbox('setValue', FormNAMEData.ADDWHONAME);
+            }
+            if(FormNAMEData.EDITWHONAME){
+                $('#EDITWHO',"#pagebottom").textbox('setValue', FormNAMEData.EDITWHONAME);
+            }
+    }
+    $(function(){
+        $("input[type='checkbox']").attr("disabled", "disabled");
+    })
+        
+</script>
+

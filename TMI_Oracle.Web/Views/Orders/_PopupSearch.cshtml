@@ -1,0 +1,144 @@
+﻿@*'/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT_FromCache?DOCCODE=ServiceProject'*@
+<templete id="dlg_CostMoney">
+    <templete>
+        <el-row style="padding: 3px 0px 3px 0px;">
+            <el-col>
+                <el-button-group>
+                    <el-button type="primary" icon="el-icon-plus" size="small" v-bind:disabled="!UserRoles.Create" v-on:click="handleAddRow">新增</el-button>
+                    <el-button icon="el-icon-copy" size="small" v-bind:disabled="!UserRoles.Export" v-on:click="Copy">复制</el-button>
+                    <el-button icon="el-icon-money" size="small" v-bind:disabled="!UserRoles.Import" v-on:click="GetMoney">请款</el-button>
+                    <el-button type="danger" size="small" v-on:click="handledelSeltRow" v-bind:disabled="(UserRoles.Delete ? selctRows.length===0 : true)">批量删除</el-button>
+                </el-button-group>
+            </el-col>
+        </el-row><!--列表按钮组-->
+        <el-row>
+            <el-col>
+                <el-table ref="tb_CostMoney" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                          v-bind:default-sort="{prop:'Id',order:'descending'}"
+                          v-bind:data="tb_CostMoney_data"
+                          v-loading="tbLoading"
+                          v-on:row-dblclick="handledblclick"
+                          v-on:selection-change="handleSelectionChange">
+                    <el-table-column fixed type="selection" width="36"></el-table-column>
+                    <template>
+                        <el-table-column show-overflow-tooltip prop="SupplierName" label="供应商名称" sortablev-bind:formatter="formatter({Type: 'string', Name: 'SupplierName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ServiceProject" label="服务项目" sortablev-bind:formatter="formatter({Type: 'string', Name: '英文名',ForeignKeyGetListUrl:true})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Price" label="单价" sortablev-bind:formatter="formatter({Type: 'number', Name: 'Price'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Num" label="数量" sortablev-bind:formatter="formatter({Type: 'number', Name: 'Num'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TotalAmount" label="金额" sortablev-bind:formatter="formatter({Type: 'number', Name: 'TotalAmount'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ExcessAmount" label="余额" sortablev-bind:formatter="formatter({Type: 'number', Name: 'ExcessAmount'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RequestAmount" label="请款" sortablev-bind:formatter="formatter({Type: 'number', Name: 'RequestAmount'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortablev-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                    </template>
+                </el-table><!--Table列表-->
+            </el-col>
+        </el-row>
+    </templete><!--Table列表-->
+    <el-dialog title="预算成本" ref="CostMoneyDialog" width="60%" center
+               v-bind:close-on-click-modal="false"
+               v-bind:show-close="false"
+               v-bind:visible.sync="DialogVisible"
+               v-loading="dlgLoading">
+        <div slot="title" class="el-dialog__title" style="">
+            <el-row>
+                <el-col v-bind:span="8" style="cursor:move;">&nbsp;</el-col>
+                <el-col v-bind:span="8" style="cursor:move;">团队联系人信息</el-col>
+                <el-col v-bind:span="8" style="text-align:right;">
+                    <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgok_func" title="确 定" circle></el-button>
+                    <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="DialogVisible = false" title="取 消" circle></el-button>
+                </el-col>
+            </el-row>
+        </div>
+        <el-form ref="CostMoneyForm" v-bind:model="SupplierName" label-position="right" inline size="small">
+            <el-form-item v-bind:label-width="formLabelWidth" label="供应商名称" prop="SupplierName"
+                          v-bind:rules="el_FormFieldRules({Name:'SupplierName',DisplayName:'供应商名称',Required:true,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="CostMoney['SupplierName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" v-on:change="NameChsToPinYin" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="服务项目" prop="ServiceProject"
+                          v-bind:rules="el_FormFieldRules({Name:'ServiceProject',DisplayName:'服务项目',Required:true,Editable:true,MinLength:0,MaxLength:100})">
+                <el-select v-model="OrderCuntomer['ServiceProject']" style="width:178px" reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading">
+                    <template v-if="el_selt.ServiceProject_form">
+                        <el-option v-for="item in el_selt.ServiceProject_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="单价" prop="Price"
+                          v-bind:rules="el_FormFieldRules({Name:'Price',DisplayName:'单价',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="CostMoney['Price']" placeholder="单价" v-bind:precision="2" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="数量" prop="Num"
+                          v-bind:rules="el_FormFieldRules({Name:'Num',DisplayName:'数量',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="CostMoney['Num']" placeholder="数量" v-bind:precision="2" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="金额" prop="TotalAmount"
+                          v-bind:rules="el_FormFieldRules({Name:'TotalAmount',DisplayName:'金额',Required:true,Editable:false,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="CostMoney['TotalAmount']" placeholder="金额" v-bind:precision="2" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="请款" prop="RequestAmount"
+                          v-bind:rules="el_FormFieldRules({Name:'RequestAmount',DisplayName:'请款',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="CostMoney['RequestAmount']" placeholder="请款" v-bind:precision="2" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="余额" prop="ExcessAmount"
+                          v-bind:rules="el_FormFieldRules({Name:'ExcessAmount',DisplayName:'余额',Required:true,Editable:false,MinLength:0,MaxLength:0})">
+                <el-input-number v-model="CostMoney['ExcessAmount']" placeholder="余额" v-bind:precision="2" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="备注" prop="Remark"
+                          v-bind:rules="el_FormFieldRules({Name:'Remark',DisplayName:'备注',Required:false,Editable:true,MinLength:0,MaxLength:1000})">
+                <el-input type="textarea" v-model="CostMoney['Remark']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="default" icon="el-icon-close" v-on:click="DialogVisible = false">取 消</el-button>
+            <el-button type="primary" icon="el-icon-check" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgok_func">确 定</el-button>
+        </span>
+    </el-dialog><!--预算成本-编辑-->
+    <el-dialog ref="FinanceMoneyDialog" width="60%" center
+               v-bind:close-on-click-modal="false"
+               v-bind:show-close="false"
+               v-bind:visible.sync="DialogVisible_FM"
+               v-loading="dlgLoading_FM">
+        <div slot="title" class="el-dialog__title" style="">
+            <el-row>
+                <el-col v-bind:span="8" style="cursor:move;">&nbsp;</el-col>
+                <el-col v-bind:span="8" style="cursor:move;">请款数据</el-col>
+                <el-col v-bind:span="8" style="text-align:right;">
+                    <el-button type="primary" icon="el-icon-check" size="mini" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgOK_Func_FM" title="确 定" circle></el-button>
+                    <el-button type="danger" icon="el-icon-close" size="mini" v-on:click="DialogVisible_FM = false" title="取 消" circle></el-button>
+                </el-col>
+            </el-row>
+        </div>
+        <el-row>
+            <el-col>
+                <el-table ref="tb_FinanceMoney" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe show-summary
+                          v-bind:default-sort="{prop:'Id',order:'descending'}"
+                          v-bind:data="tb_FM_data_tj"
+                          v-loading="tbLoading_FM"
+                          v-on:selection-change="SelectionChange_FM">
+                    <template>
+                        <el-table-column show-overflow-tooltip prop="SupplierName" label="供应商名称" sortablev-bind:formatter="formatter({Type: 'string', Name: 'SupplierName'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ServiceProject" label="服务项目" sortablev-bind:formatter="formatter({Type: 'string', Name: '英文名',ForeignKeyGetListUrl:true})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Price" label="单价" sortablev-bind:formatter="formatter({Type: 'number', Name: 'Price'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Num" label="数量" sortablev-bind:formatter="formatter({Type: 'number', Name: 'Num'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TotalAmount" label="金额" sortablev-bind:formatter="formatter({Type: 'number', Name: 'TotalAmount'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ExcessAmount" label="余额" sortablev-bind:formatter="formatter({Type: 'number', Name: 'ExcessAmount'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="RequestAmount" label="请款" sortablev-bind:formatter="formatter({Type: 'number', Name: 'RequestAmount'})" width="120px">
+                            <templete slot-scop="sp">
+                                <el-input-number v-model="sp.row.RequestAmount" placeholder="请款" v-bind:precision="2" v-bind:style="{width:'178px'}" v-on:change="ChangeRowRequestAmount(sp)" />
+                            </templete>
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                    </template>
+                </el-table><!--Table列表-->
+            </el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="default" icon="el-icon-close" v-on:click="DialogVisible_FM = false">取 消</el-button>
+            <el-button type="primary" icon="el-icon-check" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgOK_Func_FM">确 定</el-button>
+        </span>
+    </el-dialog>
+</templete>

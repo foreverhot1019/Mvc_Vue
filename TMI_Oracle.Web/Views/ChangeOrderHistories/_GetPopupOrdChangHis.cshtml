@@ -1,0 +1,100 @@
+﻿@model TMI.Web.Models.ChangeOrderHistory
+@{
+    if (ViewData["EnumChangeType"] == null)
+    {
+        var ArrEnumChangeType = TMI.Web.Extensions.Common.GetEnumToDic("EnumChangeType", "TMI.Web.Models.ChangeOrderHistory");
+        ViewData["EnumChangeType"] = Newtonsoft.Json.JsonConvert.SerializeObject(ArrEnumChangeType.Select(x => new
+        {
+            text = x.Key,
+            value = x.Value,
+            x.DisplayName,
+            x.DisplayDescription
+        }));
+    }
+}
+
+<div id="Win_OrdChangeHistory" class="easyui-window" title="操作日志" style="width:700px; height:500px; padding:10px;"
+     data-options="
+     modal:true,
+     collapsible:false,
+     minimizable:false,
+     maximizable:false,
+     closed:true,
+     iconCls:'icon-paperclip'">
+    <div class="table-responsive">
+        <table id="dg_OrdChangeHistory" class="easyui-datagrid" title="" style="width:auto;height:auto"
+               data-options="
+           rownumbers:true,
+           idField:'Id',
+           sortName:'Id',
+           sortOrder:'desc',
+           remoteFilter: true,
+           singleSelect: true,
+           method: 'get',
+           pagination: true,
+           onLoadSuccess:onLoadSuccess_OrdChangeHistory">
+            <thead>
+                <tr>
+                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                    @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+
+                    <th data-options="field:'Key_Id',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Key_Id)</th>
+
+                    <th data-options="field:'TableName',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.TableName)</th>
+
+                    <th data-options="field:'ChangeType',width:120,editor:{type:'combobox',options:{required:true,data:@(ViewData["EnumChangeType"]??"[]") ,validType:'length[0,50]' } },sortable:true,resizable:true, formatter:EnumChangeTypeformatter">@Html.DisplayNameFor(model => model.ChangeType)</th>
+
+                    <th data-options="field:'InsertNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.InsertNum)</th>
+
+                    <th data-options="field:'UpdateNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.UpdateNum)</th>
+
+                    <th data-options="field:'DeleteNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.DeleteNum)</th>
+
+                    <th data-options="field:'Content',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,200]' } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Content)</th>
+
+                    <th data-options="field:'ADDID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]' } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDID)</th>
+
+                    <th data-options="field:'ADDWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]' } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+
+                    <th data-options="field:'ADDTS',width:160,align:'right',editor:{type:'datebox',options:{required:false} },sortable:true,resizable:true  ,formatter:dateformatter">@Html.DisplayNameFor(model => model.ADDTS)</th>
+
+                    <th data-options="field:'EDITWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'}} ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+
+                    <th data-options="field:'EDITTS',width:160,align:'right',editor:{type:'datebox',options:{required:false } },sortable:true,resizable:true  ,formatter:dateformatter">@Html.DisplayNameFor(model => model.EDITTS)</th>
+
+                    <th data-options="field:'EDITID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'}} ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITID)</th>
+
+                    <th data-options="field:'OperatingPoint',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.OperatingPoint)</th>
+
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    var EnumChangeTypeJson = @Html.Raw(ViewData["EnumChangeType"]??"[]");
+    function EnumChangeTypeformatter(value, row,index) {
+        try {
+            if (typeof value === 'undefined')
+                return value;
+            if (value == null)
+                return value;
+            else {
+                for(var i in EnumChangeTypeJson)
+                {
+                    if(EnumChangeTypeJson[i].value == value){
+                        return EnumChangeTypeJson[i].text;
+                    }
+                }
+            }
+        }
+        catch (e) {
+            return value;
+        }
+    }
+    //加载成功
+    function onLoadSuccess_OrdChangeHistory(rowdata) {
+        //行号自适应宽度
+        $(this).datagrid("fixRownumber");
+    }
+</script>

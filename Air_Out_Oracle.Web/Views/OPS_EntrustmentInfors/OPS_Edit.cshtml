@@ -1,0 +1,875 @@
+﻿@model AirOut.Web.Models.OPS_EntrustmentInfor
+@{
+    ViewBag.Title = "承揽接单 | 编辑";
+    //控件排序
+    var Num = 1;
+    var CusInsDataID = ViewBag.CusInsDataID;
+}
+<!--回车下一个-->
+<script async defer src="~/Scripts/jsext.js"></script>
+<script src="~/Scripts/opsmhw.js"></script>
+<script async defer type="text/javascript">
+	//表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+	 $(document).ready(function () {
+		initJcdt(); //初始化基础数据
+		initPage();//初始化页面
+         
+		$("#Operation_Id").textbox("disable");
+		$("#ADDWHO").textbox("disable");
+		$("#ADDTS").datebox("disable");
+		$("#ADDPoint").combogrid("disable");
+		$("#EDITWHO").textbox("disable");
+		$("#EDITTS").datebox("disable");
+	    $("#EDITPoint").combogrid("disable");
+
+
+		//$("#MBL", "#wtxx").on('onChange', function(newValue, oldValue){
+		//    console.log("newValue:",newValue,"    oldValue:", oldValue);
+		//    $("#MBL", "#zdxx").textbox("setValue", newValue)
+		//    $("#MBL", "#fdxx").textbox("setValue", newValue)
+		//});
+
+
+	});
+	//初始化基础数据
+    function initJcdt() {
+        Data_Unit = @Html.Raw(ViewData["Data_Unit"] ?? "[]");
+        Data_Currency = @Html.Raw(ViewData["Data_Currency"] ?? "[]");
+        Data_Country = @Html.Raw(ViewData["Data_Country"] ?? "[]");
+    }
+	//初始化页面
+    function initPage() {
+        //绑定onChange方法
+        var domjsons=[
+             {//总单号
+                 domid:'#MBL',
+                 parentid:'#zdxx',
+                 type:'textbox',
+                 targetid1:'#fdxx',
+                 targetid2:"#wtxx",
+                 num:3
+             },
+            {//航空公司
+                domid:'#Airways_Code',
+                parentid:'#zdxx',
+                type:'combogrid',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//国外代理
+                domid:'#FWD_Code',
+                parentid:'#zdxx',
+                type:'combogrid',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//起运港
+                domid:'#Depart_Port',
+                parentid:'#zdxx',
+                type:'combogrid',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//目的港
+                domid:'#End_Port',
+                parentid:'#zdxx',
+                type:'combogrid',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//航班号/EDT
+                domid:'#FLIGHT_No',
+                parentid:'#zdxx',
+                type:'combogrid',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//航班日期
+                domid:'#Flight_Date_Want',
+                parentid:'#zdxx',
+                type:'datebox',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:3
+            },
+            {//运费P/C
+                domid:'#Carriage_H',
+                parentid:'#zdxx',
+                type:'textbox',
+                targetid1:'#fdxx',
+                targetid2:"#wtxx",
+                num:2
+            },
+             {//杂费P/C
+                 domid:'#Incidental_Expenses_H',
+                 parentid:'#zdxx',
+                 type:'textbox',
+                 targetid1:'#fdxx',
+                 targetid2:"#wtxx",
+                 num:2
+             },
+             {//申明价值（运输）
+                 domid:'#Declare_Value_Trans_H',
+                 parentid:'#zdxx',
+                 type:'textbox',
+                 targetid1:'#fdxx',
+                 targetid2:"#wtxx",
+                 num:2
+             },
+            {//申明价值（海关）
+                domid:'#Declare_Value_Ciq_H',
+                parentid:'#zdxx',
+               type:'textbox',
+               targetid1:'#fdxx',
+               targetid2:"#wtxx",
+               num:2
+            },
+            {
+                domid:'#Notify_Part_H',
+                parentid:'#wtxx',
+                type:'textbox',
+                targetid1:'#fdxx',
+                targetid2:"#zdxx",
+                num:2
+            },
+           {
+               domid:'#Shipper_H',
+               parentid:'#wtxx',
+               type:'textbox',
+               targetid1:'#fdxx',
+               targetid2:"#zdxx",
+               num:2
+           },
+           {
+               domid:'#Consignee_H',
+               parentid:'#wtxx',
+               type:'textbox',
+               targetid1:'#fdxx',
+               targetid2:"#zdxx",
+               num:2
+           },
+            {
+                domid:'#Notify_Part_M',
+                parentid:'#wtxx',
+                type:'textbox',
+                targetid1:'#fdxx',
+                targetid2:"#zdxx",
+                num:2
+            },
+           {
+               domid:'#Shipper_M',
+               parentid:'#wtxx',
+               type:'textbox',
+               targetid1:'#fdxx',
+               targetid2:"#zdxx",
+               num:2
+           },
+           {
+               domid:'#Consignee_M',
+               parentid:'#wtxx',
+               type:'textbox',
+               targetid1:'#fdxx',
+               targetid2:"#zdxx",
+               num:2
+           }
+        ]
+        binddome(domjsons);
+    }
+
+   
+    function binddome(domjsons){
+        $.each(domjsons,function (index,item) {
+            switch(item.num){
+                case 1:
+                    $(item.domid, item.parentid)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.targetid1)[item.type]("setValue", newValue)
+                        }
+                    });
+                    break;
+                case 2:
+                    $(item.domid, item.parentid)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.targetid1)[item.type]("setValue", newValue)
+                        }
+                    });
+                    $(item.domid, item.targetid1)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.parentid)[item.type]("setValue", newValue)
+                        }
+                    });
+                    break;
+                case 3:
+                    $(item.domid, item.parentid)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.targetid1)[item.type]("setValue", newValue)
+                            $(item.domid, item.targetid2)[item.type]("setValue", newValue)
+                        }
+                    });
+                    $(item.domid, item.targetid1)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.parentid)[item.type]("setValue", newValue)
+                            $(item.domid, item.targetid2)[item.type]("setValue", newValue)
+                        }
+                    });
+                    $(item.domid, item.targetid2)[item.type]({
+                        onChange: function(newValue, oldValue){
+                            $(item.domid, item.parentid)[item.type]("setValue", newValue)
+                            $(item.domid, item.targetid1)[item.type]("setValue", newValue)
+                        }
+                    });
+                    break;
+            }
+        });
+    }
+
+
+	//加载成功
+    function onLoadSuccess(rowdata) {
+        //行号自适应宽度
+        $(this).datagrid("fixRownumber");
+    }
+	//自适应页面大小
+    function MyNavResize() {
+        //var opts = $("#navbar-minimalize").NavResize('getOptions');
+        //opts.Auto = false;
+        //opts.OnNavResizefunc = function () {
+        //    
+        //};
+    }
+	//异步获取 提取 借用账册 强行提取 选择框
+    var ArrIsLoadWin ={
+        //IsLoadMyWin1 : false,//提取
+        //IsLoadMyWin2 : false,//借用账册
+        //IsLoadMyWin3 : false,//强行提取
+        //IsLoadAlertWin : false,//料号归并-项号未找到
+        //IsLoadMyWin_Err : false,//项号比对异常明细
+        //IsLoadImportWin : false//导入数据框
+    };
+    function AsyncGetMyWin(url,IsLoadMyWin,InitMyWinFucName,Async_Load){
+        var AsyncLoad = false;
+        if(!(typeof(Async_Load)==='undefined' || Async_Load==null ||Async_Load=="")){
+            if(Async_Load)
+                AsyncLoad = true;
+        }
+        if (!ArrIsLoadWin[IsLoadMyWin]) {
+            $.messager.progress({
+                text: '正在加载数据......'
+            });
+            var TabIndexMax = $("input[tabindex]:not([id^='_easyui']):last");
+            var postObj = {};
+            if(TabIndexMax.length>0){
+                postObj.Num = TabIndexMax.attr('tabindex');
+            }
+            var retTF = true;
+            $.ajax({
+                type: "POST",
+                datatype: "html",
+                async: false,
+                data: postObj,
+                url: url,
+                success: function (data) {
+                    ArrIsLoadWin[IsLoadMyWin] = true;
+                    var docm = $("#EasyUIDom");
+                    if (data) {
+                        docm.append(data);
+                        $.parser.parse(docm);
+                        //InitMyWinFuc();
+                        eval(InitMyWinFucName);//js 方式
+                        //$(this)[InitMyWinFucName](); //jquery方式$(this).trigger(InitMyWinFucName)
+                    }
+                    else
+                        retTF = false;
+                    $.messager.progress('close');
+                },
+                error: function () {
+                    retTF = false;
+                    $.messager.progress('close');
+                }
+            });
+            return retTF;
+        }
+        else{
+            return true;
+        }
+    }
+	//导入
+    function importexcel() {
+        //异步获取 提取 借用账册 强行提取 选择框
+        var retTF = AsyncGetMyWin('/ORDERS_SECLINE_HEADS/Get_ImportWinDialog','IsLoadImportWin',"InitImportWin()");
+        if(!retTF)
+            return;
+        var OrderId = getQueryString("id");
+        $('#file_upload_pmByhand').data('uploadifive').settings.formData = { 'ID': OrderId, 'modelType': 'ORDERS_SECLINE_PRODUCT' };
+        $('#importwindow_pmByhand').window('open');
+        $('#importwindow_pmByhand').window('center');
+    }
+	//导出
+    function exportexcel() {
+        //$.messager.progress({ title: '正在执行导出！' });
+        //var inserted_product = $('#ProductNameMerge').datagrid('getRows');
+        //if (inserted_product.length > 0) {
+        //    var postdata = { orders_secline_productStr: JSON.stringify(inserted_product) };
+        //    var url = '/ORDERS_SECLINE_HEADs/ExportExcelProduct';
+        //    $.DownLoadProgress({
+        //        url: url,         //下载文件的url
+        //        method: 'Post',   //链接打开方式
+        //        data: postdata,         //要发送的数据
+        //        downLoadInfo: '下载文件', //下载界面文字
+        //        closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+        //        callbackFuc: function () {
+        //            $.messager.progress('close');
+        //        }
+        //    });
+        //} else {
+        //    $.messager.alert('提示！', '没有可以导出的数据。');
+        //}
+    }
+</script>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">空运出口</a>
+            </li>
+            <li class="active">
+                <strong>编辑 承揽接单</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div align="center">
+            <input type="button" accesskey="e" value="返回（E）"  onclick="window.location.href='/OPS_EntrustmentInfors/Index'">
+            <input type="button" accesskey="n" value="报关报检（N)" onclick="ToCusIndex()">
+            <input type="button" accesskey="g" value="仓库信息（G）">
+            <input type="button" accesskey="s" value="单证管理（S）"onclick="ToDocMent()">
+            <input type="button" accesskey="f" value="结算信息（F）">
+            <input type="button" onclick="appendss()" value="新增">
+            <input type="button" value="复制到">
+            <input type="button" accesskey="v" value="保存（V）" onclick="SaveEMH()">
+            <input type="button" value="退关">
+            <input type="button" onclick="cencelbindingwarehouse()" value="取消绑定">
+            <input type="button" value="仓单导出">
+            <input type="button" value="打印分单">
+            <input type="button" value="发送英迪">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="div_OPS_EntrustmentInfors" class="easyui-panel" title="" style="padding-top:5px; padding-bottom:5px; width:auto; "
+                 data-options="collapsible:true">
+                <div id="div_Operation" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title=""
+                     data-options="collapsible:true">
+                    <div class="form-group col-md-12" style="text-align:center;">
+                        <label for="name" style="font-size:18px;">编辑业务</label>
+                    </div><br />
+
+                    <div class="form-group col-md-12" style="text-align:center;"></div>
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Operation_Id, "业务编号", htmlAttributes: new { @class = "control-label", style = "width:20%" })
+                        @Html.EditorFor(model => model.Operation_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false", tabindex = Num++, style = "width:79%" } })
+                        @*<label for="name" style="width:20%">业务编号:</label>
+                        <input id="Operation_Id" name="Operation_Id" data-options="prompt1:''" value="model.Operation_Id" style="width:79%" class="easyui-textbox" type="text" />*@
+                    </div>
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Is_Self, "自营", htmlAttributes: new { @class = "control-label ",style="width:20%" })
+                        @Html.CheckBoxFor(model => model.Is_Self, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:79%" })
+                        @*<label for="name" style="width:20%">自营:</label>
+                        <input id="Is_Self" name="Is_Self" class="easyui-checkbox" tabindex=Num++ onclick="isselect()" type="checkbox" />*@
+                    </div>
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Ty_Type, "接单类别", htmlAttributes: new { @class = "control-label ",  style="width:20%"})
+                        @Html.EditorFor(model => model.Ty_Type, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:79%" } })
+                        @*<label for="name" style="width:20%">接单类别:</label>
+                        <input id="Ty_Type" name="Ty_Type" data-options="prompt1:''" tabindex=Num++ style ="width:79%" class="easyui-combogrid " type="text" />*@
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Lot_No, "拼箱码", htmlAttributes: new { @class = "control-label ", style = "width:20%" })
+                        @Html.EditorFor(model => model.Lot_No, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:79%" } })
+                        @*<label for="name" style="width:20%">拼箱码:</label>
+                        <input id="Lot_No" name="Lot_No" data-options="prompt1:''" style="width:79%" class="easyui-textbox" type="text" />*@
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="name" style="width:20%">分担运费:</label>
+                        <input id="As_Arranged" name="As_Arranged" class="easyui-radio" tabindex=@(Num++) type="radio" onclick="radioselect_As_Arranged()" /><label for="name">As Arranged</label> 
+                        <input id="Infact" name="Infact" class="easyui-radio" type="radio" tabindex=@(Num++) onclick="radioselect_Infact()" /><label for="name">Infact</label> 
+                        @Html.HiddenFor(model => model.Hbl_Feight)
+                        @*<input id="Hbl_Feight" name="Hbl_Feight" class="easyui-textbox" type="hidden"  />*@
+                    </div>
+                    <div class="form-group col-md-4">
+                        @Html.CheckBoxFor(model => model.Is_XC, new { @class = "easyui-checkbox",tabindex = Num++ })<label for="name">消磁</label>                   
+                        @Html.CheckBoxFor(model => model.Is_BAS, new { @class = "easyui-checkbox",tabindex = Num++})<label for="name">BSA</label> 
+                        @Html.CheckBoxFor(model => model.Is_DCZ, new { @class = "easyui-checkbox",tabindex = Num++})<label for="name">代操作</label> 
+                        @Html.CheckBoxFor(model => model.Is_ZB, new { @class = "easyui-checkbox",tabindex = Num++ })<label for="name">重板</label> 
+                        @*<input id="Is_XC" name="Is_XC" class="easyui-checkbox" tabindex=Num++ type="checkbox" />消磁
+                        <input id="Is_BAS" name="Is_BAS" class="easyui-checkbox" tabindex=Num++ type="checkbox" />BSA
+                        <input id="Is_DCZ" name="Is_DCZ" class="easyui-checkbox" tabindex=Num++ type="checkbox" />代操作
+                        <input id="Is_ZB" name="Is_ZB" class="easyui-checkbox" tabindex=Num++ type="checkbox" />重板*@
+                    </div>
+                </div>
+                <br />               
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.Partial("OPS_M_Edit_M")
+                <div id="tt" class="easyui-tabs" style="width:100%;height:auto;" data-options="fit:true">
+                    @*@Html.AntiForgeryToken()*@
+                    <div title="委托信息" id="wtxx" style="padding:20px;display:none;">
+                        @Html.Partial("EditForm")
+                    </div>
+                    @*<div title="主单信息" id="zdxx" data-options="" style="overflow:auto;padding:20px;display:none;">
+                @Html.Partial("OPS_M_Edit")
+            </div>*@
+                    <div title="分单信息" id="fdxx" data-options="" style="padding:20px;display:none;">
+                        @Html.Partial("OPS_H_Edit")
+                    </div>
+                    <div title="" id="addtals" data-options="iconCls:'icon-plus',plain:true" style="padding:8px;display:none;">
+                        
+                    </div>
+                    <!--表单唯一值，防止重复提交-->
+                    @Html.Hidden("ActionGuidName", ViewData["ActionGuidName"] ?? "")
+                    @Html.Hidden("ActionGuid", ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))
+                </div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <hr />
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.ADDWHO, "创建人", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", tabindex=Num++, style = "width:80%" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.ADDPoint, "创建点", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.ADDPoint, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:80%", type = "text" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.ADDTS, "创建时间", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datebox", tabindex = Num++, style = "width:80%" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.EDITWHO, "修改人", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:80%" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.EDITPoint, "修改点", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.EDITPoint, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:80%", type = "text" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.EDITTS, "修改时间", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datebox", tabindex = Num++, style = "width:80%" } })
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    @Html.LabelFor(model => model.OperatingPoint, "批次号", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                    @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:80%" } })
+                </div>
+            </div>
+		</div>
+    </div>
+</div>
+
+    <div id="win" class="easyui-window" title="绑定仓库接单信息" style="width:600px;height:400px"
+         data-options="iconCls:'icon-save',modal:true">
+        @Html.Partial("Warehouse_receipt")
+    </div>
+}
+<!--用于后端 加载dom并且渲染成EasyUI样式-->
+<div id="EasyUIDom" style="height:35px; clear:both; border:0 solid;"></div>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    <script type="text/javascript">
+        $.extend($.fn.tabs.methods, {
+            //通过页签的序号，获取页签的ID号
+            getTabId: function(jq,id) {
+                var tabs = $.data(jq[0], 'tabs').tabs;
+                for(var i=0; i<tabs.length; i++){
+                    var tab = tabs[i];
+                    if (i == id){
+                        return tab.panel('options').id;
+                    }
+                }
+                return null;
+            },
+            //通过ID号，获取对应的页签
+            getTabById: function(jq,id) {
+                var tabs = $.data(jq[0], 'tabs').tabs;
+                for(var i=0; i<tabs.length; i++){
+                    var tab = tabs[i];
+                    if (tab.panel('options').id == id){
+                        return tab;
+                    }
+                }
+                return null;
+            },
+            //通过ID选择页签
+            selectById:function(jq,id) {
+                return jq.each(function() {
+                    var state = $.data(this, 'tabs');
+                    var opts = state.options;
+                    var tabs = state.tabs;
+                    var selectHis = state.selectHis;
+                    if (tabs.length == 0) {return;}
+                    var panel = $(this).tabs('getTabById',id); // get the panel to be activated 
+                    if (!panel){return}
+                    var selected = $(this).tabs('getSelected');
+                    if (selected){
+                        if (panel[0] == selected[0]){return}
+                        $(this).tabs('unselect',$(this).tabs('getTabIndex',selected));
+                        if (!selected.panel('options').closed){return}
+                    }
+                    panel.panel('open');
+                    var title = panel.panel('options').title;        // the panel title 
+                    selectHis.push(title);        // push select history 
+                    var tab = panel.panel('options').tab;        // get the tab object 
+                    tab.addClass('tabs-selected');
+                    // scroll the tab to center position if required. 
+                    var wrap = $(this).find('>div.tabs-header>div.tabs-wrap');
+                    var left = tab.position().left;
+                    var right = left + tab.outerWidth();
+                    if (left < 0 || right > wrap.width()){
+                        var deltaX = left - (wrap.width()-tab.width()) / 2;
+                        $(this).tabs('scrollBy', deltaX);
+                    } else {
+                        $(this).tabs('scrollBy', 0);
+                    }
+                    $(this).tabs('resize');
+                    opts.onSelect.call(this, title, $(this).tabs('getTabIndex',panel));
+                });
+            },
+            //判断页签ID是否存在
+            existsById:function(jq,id){
+                return $(jq[0]).tabs('getTabById',id) != null;
+            }
+        });
+        var url = "/OPS_EntrustmentInfors/AddEditFore?id=" + $("#Id","#wtxx").val();
+        var tabId = "";
+        $('#tt').tabs({
+            border:false,
+            //用户在选择一个选项卡面板的时候触发
+            onSelect:function(title,index){
+                if(title == ""){
+                    var num = index/2+1;
+                    var idwt = "wtxx" + num;
+                    var idfd = "fdxx" + num;
+                    $('#tt').tabs('add',{    
+                        title:'分单信息'+ num,    
+                        content:'<iframe scrolling="no" frameborder="0"   style="width:100%;height:100%;"></iframe>',
+                        
+                        id:idfd,
+                        closable:true,  
+                        index: index,
+                        tools:[{    
+                            iconCls:'icon-mini-refresh',    
+                            handler:function(){    
+                                alert('refresh');    
+                            }    
+                        }]
+                    });  
+                    $('#tt').tabs('add',{    
+                        title:'委托信息'+num,   
+                        href:url,//content:'<iframe scrolling="no" frameborder="0"  src="'+ url +'" style="width:100%;height:100%;"></iframe>',//加载页面
+                        id:idwt,
+                        closable:true,  
+                        index: index,
+                        tools:[{    
+                            iconCls:'icon-mini-refresh',    
+                            handler:function(){    
+                                alert('refresh');    
+                            }    
+                        }]    
+                    });  
+                }
+
+                tabId = "#"+$("#tt").tabs("getTabId",index+"");
+            },
+            //选项卡面板关闭的时候触发
+            onBeforeClose: function(title,index){
+                var tab = $("#tt").tabs("select", index).tabs("options");
+                var target = this;
+                $.messager.confirm('确认','你确认要'+title,function(r){
+                    if (r){
+                        var opts = $(target).tabs('options');
+                        var bc = opts.onBeforeClose;
+                        opts.onBeforeClose = function(){};  // 允许现在关闭
+                        $(target).tabs('close',index);
+                        opts.onBeforeClose = bc;  // 还原事件函数
+                }
+                });
+                return false;	// 阻止关闭
+            },
+            //在ajax选项卡面板加载完远程数据的时候触发。
+            onLoad : function(){
+                var opts = $(this).tabs("options");
+                console.log("opts:", opts);
+                console.log("opts.id:", opts.ID);
+                //initset() ;
+            }
+        });
+
+    function appendss(){
+        
+        var id = $("#tt").tabs("getTabId","0");
+        var tabs = $("#tt").tabs("getTabById","wtxx");
+        var tab = $("#tt").tabs("selectById","wtxx");
+        var isExist = $("#tt").tabs("existsById","wtxx");
+        console.log("id",id,"tabs",tabs, "tab",tab,"isExist",isExist);
+    }
+
+        $(function(){
+            if($("#Hbl_Feight").val() == "As_Arranged"){
+                $("#As_Arranged").attr("checked",true);
+                $("#Infact").attr("checked",false);
+            }else if($("#Hbl_Feight").val() == "Infact"){
+                $("#As_Arranged").attr("checked",true);
+                $("#Infact").attr("checked",false);
+            }else{
+                $("#As_Arranged").attr("checked",false);
+                $("#Infact").attr("checked",false);
+            }
+        });
+        //分担运费 单选框选中1 As_Arranged
+        function radioselect_As_Arranged(){
+            $("#As_Arranged").attr("checked",true);
+            $("#Infact").attr("checked",false);
+            $("#Hbl_Feight").val("As_Arranged");
+        }
+        //分担运费 单选框选中2 Infact
+        function radioselect_Infact(){
+            $("#Infact").attr("checked",true);
+            $("#As_Arranged").attr("checked",false);
+            $("#Hbl_Feight").val("Infact");
+        }
+        
+        //保存
+        function SaveEMH(){
+            //console.log("Shipper_H:",$("#Shipper_H","#wtxx").textbox("getValue"));
+            //console.log("Shipper_H:",$("#Shipper_H","#fdxx").textbox("getValue"));
+            var is_binding = Is_Bindingwtxx();
+            //委托表信息
+            var newEntrustmentInfor = {
+                Id:$("#Id","#wtxx").val(),
+                Operation_Id: $("#Operation_Id").textbox("getValue"),
+                Consign_Code: $("#Consign_Code","#wtxx").combogrid("getValue"),
+                Custom_Code: $("#Custom_Code","#wtxx").textbox("getValue"),
+                Area_Code: $("#Area_Code","#wtxx").textbox("getValue"),
+                Entrustment_Name: $("#Entrustment_Name","#wtxx").combogrid("getValue"),
+                Entrustment_Code: $("#Entrustment_Code","#wtxx").textbox("getValue"),
+                FWD_Code: $("#FWD_Code","#wtxx").combogrid("getValue"),
+                Consignee_Code: $("#Consignee_Code","#wtxx").combogrid("getValue"),
+                Carriage_Account_Code: $("#Carriage_Account_Code","#wtxx").combogrid("getValue"),
+                Incidental_Account_Code: $("#Incidental_Account_Code","#wtxx").combogrid("getValue"),
+                Depart_Port: $("#Depart_Port","#wtxx").combogrid("getValue"),
+                Transfer_Port: $("#Transfer_Port","#wtxx").combogrid("getValue"),
+                End_Port: $("#End_Port","#wtxx").combogrid("getValue"),
+                Shipper_H: $("#Shipper_H","#wtxx").textbox("getValue"),
+                Consignee_H: $("#Consignee_H","#wtxx").textbox("getValue"),
+                Notify_Part_H: $("#Notify_Part_H","#wtxx").textbox("getValue"),
+                Shipper_M: $("#Shipper_M","#wtxx").textbox("getValue"),
+                Consignee_M: $("#Consignee_M","#wtxx").textbox("getValue"),
+                Notify_Part_M: $("#Notify_Part_M","#wtxx").textbox("getValue"),
+                Pieces_TS: $("#Pieces_TS","#wtxx").numberbox("getValue"),
+                Weight_TS: $("#Weight_TS","#wtxx").numberbox("getValue"),
+                Pieces_SK: $("#Pieces_SK","#wtxx").numberbox("getValue"),
+                Slac_SK: $("#Slac_SK","#wtxx").numberbox("getValue"),
+                Weight_SK: $("#Weight_SK","#wtxx").numberbox("getValue"),
+                Pieces_DC: $("#Pieces_DC","#wtxx").numberbox("getValue"),
+                Slac_DC: $("#Slac_DC","#wtxx").numberbox("getValue"),
+                Weight_DC: $("#Weight_DC","#wtxx").numberbox("getValue"),
+                Pieces_Fact: $("#Pieces_Fact","#wtxx").numberbox("getValue"),
+                Weight_Fact: $("#Weight_Fact","#wtxx").numberbox("getValue"),
+                IS_MoorLevel: $("#IS_MoorLevel","#wtxx").get(0).checked,
+                MoorLevel: $("#MoorLevel","#wtxx").combogrid("getValue"),
+                Volume_TS: $("#Volume_TS","#wtxx").numberbox("getValue"),
+                Charge_Weight_TS: $("#Charge_Weight_TS","#wtxx").numberbox("getValue"),
+                Bulk_Weight_TS: $("#Bulk_Weight_TS","#wtxx").numberbox("getValue"),
+                Volume_SK: $("#Volume_SK","#wtxx").numberbox("getValue"),
+                Charge_Weight_SK: $("#Charge_Weight_SK","#wtxx").numberbox("getValue"),
+                Bulk_Weight_SK: $("#Bulk_Weight_SK","#wtxx").numberbox("getValue"),
+                Bulk_Percent_SK: $("#Bulk_Percent_SK","#wtxx").numberbox("getValue"),
+                Account_Weight_SK: $("#Account_Weight_SK","#wtxx").numberbox("getValue"),
+                Volume_DC: $("#Volume_DC","#wtxx").numberbox("getValue"),
+                Charge_Weight_DC: $("#Charge_Weight_DC","#wtxx").numberbox("getValue"),
+                Bulk_Weight_DC: $("#Bulk_Weight_DC","#wtxx").numberbox("getValue"),
+                Bulk_Percent_DC: $("#Bulk_Percent_DC","#wtxx").numberbox("getValue"),
+                Account_Weight_DC: $("#Account_Weight_DC","#wtxx").numberbox("getValue"),
+                Volume_Fact: $("#Volume_Fact","#wtxx").numberbox("getValue"),
+                Charge_Weight_Fact: $("#Charge_Weight_Fact","#wtxx").numberbox("getValue"),
+                Bulk_Weight_Fact: $("#Bulk_Weight_Fact","#wtxx").numberbox("getValue"),
+                Bulk_Percent_Fact: $("#Bulk_Percent_Fact","#wtxx").numberbox("getValue"),
+                Account_Weight_Fact: $("#Account_Weight_Fact","#wtxx").numberbox("getValue"),
+                //Marks_H: $("#Marks_H","#wtxx").textbox("getValue"),
+                //EN_Name_H: $("#EN_Name_H","#wtxx").textbox("getValue"),
+                Book_Flat_Code: $("#Book_Flat_Code","#wtxx").combogrid("getValue"),
+                Airways_Code: $("#Airways_Code","#wtxx").combogrid("getValue"),
+                FLIGHT_No: $("#FLIGHT_No","#wtxx").combogrid("getValue"),
+                MBL: $("#MBL","#wtxx").textbox("getValue"),
+                HBL: $("#HBL","#wtxx").textbox("getValue"),
+                Flight_Date_Want: $("#Flight_Date_Want","#zdxx").datebox("getValue"),
+                Book_Remark: $("#Book_Remark","#wtxx").textbox("getValue"),
+                RK_Date: $("#RK_Date","#wtxx").datebox("getValue"),
+                CK_Date: $("#CK_Date","#wtxx").datebox("getValue"),
+                CH_Name: $("#CH_Name","#wtxx").textbox("getValue"),
+                AMS: $("#AMS","#wtxx").numberbox("getValue"),
+                Lot_No: $("#Lot_No").textbox("getValue"),
+                Is_Self: $("#Is_Self").get(0).checked,
+                Ty_Type: $("#Ty_Type").combogrid("getValue"),
+                Hbl_Feight: $("#Hbl_Feight").val(),
+                Is_XC: $("#Is_XC").get(0).checked,
+                Is_BAS: $("#Is_BAS").get(0).checked,
+                Is_DCZ: $("#Is_DCZ").get(0).checked,
+                Is_ZB: $("#Is_ZB").get(0).checked,
+                //Is_TG: $("#Is_TG").get(0).checked,//退关
+            };
+            //主单表信息
+            var newM_Order = {
+                Id:$("#Id","#zdxx").val(),
+                MBL: $("#MBL","#zdxx").textbox("getValue"),
+                Airways_Code: $("#Airways_Code","#zdxx").combogrid("getValue"),
+                FWD_Code: $("#FWD_Code","#zdxx").combogrid("getValue"),
+                Shipper_M: $("#Shipper_M","#zdxx").textbox("getValue"),
+                Consignee_M: $("#Consignee_M","#zdxx").textbox("getValue"),
+                Notify_Part_M: $("#Notify_Part_M","#zdxx").textbox("getValue"),
+                Depart_Port: $("#Depart_Port","#zdxx").combogrid("getValue"),
+                End_Port: $("#End_Port","#zdxx").combogrid("getValue"),
+                Flight_No: $("#Flight_No","#zdxx").textbox("getValue"),
+                Flight_Date_Want: $("#Flight_Date_Want","#zdxx").datebox("getValue"),
+                Currency_M: $("#Currency_M","#zdxx").combogrid("getValue"),
+                Bragainon_Article_M: $("#Bragainon_Article_M","#zdxx").combogrid("getValue"),
+                Pay_Mode_M: $("#Pay_Mode_M","#zdxx").combogrid("getValue"),
+                Carriage_M: $("#Carriage_M","#zdxx").textbox("getValue"),
+                Incidental_Expenses_M: $("#Incidental_Expenses_M","#zdxx").textbox("getValue"),
+                Declare_Value_Trans_M: $("#Declare_Value_Trans_M","#zdxx").textbox("getValue"),
+                Declare_Value_Ciq_M: $("#Declare_Value_Ciq_M","#zdxx").textbox("getValue"),
+                Risk_M: $("#Risk_M","#zdxx").textbox("getValue"),
+                Marks_M: $("#Marks_M","#zdxx").textbox("getValue"),
+                EN_Name_M: $("#EN_Name_M","#zdxx").textbox("getValue"),
+                Hand_Info_M: $("#Hand_Info_M","#zdxx").textbox("getValue"),
+                Signature_Agent_M: $("#Signature_Agent_M","#zdxx").textbox("getValue"),
+                Rate_Class_M: "",//
+                Air_Frae: 0,//空运费单价
+                AWC: 0,
+                Pieces_M: 0,
+                Weight_M: 0,
+                Volume_M: 0,
+                Charge_Weight_M: 0,
+                Price_Article: "", //约价方案
+                CCC: "",
+                File_M: "",
+                Status: 1,
+                //OperatingPoint:null,
+                //ADDID:null,
+                //ADDWHO:null,
+                //ADDTS:null,
+                //EDITWHO:null,
+                //EDITTS:null,
+                //EDITID:null,
+            };
+            //分单表信息
+            var newH_Order = {
+                Id:$("#Id","#fdxx").val(),
+                Operation_Id: $("#Operation_Id").textbox("getValue"),
+                Shipper_H: $("#Shipper_H","#fdxx").textbox("getValue"),
+                Consignee_H: $("#Consignee_H","#fdxx").textbox("getValue"),
+                Notify_Part_H: $("#Notify_Part_H","#fdxx").textbox("getValue"),
+                Currency_H: $("#Currency_H","#fdxx").combogrid("getValue"),
+                Bragainon_Article_H: $("#Bragainon_Article_H","#fdxx").combogrid("getValue"),
+                Pay_Mode_H: $("#Pay_Mode_H","#fdxx").combogrid("getValue"),
+                Carriage_H: $("#Carriage_H","#fdxx").textbox("getValue"),
+                Incidental_Expenses_H: $("#Incidental_Expenses_H","#fdxx").textbox("getValue"),
+                Declare_Value_Trans_H: $("#Declare_Value_Trans_H","#fdxx").textbox("getValue"),
+                Declare_Value_Ciq_H: $("#Declare_Value_Ciq_H","#fdxx").textbox("getValue"),
+                Risk_H: $("#Risk_H","#fdxx").textbox("getValue"),
+                Marks_H: $("#Marks_H","#fdxx").textbox("getValue"),
+                EN_Name_H: $("#EN_Name_H","#fdxx").textbox("getValue"),
+                Pieces_H: $("#Pieces_H","#fdxx").numberbox("getValue"),
+                Weight_H: $("#Weight_H","#fdxx").numberbox("getValue"),
+                Volume_H: $("#Volume_H","#fdxx").numberbox("getValue"),
+                Charge_Weight_H: $("#Charge_Weight_H","#fdxx").numberbox("getValue"),
+                MBL: $("#MBL","#fdxx").textbox("getValue"),
+                HBL: $("#HBL","#wtxx").textbox("getValue"),
+
+                Is_Self: $("#Is_Self").get(0).checked,
+                Ty_Type: $("#Ty_Type").combogrid("getValue"),
+                Lot_No: $("#Lot_No").textbox("getValue"),
+                Hbl_Feight: $("#Hbl_Feight").val(),
+                Is_XC: $("#Is_XC").get(0).checked,
+                Is_BAS: $("#Is_BAS").get(0).checked,
+                Is_DCZ: $("#Is_DCZ").get(0).checked,
+                Is_ZB: $("#Is_ZB").get(0).checked,
+                //Is_TG: $("#Is_TG").get(0).checked,//退关
+
+            };
+             
+            $.ajax({
+                url: '/OPS_EntrustmentInfors/SaveEMH',
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ EntrustmentInfor:newEntrustmentInfor,M_Order:newM_Order,H_Order:newH_Order,Is_Binding:is_binding }),//JSON.stringify()
+                success: function (result) {
+                    console.log("result.success:",result.success);
+                    if (result.success = true) {
+                        //$(location).attr('href', "/OPS_EntrustmentInfors/OPS_Edit?id=" + row.Id);
+                        $.messager.alert("提示", "保存成功");
+                        return true;
+                    } else {
+                        $.messager.alert("err",result.err);
+                        return false;
+                    }
+                },
+                error: function (result) {
+                    return false;
+                }
+            });
+        }
+
+        function ToCusIndex(id){
+            $(location).attr('href', "/CustomsInspections/CusIndex?OPS_ENid="+getQueryString("id"));
+        }
+
+    function ToDocMent(){
+        //Oid=getQueryString("id")
+        //id=$("#Id").val();
+        //$.ajax({
+        //    type: 'GET',
+        //    url: '/OPS_EntrustmentInfors/OPS_Edit?Oid=' + Oid+ '&id='+Oid ,
+        //    success: function () {
+        //        //console.log("success");
+        //    }
+        //});
+        if(@ViewBag.CusInsDataID==000){
+            $.messager.alert("提示","该订单未完成报关");
+        }else{
+            $(location).attr('href', "/DocumentManagements/Index?id="+@ViewBag.CusInsDataID);
+        }
+
+}
+
+        //取消仓库接单的绑定
+        function cencelbindingwarehouse(){
+            //实际进仓清0
+            $("#Pieces_Fact", "#wtxx").numberbox("setValue", 0);
+            $("#Weight_Fact", "#wtxx").numberbox("setValue", 0);
+            $("#Volume_Fact", "#wtxx").numberbox("setValue", 0);
+            Is_Bindingcencel();//取消绑定
+            SaveEMH();
+        }
+	</script>
+}

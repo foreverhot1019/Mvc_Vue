@@ -1,0 +1,63 @@
+﻿@model AirOut.Web.Models.Ar_ApHead
+@{
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+    //int FTParentId = ViewData["FTParentId"] == null ? 0 : (int)ViewData["FTParentId"];
+    var readOnly = ViewData["readOnly"]??"";
+}
+@Html.HiddenFor(model => model.Id)
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_Type, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Type, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Type, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Money_Code, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Money_Code, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Money_Code, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_Object_Id, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Object_Id, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Object_Id, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_Object_Name, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Object_Name, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Object_Name, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Payway, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Payway, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Payway, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_TaxRateType, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_TaxRateType, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_TaxRateType, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_TaxRate, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_TaxRate, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'" + readOnly, tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_TaxRate, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-2 col-md-2 col-sm-2">
+    @Html.LabelFor(model => model.Bill_HasTax, htmlAttributes: new { @class = "control-label " })
+    <div style="width:100%;">
+        <input type="radio" name="Bill_HasTax" value="1" @(Model.Bill_HasTax ? "checked=\"checked\"" : "")/>含税
+        <input type="radio" name="Bill_HasTax" value="0" @(Model.Bill_HasTax ? "" : "checked=\"checked\"") />不含税
+        @Html.ValidationMessageFor(model => model.Bill_HasTax, "", new { @class = "text-danger" })
+    </div>
+</div>
+@Html.HiddenFor(x => x.Org_Money_Code)
+@Html.HiddenFor(x => x.Create_Status)
+@Html.HiddenFor(x => x.Status, new { @Value=(int)Model.Status})
+@Html.HiddenFor(x => x.AuditStatus, new { @Value = (int)Model.AuditStatus })
+@{
+    TempData["Num"] = Num;
+    ViewData["Num"] = Num;
+}

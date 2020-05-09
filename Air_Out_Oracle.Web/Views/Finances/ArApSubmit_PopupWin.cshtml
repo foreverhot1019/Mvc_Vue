@@ -1,0 +1,397 @@
+﻿@model AirOut.Web.Models.Finance
+@{
+    bool? IsAr = null;
+    if (Model != null)
+    {
+        IsAr = Model.IsAr;
+    }
+
+    int Num = 0;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="ArApSubmit_PopupWin" class="easyui-dialog" title="提交应收/应付账单" style="width:630px; height:450px; background:#fafafa;"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            //dg_reload();
+            if(!(typeof(keydownEvent)==='undefined'||keydownEvent==null))
+                $(document).unbind('keydown',keydownEvent);
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存(Q)',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },{
+         text:'保存并发送(W)',
+         iconCls:'icon-plus',
+         handler:function(){
+             Form_Submit(1);
+             return false;
+         }
+     },{
+         text:'关闭(C)',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#ArApSubmit_PopupWin').window('close');
+            return false;
+         }
+     }]">
+    <div id="div_ArApSubmitFrom" class="row" style="width:100%; margin:auto; ">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="margin:auto;">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <form id="formSubmit" class="form-horizontal">
+                <div class="row" style=" padding-top:5px; padding-bottom:5px;">
+                    <table id="ArAp_datagrid" class="easyui-datagrid" title="" style="width:auto; height:auto; min-height:200px; "
+                           data-options="rownumbers:true,pagination:false">
+                        <thead>
+                            <tr>
+                                <th data-options="field:'Bill_Object_Id',width:100">@Html.DisplayNameFor(model => model.Bill_Object_Id)</th>
+                                <th data-options="field:'Bill_Object_Name',width:150,">@Html.DisplayNameFor(model => model.Bill_Object_Name)</th>
+                                <th data-options="field:'Money_Code',width:50">@Html.DisplayNameFor(model => model.Money_Code)</th>
+                                <th data-options="field:'Bill_Account2',width:60">@Html.DisplayNameFor(model => model.Bill_Account2)</th>
+                                <th data-options="field:'Bill_Amount',width:58">@Html.DisplayNameFor(model => model.Bill_Amount)</th>
+                                <th data-options="field:'Bill_TaxAmount',width:58">@Html.DisplayNameFor(model => model.Bill_TaxAmount)</th>
+                                <th data-options="field:'Bill_AmountTaxTotal',width:60">@Html.DisplayNameFor(model => model.Bill_AmountTaxTotal)</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>                     
+                @Html.HiddenFor(x => x.IsAr)
+                @Html.HiddenFor(x => x.Bill_Type)
+                @Html.HiddenFor(x => x.Money_Code)
+                @Html.HiddenFor(x => x.Bill_Object_Id)
+                @Html.HiddenFor(x => x.Bill_Object_Name)
+                @Html.HiddenFor(x => x.Bill_Account2)
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Invoice_Remark, htmlAttributes: new { @class = "col-md-2 control-label " })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Invoice_Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,200]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Sumbmit_No, htmlAttributes: new { @class = "col-md-2 control-label " })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Sumbmit_No, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_MoneyCode, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Invoice_MoneyCode, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_FeeType, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Invoice_FeeType, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,100]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.ECCInvoice_Rate, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.ECCInvoice_Rate, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,validType:'length[0,50]',min:0,precision:3", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_TaxRateType, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Invoice_TaxRateType, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_HasTax, "是否含税", htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        <input type="radio" name="Invoice_HasTax" value="true" @(Model == null ? "checked=\"checked\"" : Model.Invoice_HasTax ? "checked=\"checked\"" : "") />含税
+                        <input type="radio" name="Invoice_HasTax" value="false" @(Model == null ? "" : Model.Invoice_HasTax ? "" : "checked=\"checked\"") />不含税
+                        @Html.ValidationMessageFor(model => model.Invoice_HasTax, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script id="ArApSubmit_PopupWin_js">
+    const TopDiv ='#ArApSubmit_PopupWin';//最外层div，防止id名相同
+    const IsAr = @Html.Raw(IsAr == null ? "null" : ((bool)IsAr ? "true" : "false"));
+    function InitSubmitPopupWinFuc() {
+        //console.log('InitAddEdit_PopupWinFuc---------------');
+        initEasyUIControl('div_ArApSubmitFrom');
+        initPageWin();
+        AddkeydownListen();//设置 键盘监控事件
+        //合并 数据列 start
+        var dtlData = $("#finance_datagrid").datagrid('getChecked');
+        //array.reduce(function(total, currentValue, currentIndex, arr), initialValue)
+        var result = dtlData.reduce(function (r, a) {
+            var key = a.Bill_Object_Id+'_'+a.Bill_Object_Name+'_'+a.Money_Code;
+            var obj = {Bill_Account2:0, Bill_Amount:0, Bill_TaxAmount:0, Bill_AmountTaxTotal:0};
+            r[key] = r[key] || obj;
+            var Bill_Account2 = parseFloat(a.Bill_Account2);
+            if(!(Bill_Account2==null || isNaN(Bill_Account2)))
+                r[key].Bill_Account2 += Bill_Account2;
+
+            var Bill_Amount = parseFloat(a.Bill_Amount);
+            if(!(Bill_Amount==null || isNaN(Bill_Amount)))
+                r[key].Bill_Amount += Bill_Amount;
+
+            var Bill_TaxAmount = parseFloat(a.Bill_TaxAmount);
+            if(!(Bill_TaxAmount==null || isNaN(Bill_TaxAmount)))
+                r[key].Bill_TaxAmount += Bill_TaxAmount;
+
+            var Bill_AmountTaxTotal = parseFloat(a.Bill_AmountTaxTotal);
+            if(!(Bill_AmountTaxTotal==null || isNaN(Bill_AmountTaxTotal)))
+                r[key].Bill_AmountTaxTotal += Bill_AmountTaxTotal;
+            return r;
+        }, Object.create(null));
+        var data =[];
+        for(var i in result){
+            var hdata = i.split('_');
+            var idata = {};
+            var r = result[i];
+            r.Bill_Account2 = parseFloat(r.Bill_Account2.toFixed(2));
+            r.Bill_Amount = parseFloat(r.Bill_Amount.toFixed(2));
+            r.Bill_TaxAmount = parseFloat(r.Bill_TaxAmount.toFixed(2));
+            r.Bill_AmountTaxTotal = parseFloat(r.Bill_AmountTaxTotal.toFixed(2));
+            data.push($.extend(idata,{Bill_Object_Id:hdata[0],Bill_Object_Name:hdata[1],Money_Code:hdata[2]},r));
+        }
+        //合并 数据列 end
+        $("#ArAp_datagrid",TopDiv).datagrid({
+            data: data
+        });
+        if($("div.validation-summary-errors.text-danger li").css('display')!='none'){
+            $(TopDiv).window("panel").find("div.dialog-button a").attr("disabled","disabled").css("pointer-events","none");
+        }else if(IsAr!=null && !IsAr){
+            var $a  =$(TopDiv).window("panel").find("div.dialog-button").find("span.l-btn-icon.icon-plus").parent().parent();
+            $a.attr("disabled","disabled").css("pointer-events","none").css("display","none");
+        }
+    }
+    //初始化页面
+    function initPageWin() {
+        initCombogrid('_FromCache');
+        var FromData = "{}";
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl(TopDiv, null, true, FormNAMEData);
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        //币种
+        var $Invoice_MoneyCode =$('#Invoice_MoneyCode',TopDiv);
+        if($Invoice_MoneyCode.length>0){
+            $Invoice_MoneyCode.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                textField:"Id",
+                url1: '/PARA_Currs/GetPagerPARA_CURR' + _FromCache
+            }));
+            //币种 keyup事件 小写转大写
+            $Invoice_MoneyCode.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        //费用类型
+        var $Invoice_FeeType =$('#Invoice_FeeType', TopDiv);
+        if($Invoice_FeeType.length>0){
+            $Invoice_FeeType.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required: true,
+                url1: '/FeeTypes/GetPagerFeeTypes' + _FromCache
+            }));
+            //费用类型 keyup事件 小写转大写
+            $Invoice_FeeType.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        function Bill_TaxRateTypeSleted(Selted){
+            if (Selted) {
+                var NameVal = Selted["ENAME"];
+                if (!(typeof NameVal === 'undefined' || NameVal == null || NameVal=='' )) {
+                    if (!isNaN(NameVal)) {
+                        var taxRate = parseFloat(NameVal);
+                        $("#Bill_TaxRate").numberbox("setValue", taxRate);
+                        var val = '1';
+                        if (taxRate <= 0) {
+                            val = '0';
+                        }
+                        $("input:radio[name='Bill_HasTax'][value='" + val + "']", TopDiv).prop('checked', 'checked');
+                    }
+                }
+            } else {
+                $("#Invoice_HasTax").numberbox("setValue", 0);
+                $("input:radio[name='Invoice_HasTax'][value='0']", TopDiv).prop('checked', 'checked');
+            }
+        }
+        //税率类型
+        var $Invoice_TaxRateType =$('#Invoice_TaxRateType', TopDiv);
+        if($Invoice_TaxRateType.length>0){
+            $Invoice_TaxRateType.combogrid($.extend({}, combogrid_DefaultSettings, {
+                required: true,
+                url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT' + _FromCache + '?DOCCODE=Bill_TaxRateType',
+                onChange: function () {
+                    //var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                    //Bill_TaxRateTypeSleted(Selted);
+                }
+            }));
+            //税率类型 keyup事件 小写转大写
+            $Invoice_TaxRateType.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+    }
+    //刷新 父界面 datagrid
+    function dg_reload(){
+        var $dgHead = $("table.easyui-datagrid:not([id$='_dtl_datagrid'])");
+        if($dgHead.length>0)
+            $dgHead.datagrid('reload');
+    }
+    //提交数据
+    function Form_Submit(_SendECC) {
+        var SendECC = false;
+        var SendECCType = typeof (_SendECC);
+        if (!(SendECCType === 'undefined' || _SendECC == null || _SendECC == "")) {
+            if (SendECCType === 'boolean') {
+                SendECC = _SendECC
+            } else {
+                if (!isNaN(_SendECC)) {
+                    if (parseInt(_SendECC) > 0)
+                        SendECC = true;
+                } else {
+                    if ($.trim(_SendECC) != "")
+                        SendECC = true;
+                }
+            }
+        }
+        if(SendECC){
+            setTargetRequired($("#Invoice_MoneyCode", TopDiv),true);
+            setTargetRequired($("#Invoice_FeeType", TopDiv),true);
+        }else{
+            setTargetRequired($("#Invoice_MoneyCode", TopDiv),false);
+            setTargetRequired($("#Invoice_FeeType", TopDiv),false);
+        }
+        var formHead = $($('#formSubmit', TopDiv)[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid){
+            return false;
+        }
+        var fromhedddata = getFormSerializeJson(formHead);
+        var url = "/Finances/SaveArApSubmit_PopupWin";
+        var ArrChecked = $("#finance_datagrid").datagrid('getChecked');//$("#ArAp_datagrid",TopDiv).datagrid("getRows");
+        if(typeof ArrChecked==='undefined'||ArrChecked == null||ArrChecked.length<1){
+            $.messager.alert("警告","至少需要选中一条数据，才能操作");
+            return false;
+        }
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        var postdata = {};
+        postdata["ArrFinance"] =ArrChecked;
+        postdata["SendECC"] = SendECC.toString();
+        postdata["OFinance"] =fromhedddata;
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify(postdata),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        $(TopDiv).window('close');
+                        for(var i in ArrChecked){
+                            var item =ArrChecked[i];
+                            var rowIndex = $dg.datagrid("getRowIndex",item);
+                            //if(item.IsAr==true)
+                            //    item.IsAr =1;
+                            //else
+                            //    item.IsAr =0;
+                            $.extend(item,data.data);
+                            $dg.datagrid("refreshRow",rowIndex);
+                        }
+                        if(!(typeof(data.ErrMsg)==='undefined'||data.ErrMsg ==null||data.ErrMsg=='')){
+                            $.messager.alert('警告', data.ErrMsg);
+                        }
+                    } else{
+                        $.messager.alert('警告', data.ErrMsg);
+                    }
+                }
+                else{
+                    $.messager.alert('警告', '未知错误');
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $.messager.alert('警告', '数据处理中,出现网络错误');
+            }
+        });
+    }
+    //监控 键盘事件
+    function AddkeydownListen(){
+        //监控 键盘事件
+        $(document).bind("keydown",keydownEvent);
+    }
+    var keydownEvent =function (event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        var keyCode = e.which || e.keyCode;
+        console.log(e,keyCode);
+        if(e.altKey){
+            PressCtrl=true;
+            //C	67 关闭
+            if (keyCode == 67) {
+                $(TopDiv).window('close');
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+            //Q	81 保存
+            if (keyCode == 81) {
+                var $a = $(TopDiv).window("panel").find("div.dialog-button span.l-btn-icon.icon-ok").parent().parent();
+                if(!$a.attr("disabled"))
+                    $a.click();
+                //阻止默认浏览器动作(W3C)
+                if (e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+            //W	87 保存并发送
+            if (keyCode == 87) {
+                var $a = $(TopDiv).window("panel").find("div.dialog-button span.l-btn-icon.icon-plus").parent().parent();
+                if(!$a.attr("disabled"))
+                    $a.click();
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+        }
+    }
+</script>

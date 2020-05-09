@@ -1,0 +1,190 @@
+﻿@*是否是应收账单*@
+@model bool? 
+@{
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+}
+
+<div id="win" class="easyui-dialog" title="选择主/分单数据" style="width:800px;height:493px"
+     data-options="iconCls:'icon-ok',shadow: true,
+     buttons: [{
+         text:'确定',
+         iconCls:'icon-ok',
+         handler:function(){
+             SeltOPSMOrdOK();
+         }
+     },{
+         text:'取消',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#win').window('close');
+         }
+     }]">
+    <form id="searchformWin" method="post" style="padding-bottom:0px; width:auto">
+        <div id="div_searchWin" style="padding-top:5px; padding-bottom:0px; width:auto;" class="easyui-panel" title="查询条件"
+             data-options="collapsible:true">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="Operation_Id" style="width:60px;">业务编号:</label>
+                        <input id="Operation_Id" name="Operation_Id" tabindex="@(Num++)" data-options="prompt1:''" style="width:150px;" class="easyui-textbox" type="text" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="MBL" style="width:60px;">总单号:</label>
+                        <input id="MBL" name="MBL" tabindex="@(Num++)" data-options="prompt1:'总单号'" style="width:150px;" class="easyui-textbox" type="text" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="Entrustment_Code" style="width:60px;">委托方:</label>
+                        <input id="Entrustment_Code" name="Entrustment_Code" tabindex="@(Num++)" data-options="prompt1:'委托方'" style="width:150px;" class="easyui-combogrid" type="text" />
+                    </div>
+                </div>
+                <div class="form-group col-md-12" style="text-align:center;">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="searchfWin()">查询</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="clearfromWin()">重置</a>
+                </div>
+            </div>
+        </div>
+    </form>
+    @if (Model == null){
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    }
+    else { 
+        @Html.Partial("ListView",new AirOut.Web.Models.OPS_M_Order())
+    }
+</div>
+<script type="text/javascript">
+    var IsBmsBillAr = '@Model';//是否是应收账单
+    function InitOPSMOrdWinFuc() {
+        initEasyUIControl('searchformWin');
+        initPageWin();
+        @if (Model != null)
+        {
+            <text>
+            var opts = $("#ops_m_order_datagrid", "#win").datagrid('options');
+            opts.url = '/OPS_M_Orders/GetData';
+            opts.singleSelect = true;
+            var $Panel = $("#div_searchWin", "#win");
+            $Panel.panel('header').css({ 'border-top': 0, 'border-left': 0, 'border-right': 0 });
+            $Panel.panel('body').css({ 'border-top': 0, 'border-left': 0, 'border-right': 0 });
+            var $dgPanel = $('#ops_m_order_datagrid', "#win").datagrid('getPanel');
+            $dgPanel.panel('header').css({ 'border-top': 0, 'border-left': 0, 'border-right': 0 });
+            $dgPanel.panel('body').css({ 'border-top': 0, 'border-left': 0, 'border-right': 0 });
+            </text>
+        }
+    }
+    //初始化页面
+    function initPageWin() {
+        $("#Entrustment_Code", "#win").combogrid($.extend({}, combogrid_DefaultSettings, {
+            idField: 'TEXT',
+            valueField: 'TEXT',
+            textField: 'IDTEXT',
+            url1: '/CusBusInfos/GetPagerCusBusInfos_FromCache'
+        }));
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl('searchformWin', null, false, {});
+    }
+    //选择委托数据确认
+    function SeltOPSMOrdOK() {
+        console.log('------------');
+        var SletRows = $("#ops_m_order_datagrid", "#win").datagrid('getSelections');
+        if (SletRows == null || SletRows.length != 1) {
+            //$("#win").window("close");
+            $.messager.alert('警告', '只能选择一条委托数据，结算！');
+            return false;
+        }
+        if (SletRows[0] == null || SletRows[0].Id == null || SletRows[0].Id == '' || SletRows[0].Id <= 0) {
+            $("#win").window("close");
+            $.messager.alert('警告', '选择的委托数据，无法取到主键Id，请联系 管理员！');
+            return false;
+        }
+        if (!(typeof (IsBmsBillAr) === 'undefined' || IsBmsBillAr == null || IsBmsBillAr == '')) {
+            if (IsBmsBillAr)
+                window.location.href = '/Bms_Bill_Ars/BmsBillArView?OPS_M_OrdId=' + SletRows[0].Id;
+            else
+                window.location.href = '/Bms_Bill_Aps/BmsBillApView?OPS_M_OrdId=' + SletRows[0].Id;
+        }
+        else {
+            $("#win").window("close");
+            $.messager.alert('警告', '应收/应付 数据不明确！');
+            return false;
+        }
+    }
+    //点击重置按钮时，触发，清空查询条件
+    function clearfromWin() {
+        $('#searchformWin', "#win").form('clear');
+    }
+    //点击查询按钮时，触发
+    function searchfWin() {
+        setfilteroptsWin();//设置查询条件
+        reloadWin();
+    }
+    //设置查询条件
+    function setfilteroptsWin() {
+        var Operation_Id = $("#Operation_Id", "#win").textbox("getValue");
+        var MBL = $("#MBL", "#win").textbox("getValue");
+        var Entrustment_Code = $("#Entrustment_Code", "#win").textbox("getValue");
+
+        var params = [];
+        var opts = $('#ops_m_order_datagrid', "#win").datagrid('options');
+        if (!(typeof (Operation_Id) === 'undefined' || Operation_Id == null || Operation_Id == "")) {
+            params.push({ "field": "Operation_Id", "op": "equal", "value": Operation_Id });
+        }
+        if (!(typeof (MBL) === 'undefined' || MBL == null || MBL == "")) {
+            params.push({ "field": "MBL", "op": "equal", "value": MBL });
+        }
+        if (!(typeof (Entrustment_Code) === 'undefined' || Entrustment_Code == null || Entrustment_Code == "")) {
+            params.push({ "field": "Entrustment_Code", "op": "equal", "value": Entrustment_Code });
+        }
+        opts.queryParams = {
+            'filterRules': JSON.stringify(params)
+        };
+    }
+    //刷新
+    function reloadWin() {
+        $('#ops_m_order_datagrid', "#win").datagrid('reload');
+    }
+    //货是否到齐
+    function NewBoolFommater(value, row, index) {
+        var returnstr = "否";
+        var TF = false;
+        try {
+            if (typeof value === 'undefined')
+                TF = false;
+            else if (typeof value === 'boolean') {
+                if (value == true)
+                    TF = true;
+            }
+            else if (value == null)
+                TF = false;
+            else {
+                if (isNaN(value)) {
+                    if (value.toLowerCase() == 'true')
+                        TF = true;
+                }
+                else {
+                    var intval = parseInt(value);
+                    if (intval > 0)
+                        TF = true;
+                }
+            }
+        }
+        catch (e) {
+            TF = false;
+        }
+        if (TF)
+            returnstr = "是";
+        var $this = this;
+        if ($this) {
+            if ($this.title) {
+                returnstr = $this.title.replace(/[是否|标签]/g, "");
+                returnstr = (TF ? "已" : "未") + returnstr;
+            }
+        }
+
+        return "<spn>" + returnstr + "</spn>";
+    }
+</script>

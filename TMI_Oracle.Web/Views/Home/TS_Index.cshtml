@@ -1,0 +1,25 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>    
+    @Scripts.Render("~/bundles/jquery")
+    <meta name="viewport" content="width=device-width" />
+    <title>TS_Index</title>
+    <script src="~/Scripts/require.js"></script>
+    @*<script src="~/TypeScript_File/C_AB.js"></script>
+    <script src="~/TypeScript_File/index.js"></script>*@
+</head>
+<body>
+    <div> 
+        <input id="compiler" value="TypeScript" />
+        <input id="framework" value=".Net FrameWork 4.5" />
+        <button id="btn_ts" class="warning">TypeScript</button>
+        <button id="btn_ts1" class="warning">TypeScript1</button>
+    </div>
+</body>
+</html>
+<script>require(["../TypeScript_File/index"]);</script>

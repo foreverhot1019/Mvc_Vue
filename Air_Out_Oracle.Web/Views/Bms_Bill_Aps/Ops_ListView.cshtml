@@ -1,0 +1,156 @@
+﻿@model AirOut.Web.Models.OPS_M_Order
+<table id="bms_bill_ap_ops_datagrid" class="easyui-datagrid" title="" style="width:auto; height:auto; max-height:465px;min-height:300px;"
+       data-options="
+	   rownumbers:true,
+	   checkOnSelect:true,
+	   selectOnCheck:false,
+	   idField:'Id',
+	   sortName:'MBL',
+	   sortOrder:'desc',
+	   remoteFilter: true,
+	   singleSelect: true,
+	   toolbar: '',
+	   method: 'get',
+	   //url: '/Bms_Bill_Aps/GetData',
+	   //onClickCell: onClickCell,
+       //onBeginEdit:onBeginEdit,
+	   //onSelect:onSelect,
+	   pagination: 'true'">
+    <thead>
+        <tr>
+            <th data-options="field:'ck',checkbox:true"></th>
+            <th data-options="field:'Operation_Id',width:140,sortable:true,resizable:true,
+            formatter:DzbhFormatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">业务编号</th>
+            <th data-options="field:'Flight_Date_Want',width:100,align:'right',sortable:true,resizable:true,
+            formatter:dateformatter,
+            editor:{
+            	type:'numberbox',
+            	options:{
+            		required:true,
+                    precision:2
+            	}
+            }">航班日期</th>
+            <th data-options="field:'MBL',width:140,sortable:true,resizable:true,
+            formatter:MBLFormatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">总运单号</th>
+            <th data-options="field:'Entrustment_Name',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,100]'
+            	}
+            }">委托方全称</th>
+            <th data-options="field:'Carriage_Account_Code',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,100]'
+            	}
+            }">结算方全称</th>
+            <th data-options="field:'Book_Flat_Code',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">订舱方简称</th>
+            <th data-options="field:'Depart_Port',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">起运港</th>
+            <th data-options="field:'End_Port',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">目的港</th>
+            <th data-options="field:'Entrustment_Code',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">委托方编号</th>
+            <th data-options="field:'HBL',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">分运单号</th>
+            <th data-options="field:'Pay_Mode_M',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">付款方式</th>
+            <th data-options="field:'FWD_Code',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">国外代理简称</th>
+            <th data-options="field:'Is_TG',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">作废标志</th>
+            <th data-options="field:'ADDTS',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+                }
+            }">接单日期</th>
+            <th data-options="field:'ADDWHO',width:140,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">接单人</th>
+        </tr>
+    </thead>
+</table>

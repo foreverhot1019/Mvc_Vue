@@ -1,0 +1,316 @@
+﻿@model AirOut.Web.Models.Bms_Bill_Ap
+
+<table id="bms_bill_ap_datagrid" class="easyui-datagrid" title="" style="width:auto; height:auto; min-height:300px;"
+       data-options="
+	   rownumbers:true,
+	   checkOnSelect:true,
+	   selectOnCheck:true,
+	   idField:'Id',
+	   sortName:'Id',
+	   sortOrder:'desc',
+	   remoteFilter: true,
+	   singleSelect: false,
+	   toolbar: '#bms_bill_ap_toolbar',
+	   method: 'get',
+	   //url: '/Bms_Bill_Aps/GetData',
+	   //onClickCell: onClickCell,
+       //onBeginEdit:onBeginEdit,
+	   //onSelect:onSelect,
+       pagination:'true'">
+    <thead>
+        <tr>
+            <th data-options="field:'ck',checkbox:true"></th>
+            <th data-options="field:'Line_No',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+            	type:'numberbox',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.Line_No)</th>
+            <th data-options="field:'Bill_Type',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_Type)</th>
+            <th data-options="field:'Bill_Account2',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+            	type:'numberbox',
+            	options:{
+            		required:true,
+                    precision:2
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_Account2)</th>           
+            <th data-options="field:'Bill_Amount',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+                type:'numberbox',
+                options:{
+                    required:true,
+                    precision:2
+                }
+            }">@Html.DisplayNameFor(model => model.Bill_Amount)</th>
+            <th data-options="field:'Bill_TaxRate',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+                type:'numberbox',
+                options:{
+                    required:true,
+                    precision:2
+                }
+            }">@Html.DisplayNameFor(model => model.Bill_TaxRate)</th>
+            <th data-options="field:'Bill_HasTax',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_HasTax)</th>
+            <th data-options="field:'Bill_TaxAmount',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+                type:'numberbox',
+                options:{
+                    required:true,
+                    precision:2
+                }
+            }">@Html.DisplayNameFor(model => model.Bill_TaxAmount)</th>
+            <th data-options="field:'Bill_AmountTaxTotal',width:100,align:'right',sortable:true,resizable:true,
+            editor:{
+                type:'numberbox',
+                options:{
+                    required:true,
+                    precision:2
+                }
+            }">@Html.DisplayNameFor(model => model.Bill_AmountTaxTotal)</th>
+            <th data-options="field:'Money_Code',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Money_Code)</th>
+            <th data-options="field:'Bill_Object_Id',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_Object_Id)</th>
+            <th data-options="field:'Bill_Object_Name',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_Object_Name)</th>
+            <th data-options="field:'Payway',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Payway)</th>
+            <th data-options="field:'Bill_Date',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+                }
+            }">@Html.DisplayNameFor(model => model.Bill_Date)</th>
+            <th data-options="field:'Remark',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,200]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Remark)</th>
+            <th data-options="field:'Bill_Date',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.Bill_Date)</th>
+            <th data-options="field:'ADDWHO',width:120,sortable:true,resizable:true,
+            editor:{
+                type:'textbox',
+                options:{
+                    required:false,
+                    validType:'length[0,20]'
+                }
+            }">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+            <th data-options="field:'ADDTS',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+                type:'datetimebox',
+                options:{
+                    required:false
+                }
+            }">@Html.DisplayNameFor(model => model.ADDTS)</th>
+            <th data-options="field:'BillEDITWHO',width:120,sortable:true,resizable:true,
+            formatter:joinformatter,
+            editor:{
+                type:'textbox',
+                options:{
+                    required:false,
+                    validType:'length[0,20]'
+                }
+            }">@Html.DisplayNameFor(model => model.BillEDITWHO)</th>
+            <th data-options="field:'BillEDITTS',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+                type:'datetimebox',
+                options:{
+                    required:false
+                }
+            }">@Html.DisplayNameFor(model => model.BillEDITTS)</th>
+            <th data-options="field:'AuditStatus',width:120,sortable:true,resizable:true,
+            formatter:UsedformatterByArrAuditStatus,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.AuditStatus)</th>
+            <th data-options="field:'Sumbmit_Status',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.Sumbmit_Status)</th>
+            <th data-options="field:'Sumbmit_No',width:140,sortable:true,resizable:true,hidden:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Sumbmit_No)</th>
+            <th data-options="field:'Sumbmit_Name',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Sumbmit_Name)</th>
+            <th data-options="field:'Sumbmit_Date',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.Sumbmit_Date)</th>
+            <th data-options="field:'SignIn_Status',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.SignIn_Status)</th>
+            <th data-options="field:'SignIn_No',width:140,sortable:true,resizable:true,hidden:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,50]'
+            	}
+            }">@Html.DisplayNameFor(model => model.SignIn_No)</th>
+            <th data-options="field:'SignIn_Name',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.SignIn_Name)</th>
+            <th data-options="field:'SignIn_Date',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.SignIn_Date)</th>
+            <th data-options="field:'Invoice_No',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.Invoice_No)</th>
+            <th data-options="field:'SellAccount_Status',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.SellAccount_Status)</th>
+            <th data-options="field:'SellAccount_Name',width:140,sortable:true,resizable:true,
+            editor:{
+            	type:'textbox',
+            	options:{
+            		required:false,
+                    validType:'length[0,20]'
+            	}
+            }">@Html.DisplayNameFor(model => model.SellAccount_Name)</th>
+            <th data-options="field:'SellAccount_Date',width:160,align:'right',sortable:true,resizable:true,
+            formatter:datetimeformatter,
+            editor:{
+            	type:'datetimebox',
+            	options:{
+            		required:false
+            	}
+            }">@Html.DisplayNameFor(model => model.SellAccount_Date)</th>
+            <th data-options="field:'Create_Status',width:100,align:'right',sortable:true,resizable:true,
+            formatter:function(value, row, index){
+                return formatterByEnumArray(value, row, index,ArrBms_BillCreate_Status);
+            },
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.Create_Status)</th>
+            <th data-options="field:'Cancel_Status',width:100,align:'right',sortable:true,resizable:true,
+            formatter:boolformatter,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true,
+                    precision:0
+            	}
+            }">@Html.DisplayNameFor(model => model.Cancel_Status)</th>
+            <th data-options="field:'Status',width:120,sortable:true,resizable:true,
+            formatter:UsedformatterByArrStatus,
+            editor:{
+            	type:'combogrid',
+            	options:{
+            		required:true
+            	}
+            }">@Html.DisplayNameFor(model => model.Status)</th>
+        </tr>
+    </thead>
+</table>
+<!--应付账单明细信息（应付账单信息 查找）-->
+@Html.Partial("../Bms_Bill_Ap_Dtls/ListView", new AirOut.Web.Models.Bms_Bill_Ap_Dtl())

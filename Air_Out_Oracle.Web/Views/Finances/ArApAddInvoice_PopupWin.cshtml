@@ -1,0 +1,224 @@
+﻿@model AirOut.Web.Models.Finance
+@{
+    bool? IsAr =null;
+    if (Model != null) { 
+        IsAr = Model.IsAr;
+    }
+
+    int Num = 0;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="ArApAddInvoice_PopupWin" class="easyui-dialog" title="应收/付 开票" style="width:630px; height:430px; background:#fafafa;"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            //dg_reload();
+            if(!(typeof(keydownEvent)==='undefined'||keydownEvent==null))
+                $(document).unbind('keydown',keydownEvent);
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存(Q)',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },{
+         text:'关闭(C)',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#ArApAddInvoice_PopupWin').window('close');
+            return false;
+         }
+     }]">
+    <div id="div_ArApAddInvoice" class="row" style="width:600px; margin:auto; ">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="margin:auto;">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <form id="formInvoice" class="form-horizontal">
+                <div class="form-group row">
+                    @Html.LabelFor(model => model.Money_Code, htmlAttributes: new { @class = "col-md-2 control-label " })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Money_Code, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_Account2, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_Account2, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,min:0,precision:2,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_Object_Id, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_Object_Id, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_No, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Invoice_No, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Invoice_Date, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Invoice_Date, new { htmlAttributes = new { @class = "easyui-datebox", data_options = "required:true,validType:'length[0,50]'", @Value = (Model == null ? "" : (Model.Invoice_Date == null ? "" : ((DateTime)Model.Invoice_Date).ToString("yyyy-MM-dd"))), tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script id="ArApAddInvoice_PopupWin_js">
+    const TopDiv ='#ArApAddInvoice_PopupWin';//最外层div，防止id名相同
+    function InitPopupAddInvoiceWinFuc() {
+        //console.log('InitAddEdit_PopupWinFuc---------------');
+        initEasyUIControl('div_ArApAddInvoice');
+        initPageWin();
+        AddkeydownListen();//设置 键盘监控事件
+        if($("div.validation-summary-errors.text-danger li",TopDiv).css('display')!='none'){
+            $(TopDiv).window("panel").find("div.dialog-button a").attr("disabled","disabled").css("pointer-events","none");
+        }
+    }
+    //初始化页面
+    function initPageWin() {
+        initCombogrid('_FromCache');
+        var FromData = "{}";
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //resetCombogridUrl(obj, VirtualUrlName, IsReLoad, data, isSimplePager)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl(TopDiv, null, true, FormNAMEData);
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        //币种
+        var $Money_Code =$('#Money_Code',TopDiv);
+        if($Money_Code.length>0){
+            $Money_Code.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                textField:"Id",
+                url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache
+            }));
+            //币种 keyup事件 小写转大写
+            $Money_Code.combogrid("textbox").bind('keyup',function(event){
+                var keyCode = event.which || event.keycode;
+                //console.log(keyCode);
+                if(keyCode!=229)//输入法占位符
+                    this.value = this.value.toUpperCase();
+            });
+        }
+        //供方代码
+        var $Bill_Object_Id =$('#Bill_Object_Id',TopDiv);
+        if($Bill_Object_Id.length>0){
+            $Bill_Object_Id.combogrid($.extend({}, dg_combo_coSettings, {
+                required: true,
+                textField:"Id",
+                url1: '/CusBusInfos/GetPagerCusBusInfos'+_FromCache
+            }));
+        }
+    }
+    //刷新 父界面 datagrid
+    function dg_reload(){
+        var $dgHead = $("table.easyui-datagrid:not([id$='_dtl_datagrid'])");
+        if($dgHead.length>0)
+            $dgHead.datagrid('reload');
+    }
+    //提交数据
+    function Form_Submit() {
+        var formHead = $($('#formInvoice', TopDiv)[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid){
+            return false;
+        }
+        var fromhedddata = getFormSerializeJson(formHead);
+        var url = "/Finances/SaveArApAddInvoice_PopupWin";
+        var ArrChecked = $dg.datagrid("getChecked");
+        if(typeof ArrChecked==='undefined'||ArrChecked == null||ArrChecked.length<1){
+            $.messager.alert("警告","至少需要选中一条数据，才能操作");
+            return false;
+        }
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        var postdata = {};
+        postdata["ArrFinance"] = ArrChecked;
+        postdata["OFinance"]= fromhedddata;
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify(postdata),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        $(TopDiv).window('close');
+                        for(var i in ArrChecked){
+                            var item =ArrChecked[i];
+                            var rowIndex = $dg.datagrid("getRowIndex",item);
+                            $.extend(item,data.data);
+                            $dg.datagrid("refreshRow",rowIndex);
+                        }
+                    } else{
+                        $.messager.alert('警告', data.ErrMsg);
+                    }
+                }
+                else{
+                    $.messager.alert('警告', '未知错误');
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $.messager.alert('警告', '数据处理中,出现网络错误');
+            }
+        });
+    }
+    //监控 键盘事件
+    function AddkeydownListen(){
+        //监控 键盘事件
+        $(document).bind("keydown",keydownEvent);
+    }
+    var keydownEvent =function (event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        var keyCode = e.which || e.keyCode;
+        console.log(e,keyCode);
+        if(e.altKey){
+            PressCtrl=true;
+            //C	67 关闭
+            if (keyCode == 67) {
+                $(TopDiv).window('close');
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+            //Q	81 保存
+            if (keyCode == 81) {
+                var $a = $(TopDiv).window("panel").find("div.dialog-button span.l-btn-icon.icon-ok").parent().parent();
+                if(!$a.attr("disabled"))
+                    $a.click();
+                //阻止默认浏览器动作(W3C)
+                if (e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+        }
+    }
+</script>

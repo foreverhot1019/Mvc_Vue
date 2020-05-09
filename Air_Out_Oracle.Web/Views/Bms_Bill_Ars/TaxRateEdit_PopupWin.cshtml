@@ -1,0 +1,166 @@
+﻿@model AirOut.Web.Models.Ar_ApTaxRateEditView
+@{
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+    string Bill_TaxAmountZS = Model.Bill_TaxAmount_Profix.ToString();
+}
+<div id="TaxRateEdit_PoupWin" class="easyui-dialog" title="@(Model.IsBms_Bill_Ar == null ? "" : ((bool)Model.IsBms_Bill_Ar ? "应收" : "应付"))税金数据" style="width:500px; height:300px"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            dg_reload();
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },
+     {
+         text:'关闭',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#TaxRateEdit_PoupWin').window('close');
+            return false;
+         }
+     }]">
+    @if (Model == null || Model.IsBms_Bill_Ar == null)
+    {
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    }
+    else
+    {
+        <div id="div_TaxRateEditFrom" class="row" style="width:480px; padding-left:10px; padding-top:11px;">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <form id="TaxRateEditFrom">
+                    <input id="IsBms_Bill_Ar" name="IsBms_Bill_Ar" type="hidden" value="@((bool)Model.IsBms_Bill_Ar ? "true" : "false")" />
+                    <input id="Bms_Bill_ArAp_Id" name="Bms_Bill_ArAp_Id" type="hidden" value="@Model.Bms_Bill_ArAp_Id" />
+                    <input id="Bill_TaxAmount" name="Bill_TaxAmount" type="hidden" value="@Model.Bill_TaxAmount" />
+                    <input id="Bill_TaxAmount_Profix" name="Bill_TaxAmount_Profix" type="hidden" value="@Model.Bill_TaxAmount_Profix" />
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.Bill_Account2, htmlAttributes: new { @class = "control-label " })
+                        @Html.EditorFor(model => model.Bill_Account2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,readonly:true", tabindex = Num++, style = "width:100%" } })
+                        @Html.ValidationMessageFor(model => model.Bill_Account2, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.Bill_Amount, htmlAttributes: new { @class = "control-label " })
+                        @Html.EditorFor(model => model.Bill_Amount, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,min:0,precision:2,readonly:true", tabindex = Num++, style = "width:100%" } })
+                        @Html.ValidationMessageFor(model => model.Bill_Amount, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.Bill_TaxAmount_Precision, Html.DisplayNameFor(x => x.Bill_TaxAmount_Precision).ToString(), htmlAttributes: new { @class = "control-label " })
+                        <div class="input-group ">
+                            <span class="input-group-addon">@(Bill_TaxAmountZS).</span>
+                            @Html.EditorFor(model => model.Bill_TaxAmount_Precision, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,max:99,precision:0,", tabindex = Num++, style = "width:100px;" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Bill_TaxAmount_Precision, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                        @Html.LabelFor(model => model.Bill_AmountTaxTotal, htmlAttributes: new { @class = "control-label " })
+                        @Html.EditorFor(model => model.Bill_AmountTaxTotal, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:false,min:0,precision:2,readonly:true", tabindex = Num++, style = "width:100%" } })
+                        @Html.ValidationMessageFor(model => model.Bill_AmountTaxTotal, "", new { @class = "text-danger" })
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+<script type="text/javascript" id="TaxRateEdit_PoupWin_js">
+    var IsBmsBillAr = '@Model.IsBms_Bill_Ar';//是否是应收账单
+    var IsError = '@(Model == null || Model.IsBms_Bill_Ar == null)';
+    function InitTaxRateEdit_PoupWinFuc() {
+        //console.log('InitTaxRateEdit_PoupWinFuc---------------');
+        initEasyUIControl('div_TaxRateEditFrom');
+        if (!IsError) {
+            initPageWin();
+        }
+    }
+    //初始化页面
+    function initPageWin() {
+        if ($("#Bill_Amount", '#div_TaxRateEditFrom')) {
+            var $prefix = $("span.input-group-addon", '#div_TaxRateEditFrom');
+            var $txt = $("#Bill_Amount", '#div_TaxRateEditFrom').textbox('textbox');
+            var height = $txt.height();
+            var width = $txt.width();
+            $prefix.css({ "height": height, "padding-top": 5, "padding-left": 6, "padding-right": 6 });
+
+            var pwidth = $prefix.width();
+            var $BTaxAmount = $("#Bill_TaxAmount_Precision", '#div_TaxRateEditFrom');
+            //console.log($BTaxAmount.textbox('textbox').width());
+            $BTaxAmount.textbox("resize", width - pwidth);
+        }
+        @*initCombogrid('_FromCache');
+        var FromData = @Html.Raw(AddEditModel.Ar_ApHead == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(AddEditModel.Ar_ApHead));
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl('div_BmsBillArApFrom', null, false, FormNAMEData);*@
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+    }
+    //验证明细数据
+    function validDtl() {
+        //费用代码
+        var Charge_Code = $('#Charge_Code').combogrid("getValue");
+        if (typeof (Charge_Code) === 'undefined' || Charge_Code == null || Charge_Code == '')
+            return "费用代码，不能为空";
+        return "";
+    }
+    //刷新 父界面 datagrid
+    function dg_reload() {
+        var $CPanel = $("#M_layout").layout('panel', 'center');
+        var $dgHead = $CPanel.find("table.easyui-datagrid");
+        $dgHead.datagrid('reload');
+    }
+    //提交数据
+    function Form_Submit() {
+        var formHead = $($('#TaxRateEditFrom', "#TaxRateEdit_PoupWin")[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid) {
+            return false;
+        }
+        var postObj = getFormSerializeJson(formHead);
+        var url = "/Bms_Bill_Ars/SaveTaxRateEditPopupWin";
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify({ "OAr_ApTaxRateEditView": postObj }),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        $('#TaxRateEdit_PoupWin').window('close');
+                        $.messager.alert('提示', "操作成功");
+                    } else {
+                        $.messager.alert('警告', data.ErrMsg);
+                        $('#TaxRateEditFrom').form('load', postObj);
+                    }
+                }
+                else {
+                    $.messager.alert('警告', '未知错误');
+                    $('#TaxRateEditFrom').form('load', postObj);
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $('#TaxRateEditFrom').form('load', postObj);
+            }
+        });
+    }
+</script>

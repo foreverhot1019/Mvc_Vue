@@ -1,0 +1,8 @@
+﻿@model AirOut.Web.Models.OPS_EntrustmentInfor
+@{
+    Layout = null;
+    var i = ViewBag.i;
+    var tabindex = ViewBag.tabindex;
+}
+
+@Html.Partial("OPS_EntrustmentInfor_Edit", Model, new ViewDataDictionary { { "i", i }, { "tabindex", tabindex } });

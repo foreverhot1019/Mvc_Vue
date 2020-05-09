@@ -1,0 +1,26 @@
+﻿@using AirOut.Web.Models
+@model AccountRecordViewModel
+
+<tr>
+    <td>@Model.User.UserName</td>
+    <td>@Model.User.UserNameDesc</td>
+    @{
+        var MaxRolesCount = (int)ViewBag.MaxRolesCount;
+        if (MaxRolesCount >= 0)
+        {
+            var RoleIds = Model.User.Roles.Select(n => n.RoleId);
+            var RoleNames = string.Join("<br />", Model.Roles.Where(x => RoleIds.Contains(x.Id)).Select(x => x.Name));
+            <td>@Html.Raw(RoleNames)</td>
+        }
+        else { 
+            <td>&nbsp;</td>
+        }
+    }
+    <td>
+        @Html.Partial("_AttachRolePartial", new AttachRoleViewModel { UserId = Model.User.Id })
+    </td>
+    @*<td>
+        @Html.Partial("_DeleteAccountPartial", Model.User)
+    </td>*@
+</tr>
+

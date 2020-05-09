@@ -1,0 +1,176 @@
+﻿﻿@model AirOut.Web.Models.OPS_H_Order
+@{
+    //控件排序
+    var Num = 1;
+}
+@Html.HiddenFor(model => model.Id)
+@*<div class="row">*@
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Batch_Num, "批次号", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Batch_Num, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Shipper_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Shipper_H, "分单发货人", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Shipper_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Shipper_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Consignee_H, "分单收货人", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Consignee_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Consignee_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Notify_Part_H, "分单通知人", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Notify_Part_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Notify_Part_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Currency_H, "币种", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Currency_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Currency_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Bragainon_Article_H, "成交条款", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bragainon_Article_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Bragainon_Article_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Pay_Mode_H, "付款方式", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Pay_Mode_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Pay_Mode_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Carriage_H, "运费P/C", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Carriage_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Carriage_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Incidental_Expenses_H, "杂费P/C", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Incidental_Expenses_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Incidental_Expenses_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Declare_Value_Trans_H, "申明价值（运输）", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Declare_Value_Trans_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Declare_Value_Trans_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Declare_Value_Ciq_H, "申明价值（海关）", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Declare_Value_Ciq_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Declare_Value_Ciq_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Risk_H, "保险额度", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Risk_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Risk_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Marks_H, "唛头", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Marks_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Marks_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.EN_Name_H, "英文货名", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EN_Name_H, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.EN_Name_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Pieces_H, "件数", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Pieces_H, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Pieces_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Weight_H, "毛重", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Weight_H, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Weight_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Volume_H, "体积", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Volume_H, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Volume_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Charge_Weight_H, "计费重量", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Charge_Weight_H, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Charge_Weight_H,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.HBL, "分单号", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.HBL, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.HBL,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Operation_Id, "业务编号", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Operation_Id, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Operation_Id,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Is_Self, "自营", htmlAttributes: new { @class = "control-label " })
+    @Html.CheckBoxFor(model => model.Is_Self, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%" })
+    @*@Html.ValidationMessageFor(model => model.Is_Self,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Ty_Type, "接单类别", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Ty_Type, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Ty_Type,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Lot_No, "拼箱码", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Lot_No, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Lot_No,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Hbl_Feight, "分担运费", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Hbl_Feight, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Hbl_Feight,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Is_XC, "消磁", htmlAttributes: new { @class = "control-label " })
+    @Html.CheckBoxFor(model => model.Is_XC, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%" })
+    @*@Html.ValidationMessageFor(model => model.Is_XC,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Is_BAS, "BSA", htmlAttributes: new { @class = "control-label " })
+    @Html.CheckBoxFor(model => model.Is_BAS, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%" })
+    @*@Html.ValidationMessageFor(model => model.Is_BAS,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Is_DCZ, "代操作", htmlAttributes: new { @class = "control-label " })
+    @Html.CheckBoxFor(model => model.Is_DCZ, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%" })
+    @*@Html.ValidationMessageFor(model => model.Is_DCZ,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Is_ZB, "重板", htmlAttributes: new { @class = "control-label " })
+    @Html.CheckBoxFor(model => model.Is_ZB, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%" })
+    @*@Html.ValidationMessageFor(model => model.Is_ZB,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.ADDPoint, "创建点", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.ADDPoint, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.ADDPoint,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.EDITPoint, "修改点", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EDITPoint, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.EDITPoint,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.Status, "使用状态", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })*@
+</div>
+<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.OperatingPoint, "操作点", htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-numberbox", tabindex = Num++, style = "width:100%" } })
+    @*@Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })*@
+</div>
+@*</div>*@
+<!-- output all Scaffold = false Hiden field -->
+@Html.HiddenFor(model => model.ADDID)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDTS)
+@Html.HiddenFor(model => model.EDITWHO)
+@Html.HiddenFor(model => model.EDITTS)
+@Html.HiddenFor(model => model.EDITID)
+<!--end output all Scaffold = false Hiden field -->

@@ -1,0 +1,342 @@
+﻿﻿@model AirOut.Web.Models.Bms_Bill_Ar
+@{
+    //控件排序
+    var Num = ViewBag.Num == null ? 1 : (int)ViewBag.Num;
+    var ArrStatus = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    var ArrAuditStatus = AirOut.Web.Extensions.Common.GetEnumToDic("AuditStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    var ArrUseStatus = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusIsOrNoEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+    var ArrBms_BillCreate_Status = AirOut.Web.Extensions.Common.GetEnumToDic("Bms_BillCreate_Status", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value, DisplayName = n.DisplayName });
+}
+@Html.HiddenFor(model => model.Id)
+@*<div class="row">*@
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Dzbh, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Dzbh, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Dzbh,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Line_No, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Line_No, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Line_No,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Account, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Account, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Account,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Account2, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Account2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Account2,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Money_Code, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Money_Code, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Money_Code,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Object, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Object, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Object,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Payway, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Payway, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Payway,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Object_Id, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Object_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Object_Id,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Object_Name, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Object_Name, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Object_Name, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Type, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Type, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Type,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Date, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Date, new { htmlAttributes = new { @class = "easyui-datetimebox", @Value = (Model.Bill_Date == null ? "" : ((DateTime)Model.Bill_Date).ToString("yyyy-MM-dd HH:mm:ss")), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Date,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Summary, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Summary, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Summary,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Remark, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,100]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Remark,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Create_Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Create_Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Create_Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bill_Id, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bill_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bill_Id,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Dk_Operation_Id, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Dk_Operation_Id, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Dk_Operation_Id,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Bgj_No, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Bgj_No, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Bgj_No,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Org_Money_Code, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Org_Money_Code, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Org_Money_Code,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Org_Bill_Account2, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Org_Bill_Account2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Org_Bill_Account2,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Ex_Rate, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Ex_Rate, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Ex_Rate,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Hk_Line_No, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Hk_Line_No, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Hk_Line_No,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Jk_Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Jk_Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Jk_Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Jk_No, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Jk_No, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Jk_No,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Nowent_Acc, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Nowent_Acc, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,precision:2", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Nowent_Acc,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Ishk_Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Ishk_Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Ishk_Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Sbsx_Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Sbsx_Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Sbsx_Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Dsdf_Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Dsdf_Status, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:true,precision:0", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Dsdf_Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.AuditId, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AuditId, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,20]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.AuditId, "", new { @class = "text-danger" })
+</div>
+@Html.HiddenFor(model => model.AuditName)
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.AuditDate, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AuditDate, new { htmlAttributes = new { @class = "easyui-datetimebox", @Value = (Model.AuditDate == null ? "" : ((DateTime)Model.AuditDate).ToString("yyyy-MM-dd HH:mm:ss")), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.AuditDate,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.AuditStatus, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.AuditStatus, new { htmlAttributes = new { @class = "easyui-combogrid", @Value = (int)Model.AuditStatus, data_options = "required:false", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.AuditStatus,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Cancel_Id, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Cancel_Id, new { htmlAttributes = new { @class = "easyui-combogrid", data_options = "required:false,validType:'length[0,20]'", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Cancel_Id, "", new { @class = "text-danger" })
+</div>@Html.HiddenFor(model => model.Cancel_Name)
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Cancel_Date, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Cancel_Date, new { htmlAttributes = new { @class = "easyui-datetimebox", @Value = (Model.Cancel_Date == null ? "" : ((DateTime)Model.Cancel_Date).ToString("yyyy-MM-dd HH:mm:ss")), tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Cancel_Date,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @class = "easyui-textbox", @Value = (int)Model.Status, data_options = "required:true", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.Status,"" , new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.ADDWHO, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.ADDWHO, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.ADDTS, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", @Value = (Model.ADDTS == null ? "" : ((DateTime)Model.ADDTS).ToString("yyyy-MM-dd HH:mm:ss")), data_options = "required:false", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.ADDTS, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.EDITWHO, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false,readonly:true", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.EDITWHO, "", new { @class = "text-danger" })
+</div>
+<div class="form-group col-lg-3 col-md-3 col-sm-3">
+    @Html.LabelFor(model => model.EDITTS, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", @Value = (Model.EDITTS == null ? "" : ((DateTime)Model.EDITTS).ToString("yyyy-MM-dd HH:mm:ss")), data_options = "required:false,readonly:true", tabindex = Num++, style = "width:100%" } })
+    @Html.ValidationMessageFor(model => model.EDITTS, "", new { @class = "text-danger" })
+</div>
+@*</div>*@
+<!-- output all Scaffold = false Hiden field -->
+@Html.HiddenFor(model => model.OperatingPoint)
+@Html.HiddenFor(model => model.ADDID)
+@Html.HiddenFor(model => model.EDITID)
+<!--end output all Scaffold = false Hiden field -->
+<script>
+    const ArrStatus = @Html.Raw(ArrStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrStatus));//数据状态
+    const ArrAuditStatus = @Html.Raw(ArrAuditStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrAuditStatus));//数据审核状态
+    const ArrUseStatus = @Html.Raw(ArrUseStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrUseStatus));//数据bool状态
+    const ArrBms_BillCreate_Status = @Html.Raw(ArrBms_BillCreate_Status == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrBms_BillCreate_Status));//账单产生标志
+
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        //状态
+        $('#Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrStatus
+        }));
+        //审核状态
+        $('#AuditStatus').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrAuditStatus
+        }));
+        //审核人
+        $('#AuditId').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1:'/AccountManage/Get_PageUserList'+_FromCache,
+            idField: 'Id',
+            valueField: 'Id',
+            textField: 'UserNameDesc',
+            columns: [[
+                { field: 'UserNameDesc', title: '名称', width: 60 },
+                { field: 'UserName', title: '帐户', width: 100 }
+            ]],
+            onChange: function () {
+                var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                if (Selted) {
+                    var AuditId = Selted["UserNameDesc"];
+                    if (!(typeof AuditId === 'undefined' || AuditId == null ||AuditId=='')) {
+                        $("#AuditName").val(AuditId);
+                    }else{
+                        $.messager.alert('警告',"审核人名称，无法取到！");
+                    }
+                }
+            }
+        }));
+        //作废人
+        $('#Cancel_Id').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1:'/AccountManage/Get_PageUserList'+_FromCache,
+            idField: 'Id',
+            valueField: 'Id',
+            textField: 'UserNameDesc',
+            columns: [[
+                { field: 'UserNameDesc', title: '名称', width: 60 },
+                { field: 'UserName', title: '帐户', width: 100 }
+            ]],
+            onChange: function () {
+                var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                if (Selted) {
+                    var Cancel_Id = Selted["UserNameDesc"];
+                    if (!(typeof Cancel_Id === 'undefined' || Cancel_Id == null ||Cancel_Id=='')) {
+                        $("#Cancel_Name").val(Cancel_Id);
+                    }else{
+                        $.messager.alert('警告',"作废人名称，无法取到！");
+                    }
+                }
+            }
+        }));
+        //币种
+        $('#Money_Code').combogrid($.extend({}, combogrid_DefaultSettings, {
+            required: true,
+            url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache
+        }));
+        //原始币别
+        $('#Org_Money_Code').combogrid($.extend({}, combogrid_DefaultSettings, {
+            required: true,
+            url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache
+        }));
+        //供方代码
+        $('#Bill_Object_Id').combogrid($.extend({}, combogrid_DefaultSettings, {
+            required: true,
+            url: '/CusBusInfos/GetPagerCusBusInfos'+_FromCache,
+            onChange: function () {
+                var Selted = $(this).combogrid('grid').datagrid('getSelected');
+                if (Selted) {
+                    if (!(typeof datarow === 'undefined' || datarow == null)) {
+                        $("#Bill_Object_Name").textbox('setValue',Selted[$(this).combogrid('options').textField]);
+                    }
+                }
+            }
+        }));
+        //支付方式
+        $("#Payway").combogrid($.extend({}, combogrid_DefaultSettings, {
+            required:true,
+            url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=PayWay'
+        }));
+        //产生标志
+        $('#Create_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            disabled: true,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrBms_BillCreate_Status
+        }));
+        //账单类型
+        $('#Bill_Type').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=Bill_Type'
+        }));
+        //集卡产生标志
+        $('#Jk_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:false,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrUseStatus
+        }));
+        //记录是否传入香港
+        $('#Ishk_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:false,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrUseStatus
+        }));
+        //实报实销状态
+        $('#Sbsx_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:false,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrUseStatus
+        }));
+        //代收代付状态
+        $('#Dsdf_Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:false,
+            mode: 'loacl',
+            pagination: false,
+            data:ArrUseStatus
+        }));
+    }
+
+</script>

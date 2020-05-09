@@ -1,0 +1,919 @@
+﻿@model IEnumerable<TMI.Web.Models.Rate>
+@{
+    ViewBag.Title = "汇率维护";
+	var Num = 1;
+
+    var ArrStatus = TMI.Web.Extensions.Common.GetEnumToDic("UseStatusEnum", "TMI.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value.ToString(), TEXT = n.DisplayName, Value = n.Value.ToString(), DisplayName = n.DisplayName });
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script src="~/Scripts/jsext.js"></script>
+<!--真实 下载进度条 -->
+<script async defer src="~/Scripts/DownLoadProgress.js"></script>
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+</script>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">基础资料</a>
+            </li>
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+	<div class="row">
+	    <div class="col-lg-12">
+	        <div class="ibox float-e-margins">
+	            <div class="ibox-title">
+	                <h5>汇率维护表</h5>
+	                <div class="ibox-tools">
+	                    <a class="collapse-link">
+	                        <i class="fa fa-chevron-up"></i>
+	                    </a>
+						<!--
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	                        <i class="fa fa-wrench"></i>
+	                    </a>
+	                    <ul class="dropdown-menu dropdown-user">
+	                        <li>
+	                            <a href="table_data_tables.html#">Config option 1</a>
+	                        </li>
+	                        <li>
+	                            <a href="table_data_tables.html#">Config option 2</a>
+	                        </li>
+	                    </ul>
+	                    <a class="close-link">
+	                        <i class="fa fa-times"></i>
+	                    </a>
+						-->
+	                </div>
+	            </div>
+	            <div class="ibox-content">
+	                <!--<form id="searchform" method="post" style="padding-bottom:10px; width:auto">
+                        <div id="div_search" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="查询条件"
+                             data-options="collapsible:true">
+                            <div class="form-group col-md-3">
+                                <label for="name">进出口标志:</label>
+                                <input id="I_E_FLAG" name="I_E_FLAG" tabindex="@(Num++)" data-options="prompt1:'进出口标志'" style="width:100%" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="name">接单日期起:</label>
+                                <input id="_ADDTS" name="_ADDTS" tabindex="@(Num++)" data-options="prompt1:'接单日期起'" style="width:100%" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="name">接单日期讫:</label>
+                                <input id="ADDTS_" name="ADDTS_" tabindex="@(Num++)" data-options="prompt1:'接单日期讫'" style="width:100%" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="name">预关务流水号:</label>
+                                <input id="Yucustomsflowno" name="Yucustomsflowno" tabindex="@(Num++)" data-options="prompt1:'预关务流水号'" style="width:100%" class="easyui-textbox" type="text" />
+                            </div>
+                        </div>
+                    </form>-->
+					<div class="table-responsive">
+		           	    <table id="rate_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+							data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: true,
+							toolbar: '#rate_toolbar',
+							url: '/Rates/GetData',
+							method: 'get',
+							onClickCell: onClickCell,
+							onSelect:onSelect,
+							pagination: 'true',
+                            onBeginEdit:onBeginEdit">
+		                <thead>
+		                    <tr>
+		                        <th data-options="field:'ck',checkbox:true"></th>
+								@*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+								@*<th data-options="field:'LocalCurrency',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]' 
+										}
+								}">@Html.DisplayNameFor(model => model.LocalCurrency)</th>*@
+								<th data-options="field:'LocalCurrCode',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'combogrid',
+										options:{
+											required:false ,
+                                            validType:'length[0,20]' 
+										}
+								}">@Html.DisplayNameFor(model => model.LocalCurrCode)</th>
+								@*<th data-options="field:'ForeignCurrency',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]' 
+										}
+								}">@Html.DisplayNameFor(model => model.ForeignCurrency)</th>*@
+                                <th data-options="field:'ForeignCurrCode',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'combogrid',
+										options:{
+											required:false ,
+                                            validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.ForeignCurrCode)</th>
+								<th data-options="field:'Year',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:true ,
+                                            precision:0 
+										} 
+								}">@Html.DisplayNameFor(model => model.Year)</th>
+                                <th data-options="field:'Month',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:true ,
+                                            precision:0
+										}
+								}">@Html.DisplayNameFor(model => model.Month)</th>
+                                <th data-options="field:'RecRate',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:true ,
+                                            precision:4
+										} 
+								}">@Html.DisplayNameFor(model => model.RecRate)</th>
+								<th data-options="field:'PayRate',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:true ,
+                                            precision:4 
+										} 
+								}">@Html.DisplayNameFor(model => model.PayRate)</th>
+								@*<th data-options="field:'Description',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]' 
+										}
+								}">@Html.DisplayNameFor(model => model.Description)</th>*@
+                                <th data-options="field:'Status',width:120,
+                                    formatter:UsedformatterByArrStatus,
+									editor: {
+										type:'combogrid',
+										options:{
+											required:true ,
+                                            precision:2
+										}
+								}">@Html.DisplayNameFor(model => model.Status)</th>
+								@*<th data-options="field:'OperatingPoint',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:true ,precision:0 
+										} 
+								}">@Html.DisplayNameFor(model => model.OperatingPoint)</th>*@
+								<th data-options="field:'ADDWHO',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,
+                                            validType:'length[0,50]' 
+										}
+								}">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+								<th data-options="field:'ADDTS',width:160,align:'right',sortable:true,resizable:true,
+									formatter:datetimeformatter,
+									editor:{
+										type:'datetimebox',
+										options:{
+											required:false    
+										}
+								}">@Html.DisplayNameFor(model => model.ADDTS)</th>
+								<th data-options="field:'EDITWHO',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,
+                                            validType:'length[0,50]' 
+										}
+								}">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+								<th data-options="field:'EDITTS',width:160,align:'right',sortable:true,resizable:true,
+									formatter:datetimeformatter,
+									editor:{
+										type:'datetimebox',
+										options:{
+											required:false    
+										}
+								}">@Html.DisplayNameFor(model => model.EDITTS)</th>	
+							</tr>
+						</thead>
+	 				</table>
+					<div id="rate_toolbar" style="height:auto">
+						@if (Html.IsAuthorize("Create"))
+						{
+						    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                        }
+						@if (Html.IsAuthorize("Delete"))
+						{
+							<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+						}
+						@if (Html.IsAuthorize("Edit"))
+						{
+						    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+						}
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+						@if (Html.IsAuthorize("Import"))
+						{
+							<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+							<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+						}
+						@*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>*@
+					</div>
+				</div>
+				<!-- end ibox-content -->
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入"   data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        console.log(@Html.Raw(Html.RenderVue_ModelJson()));
+        const ArrStatus = @Html.Raw(ArrStatus == null ? "[]" : Newtonsoft.Json.JsonConvert.SerializeObject(ArrStatus));//数据状态
+        const Editable = '@Html.IsAuthorize("Rates", "Index", "Edit")';//编辑权限
+
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'Rate' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    //console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+                }
+            });
+        });
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        function exportexcel() {
+            var opts = $dg.datagrid('options');
+            //var filterRules = JSON.stringify(opts.filterRules);
+            //$.messager.progress({ title: '正在执行导出！' });
+            //var formData = new FormData();
+            //formData.append('filterRules', filterRules);
+            //formData.append('sort', 'Id');
+            //formData.append('order', 'asc');
+            //$.postDownload('/Rates/ExportExcel', formData, function (fileName) {
+            //	$.messager.progress('close');
+            //});
+
+            var formData = { filterRules: opts.filterRules,sort:opts.sortName,order:opts.sortOrder };
+            var url = '/Rates/ExportExcel';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: postdata,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function () {
+                    $.messager.progress('close');
+                }
+            });
+        }
+
+        var $dg = $('#rate_datagrid');
+        var editIndex = undefined;
+
+        //datagrid  键盘事件dg_keyHandler(写在 jsext 文件中)
+        //datagrid 编辑时的 combogrid通用参数设置
+        var dg_combo_coSettings = combogrid_DefaultSettings;
+        //datagrid 编辑时的 combogrid参数设置
+        var Arrcombogrid_Settings = {};
+        Arrcombogrid_Settings = function setInitCombogridSettings() {
+            var _Arrcombogrid_Settings = {};
+            _Arrcombogrid_Settings['rate_datagrid'] = {
+                'LocalCurrCode': $.extend({}, dg_combo_coSettings, {
+                    required: true,
+                    textField: 'ID',
+                    url: '/PARA_Currs/GetPagerPARA_CURR_FromCache',
+                }),
+                'ForeignCurrCode': $.extend({}, dg_combo_coSettings, {
+                    required: true,
+                    textField: 'ID',
+                    url: '/PARA_Currs/GetPagerPARA_CURR_FromCache',
+                }),
+                'Status': $.extend({}, dg_combo_coSettings, {
+                    required: true,
+                    mode: 'local',
+                    pagination: false,
+                    data: ArrStatus,
+                    textField: 'ID'
+                }),
+            };
+            ////bool状态
+            //var ArrboolCol = [
+            //    /*应收/应付*/
+            //    "Create_Status"//产生标志
+            //];
+            ////设置combogrid-bool状态
+            //for (var i in _Arrcombogrid_Settings) {
+            //    for (var ii in ArrboolCol) {
+            //        _Arrcombogrid_Settings[i][ArrboolCol[ii]] = $.extend({}, dg_combo_coSettings, {
+            //            required: true,
+            //            mode: 'local',
+            //            pagination: false,
+            //            data: ArrUseStatus
+            //        });
+            //    }
+            //}
+            return _Arrcombogrid_Settings;
+        }();
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            var row = $dg.datagrid('getData').rows[rowIndex];
+            var num = 0;
+            var regx = /^\/Date\([0-9]+(\)\/)$/g;
+            for (var i in rowData) {
+                if (regx.test(rowData[i])) {
+                    rowData[i] = datetimeformatter(rowData[i]);
+                }
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            console.log($(this).attr('id'));
+                            let combogrid_Setting = Arrcombogrid_Settings[$(this).attr('id')][targetEditor.field];
+                            if (combogrid_Setting) {
+                                //设置 combogrid 参数（回车下一个等）利用JS闭包原理，让js不回收变量
+                                var fnGetcmgrid_Setting = function (_combogrid_Setting, field, _rowIndex) {
+                                    return $.extend(combogrid_Setting, {
+                                        onLoadSuccess: function (data) {
+                                            ondgLoadSuccess($dg, field, _rowIndex);
+                                        }
+                                    }, dg_keyHandler);
+                                };
+                                $(targetEditor.target).combogrid(fnGetcmgrid_Setting(combogrid_Setting, targetEditor.field, rowIndex));
+                                //账单类型 keyup事件 小写转大写
+                                $(targetEditor.target).combogrid("textbox").bind('keyup', function (event) {
+                                    var keyCode = event.which || event.keycode;
+                                    //console.log(keyCode);
+                                    if (keyCode != 229)//输入法占位符
+                                        this.value = this.value.toUpperCase();
+                                });
+                                //设置Combogrid 分页控件 简单模式
+                                SetCombogridPager(targetEditor.target);
+                            }
+
+                            if (!(typeof(OldVal) === 'undefined'|| OldVal == null || OldVal == '')) {
+                                if (rowData[targetEditor.field]) {
+                                    OldVal = rowData[targetEditor.field];
+                                }
+                                $(targetEditor.target).combogrid('setValue', OldVal);
+                                var opts = $(targetEditor.target).combogrid('options');
+                                var url = opts.url;
+                                //设置查询参数
+                                var queryParams = {
+                                    page: 1,
+                                    rows: opts.pageSize,
+                                    q: OldVal
+                                };
+                                $(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                            }
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "textbox":
+                        case "numberbox":
+                        case "datebox":
+                        case "datetimebox":
+                            var data = $(targetEditor.target).data();
+                            var options = {
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        dg_Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            };
+                            var $target = $(targetEditor.target);
+                            $target.textbox(options);
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "checkbox":
+                        case "radio":
+                            $(targetEditor.target).keydown(function (e) {
+                                dg_chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                    }
+                }
+            }
+        }
+        //结束编辑时
+        function endEditing() {
+            if (editIndex == undefined)
+                return true;
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                if (!ValidataValue(editIndex)) {
+                    $dg.datagrid('selectRow', editIndex);
+                    $dg.datagrid('beginEdit', editIndex);
+                    return false;
+                }
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        //设置 不需要编辑的字段
+        var Arr$dgNoEditorSet = {};
+        //设置 不需要编辑的字段
+        var ColEditorNull = function () {
+            return [
+                "ADDWHO",
+                "ADDTS"
+            ];
+        }();
+        function Set$dgNoEditor(_$dg) {
+            var IsSet = false;//是否设置过
+            var funcSet = function (_ColEditorNull) {
+                if (!IsSet) {
+                    for (var i in ColEditorNull) {
+                        var Column = _$dg.datagrid('getColumnOption', ColEditorNull[i]);
+                        if (!(typeof (Column) === 'undefined' || Column == null || Column == '')) {
+                            Column.editor = {};
+                        }
+                    }
+                }
+            };
+            return {
+                IsSet: IsSet,
+                ColEditorNullColumn: ColEditorNull,
+                Set: funcSet
+            }
+        }
+        //点击单元格
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    if (!Editable)
+                    {
+                        $.messager.alert('提示', '您没有编辑权限！');
+                        return;
+                    }
+                    //动态设置 编辑样式
+                    var O$dgNoEditorSet = Arr$dgNoEditorSet[$dg.attr('id')];
+                    if (typeof (O$dgNoEditorSet) === 'undefined' || O$dgNoEditorSet == null || O$dgNoEditorSet == '') {
+                        for (var i in ColEditorNull) {
+                            var Column = $dg.datagrid('getColumnOption', ColEditorNull[i]);
+                            if (!(typeof (Column) === 'undefined' || Column == null || Column == '')) {
+                                Column.editor = {};
+                            }
+                        }
+                        Arr$dgNoEditorSet[$dg.attr('id')] = 1;
+                    }
+
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        //加载成功
+        function onLoadSuccess(rowdata) {
+            //行号自适应宽度
+            $(this).datagrid("fixRownumber");
+        }
+        //新增数据
+        function append() {
+            if (endEditing()) {
+                var NewRow = {};
+                var Columns = $dg.datagrid('getColumnFields');
+                for (var column in Columns) {
+                    if (Columns[column] == 'Status')
+                        NewRow[Columns[column]] = '1';
+                    else
+                        NewRow[Columns[column]] = null;
+                }
+                //动态设置 编辑样式
+                var O$dgNoEditorSet = Arr$dgNoEditorSet[$dg.attr('id')];
+                if (typeof (O$dgNoEditorSet) === 'undefined' || O$dgNoEditorSet == null || O$dgNoEditorSet == '') {
+                    for (var i in ColEditorNull) {
+                        var Column = $dg.datagrid('getColumnOption', ColEditorNull[i]);
+                        if (!(typeof (Column) === 'undefined' || Column == null || Column == '')) {
+                            Column.editor = {};
+                        }
+                    }
+                    Arr$dgNoEditorSet[$dg.attr('id')] = 1;
+                }
+                $dg.datagrid('insertRow', { index: 0, row: NewRow });
+                editIndex = 0 ;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            }
+        }
+        //删除
+        function removeit() {
+            var Seltdata = $dg.datagrid('getSelections');
+            if (!(typeof editIndex === 'undefined'|| editIndex ==null || isNaN(editIndex)))
+            {
+                $dg.datagrid('cancelEdit', editIndex);
+                editIndex = undefined;
+            }
+            for (var i = Seltdata.length; i > 0; i--) {
+                var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+                //console.log(rowindex);
+                $dg.datagrid('deleteRow', rowindex);
+            }
+        }
+        //接收
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    var url = '/Rates/SaveData';
+                    $.ajax({
+                        type: 'POST',
+                        url: url,//获取数据的函数
+                        async: true,//true 异步，false 同步
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                        beforeSend: function (xhr) {//发送请求前运行的函数
+                            $.messager.progress({
+                                title: '数据处理中',
+                                msg: '数据处理中，请等待...'
+                            });
+                            //验证重复提交时 请加上 这句
+                            AddAjaxActionGuidName(this);
+                        },
+                        success: function (response) {//查询成功,data为返回的数据
+                            if (response.Success) {
+                                $.messager.alert("提示", "提交成功！");
+                                $dg.datagrid('acceptChanges');
+                                $dg.datagrid('reload');
+                            }
+                            else {
+                                var ErrMsgStr = '提交错误了！';
+                                if(!(typeof(response.ErrMsg) === 'undefined' || response.ErrMsg == null || response.ErrMsg == ''))
+                                    ErrMsgStr = response.ErrMsg;
+                                $.messager.alert("错误", ErrMsgStr, 'error');
+                            }
+                        },
+                        error: function () {//查询失败
+                            $.messager.alert("错误", "提交错误了！", 'error');
+                        },
+                        complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                            $.messager.progress('close');
+                        }
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+        //刷新
+        function reload() {
+            reject();//回滚所有变更
+            $dg.datagrid('reload');
+        }
+        //字段验证
+        function ValidataValue(rowindex) {
+            var regex1 = new RegExp("^[0-9]{4}$");
+            var regex2 = new RegExp("^(?:1[0-2]|[1-9])$");
+            var regex3 = new RegExp("(^[0-9]+$)|(^[0-9]+[\.]{1}[0-9]{1,4}$)");
+            var row = $dg.datagrid('getData').rows[rowindex];
+
+            var ArrErr = [];
+            if (!regex1.test(row.Year)) {
+                ArrErr.push("'年度'字段请输入4位int型数字！");
+            }
+            if (!regex2.test(row.Month)) {
+                ArrErr.push("'月份'字段请输入[1-12]的int型数字！");
+            }
+            if (!regex3.test(row.RecRate)) {
+                ArrErr.push("'应收汇款率'字段请输入的正两位浮点数或int型数字！");
+            }
+            if (!regex3.test(row.PayRate)) {
+                ArrErr.push("'应付汇款率'字段请输入的正两位浮点数或int型数字！");
+            }
+
+            if (ArrErr.length > 0) {
+                $.messager.alert('提示', ArrErr.join("<br>"));
+                return false;
+            }
+            return true;
+        }
+        //回滚变更
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        //获取变更
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+        //选中行时
+        function onSelect(index, row) {
+            //console.log(index, row);
+        }
+        //自适应页面大小
+        function MyNavResize() {
+            var opts = $("#navbar-minimalize").NavResize('getOptions');
+            opts.Auto = false;
+            opts.OnNavResizefunc = function () {
+                //$("#edit_div_one").css('width', "100%");
+                //$("#edit_div_two").css('width', "100%");
+                //$("#OrderInfo").datagrid("resize", { width: "100%" });
+                //$("#OrderDetail").datagrid("resize", { width: "100%" });
+                //$("#ProductNameMerge").datagrid("resize", { width: "100%" });
+                //$("#Order_Head_panel").panel("resize", { width: "100%" });
+                //setTimeout(function () {
+                //    var paddigLeftRight = { "padding-left": "0px", "margin-left": "0px", "padding-right": "0px", "margin-right": "0px" };
+                //    $("#edit_div_one").css(paddigLeftRight);
+                //    $("#edit_div_two").css(paddigLeftRight);
+                //    $("#OrderInfo").css(paddigLeftRight);
+                //    $("#OrderDetail").css(paddigLeftRight);
+                //    $("#ProductNameMerge").css(paddigLeftRight);
+                //    $("#Order_Head_panel").css(paddigLeftRight);
+                //    SetbuttonssWidth();
+                //}, 100);
+            };
+        }
+        //页面加载完成
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                 {
+                     field: 'LocalCurrCode',
+                     type: 'combogrid',
+                     options: {
+                         method: 'get',
+                         mode: 'remote',
+                         delay: 300,
+                         multiple: false,
+                         panelHeight: 'auto',
+                         panelWidth: 230,
+                         pageSize: 10,//每页显示的记录条数，默认为10
+                         pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                         pagination: true,//是否分页
+                         idField: 'ID',
+                         valueField: 'ID',
+                         textField: 'ID',
+                         columns: [[
+                             { field: 'ID', title: '代码', width: 70 },
+                             { field: 'TEXT', title: '名称', width: 150 }
+                         ]],
+                         url: '/PARA_Currs/GetPagerPARA_CURR_FromCache',
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'LocalCurrCode');
+                             } else {
+                                 $dg.datagrid('addFilterRule', {
+                                     field: 'LocalCurrCode',
+                                     op: 'equal',
+                                     value: value
+                                 });
+                             }
+                             //自动添加 textbox 或 text的值
+                             //AutoAddFilterRule($dg);
+                             $dg.datagrid('doFilter');
+                         }
+                     }
+                 },
+                 {
+                     field: 'ForeignCurrCode',
+                     type: 'combogrid',
+                     options: {
+                         method: 'get',
+                         mode: 'remote',
+                         delay: 300,
+                         multiple: false,
+                         panelHeight: 'auto',
+                         panelWidth: 230,
+                         pageSize: 10,//每页显示的记录条数，默认为10
+                         pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                         pagination: true,//是否分页
+                         idField: 'ID',
+                         valueField: 'ID',
+                         textField: 'ID',
+                         columns: [[
+                             { field: 'ID', title: '代码', width: 70 },
+                             { field: 'TEXT', title: '名称', width: 150 }
+                         ]],
+                         url: '/PARA_Currs/GetPagerPARA_CURR_FromCache',
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'ForeignCurrCode');
+                             } else {
+                                 $dg.datagrid('addFilterRule', {
+                                     field: 'ForeignCurrCode',
+                                     op: 'equal',
+                                     value: value
+                                 });
+                             }
+                             //自动添加 textbox 或 text的值
+                             //AutoAddFilterRule($dg);
+                             $dg.datagrid('doFilter');
+                         }
+                     }
+                 },
+                 {
+                     field: 'Status',
+                     type: 'combogrid',
+                     options:{
+                         panelWidth: 230,
+                         mode: 'local',
+                         pagination: false,
+                         data: ArrStatus,
+                         idField: 'ID',
+                         valueField: 'ID',
+                         textField: 'TEXT',
+                         columns: [[
+                             { field: 'ID', title: '代码', width: 70 },
+                             { field: 'TEXT', title: '名称', width: 150 }
+                         ]],
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'Status');
+                             } else {
+                                 $dg.datagrid('addFilterRule', {
+                                     field: 'Status',
+                                     op: 'equal',
+                                     value: value
+                                 });
+                             }
+                             //自动添加 textbox 或 text的值
+                             //AutoAddFilterRule($dg);
+                             $dg.datagrid('doFilter');
+                         }
+                     }
+                 },
+                 {
+                     field: 'ADDTS',
+                     type: 'datebox',
+                     options: {
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'ADDTS');
+                             } else {
+                                 $dg.datagrid('addFilterRule', {
+                                     field: 'ADDTS',
+                                     op: 'equal',
+                                     value: value
+                                 });
+                             }
+                             //自动添加 textbox 或 text的值
+                             //AutoAddFilterRule($dg);
+                             $dg.datagrid('doFilter');
+                         }
+                     }
+                 },
+                 {
+                     field: 'EDITTS',
+                     type: 'datebox',
+                     options: {
+                         onChange: function (value) {
+                             if (value == '') {
+                                 $dg.datagrid('removeFilterRule', 'EDITTS');
+                             } else {
+                                 $dg.datagrid('addFilterRule', {
+                                     field: 'EDITTS',
+                                     op: 'equal',
+                                     value: value
+                                 });
+                             }
+                             //自动添加 textbox 或 text的值
+                             //AutoAddFilterRule($dg);
+                             $dg.datagrid('doFilter');
+                         }
+                     }
+                 }
+            ]);
+        });
+        //自动添加 textbox 或 text的值
+        function AutoAddFilterRule($dg_) {
+            var ColumnsFields = $dg_.datagrid('getColumnFields');
+            $.each(ColumnsFields, function (i, ColumnName) {
+                var input = $dg_.datagrid('getFilterComponent', ColumnName);
+                if (!(input.data("datebox") || input.data("datetimebox") || input.data("combobox") || input.data("checkbox") || input.data("combotree") || input.data("combogrid") || input.data("numberbox"))) {
+                    var rule = $dg_.datagrid('getFilterRule', ColumnName);
+                    var value = input.val();
+                    if (!(typeof (value) === 'undefined' || value == null || value == '')) {
+                        if ((rule && rule.value != value) || !rule) {
+                            $dg_.datagrid('addFilterRule', {
+                                field: ColumnName,
+                                op: 'equal',
+                                value: value
+                            });
+                        }
+                    } else {
+                        if (rule) {
+                            $dg_.datagrid('removeFilterRule', ColumnName);
+                        }
+                    }
+                }
+            });
+        }
+	 </script>
+}

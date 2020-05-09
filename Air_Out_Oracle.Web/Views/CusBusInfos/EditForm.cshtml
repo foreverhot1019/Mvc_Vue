@@ -1,0 +1,440 @@
+﻿﻿@model AirOut.Web.Models.CusBusInfo
+@{
+    //控件排序
+    var Num = 1;
+}
+<script async defer src="~/Scripts/jquery.validate.min.js"></script>
+<script async defer src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+@*<div class="row">*@
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseId, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseId, new { htmlAttributes = new { @class = "easyui-textbox1", data_options = "required:true ,validType:'length[0,20]'", tabindex = Num++, style = "width: 100%; height: 28px;line-height: 25px;" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseShortName, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseShortName, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true ,validType:'length[0,20]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseShortName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseName, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseName, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, data_options = "required:true ,validType:'length[0,100]'", style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SallerId, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.SallerId, new { htmlAttributes = new { @class = "easyui-combogrid",type="text", tabindex = Num++, data_options = "required:false ,validType:'length[0,100]'", style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.SallerId, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.SallerName)
+        </div>
+    </div>
+</div>
+@Html.HiddenFor(model => model.TopEnterpriseCode)
+@*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+    @Html.LabelFor(model => model.TopEnterpriseCode, htmlAttributes: new { @class = "control-label " })
+    @Html.EditorFor(model => model.TopEnterpriseCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+</div>*@
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseGroupCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseGroupCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseGroupCode, "", new { @class = "text-danger" })
+            @Html.ValidationMessageFor(model => model.TopEnterpriseCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseGroup, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseGroup, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:false ,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseGroup, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CIQID, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CIQID, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.CIQID,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.UnifiedSocialCreditCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.UnifiedSocialCreditCode, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:false, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.UnifiedSocialCreditCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CustomsCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CustomsCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.CustomsCode,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CHNName, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CHNName, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.CHNName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EngName, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EngName, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.EngName,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.AddressCHN, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.AddressCHN, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,200]'" } })
+            @Html.ValidationMessageFor(model => model.AddressCHN,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.AddressEng, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.AddressEng, new { htmlAttributes = new { @class = "easyui-textbox", @Value = "", data_options = "multiline:true,value:'" + Html.Raw(string.IsNullOrEmpty(Model.AddressEng) ? "" : Model.AddressEng.Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\\'").Replace("\"", "\\\"")) + "'", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.AddressEng,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.WebSite, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.WebSite, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.WebSite,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.TradeTypeCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.TradeTypeCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.TradeTypeCode,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.AreaCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.AreaCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.AreaCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CountryCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CountryCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.CountryCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CopoKindCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CopoKindCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.CopoKindCode,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CorpartiPerson, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.CorpartiPerson, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.CorpartiPerson,"" , new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ResteredCapital, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.ResteredCapital, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.ResteredCapital, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsInternalCompany, htmlAttributes: new { @class = "control-label " })
+            @Html.CheckBoxFor(model => model.IsInternalCompany, new { @class = "easyui-checkbox", tabindex = Num++, style = "width:100%; height:23px; margin:0px 0px 0px 0px;" })
+            @Html.ValidationMessageFor(model => model.IsInternalCompany, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EnterpriseType, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.EnterpriseType, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.EnterpriseType, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ECCAreaCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.ECCAreaCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.ECCAreaCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.TaxPayerType, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.TaxPayerType, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.TaxPayerType, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.InvoiceCountryCode, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.InvoiceCountryCode, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.InvoiceCountryCode, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.InvoiceAddress, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.InvoiceAddress, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,100]'" } })
+            @Html.ValidationMessageFor(model => model.InvoiceAddress, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.BankName, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.BankName, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,100]'" } })
+            @Html.ValidationMessageFor(model => model.BankName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.BankAccount, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.BankAccount, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,100]'" } })
+            @Html.ValidationMessageFor(model => model.BankAccount, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Currency, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Currency, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.Currency, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.LinkerMan, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.LinkerMan, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:false, validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.LinkerMan, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Telephone, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Telephone, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:false, validType:'length[0,100]'" } })
+            @Html.ValidationMessageFor(model => model.Telephone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Fax, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Fax, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%", data_options = "required:false, validType:'length[0,100]'" } })
+            @Html.ValidationMessageFor(model => model.Fax, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Status, new { htmlAttributes = new { @Value = (int)Model.Status, @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "required:true ,validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Delivery_Point, htmlAttributes: new { @class = "control-label " })
+            @Html.EditorFor(model => model.Delivery_Point, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", data_options = "validType:'length[0,50]'" } })
+            @Html.ValidationMessageFor(model => model.Delivery_Point, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+@*@Html.HiddenFor(model => model.TradeTypeId)
+@Html.HiddenFor(model => model.CopoKindId)*@
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.ADDWHO)
+@Html.HiddenFor(model => model.ADDTS)
+@Html.HiddenFor(model => model.OperatingPoint)
+@*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.OperatingPoint, "操作点", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.OperatingPoint, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:100%", type="text" } })
+        @Html.ValidationMessageFor(model => model.OperatingPoint,"" , new { @class = "text-danger" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.ADDWHO, "新增人", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.ADDWHO,"" , new { @class = "text-danger" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.ADDTS, "新增时间", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.ADDTS, new { htmlAttributes = new { @class = "easyui-datetimebox", tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.ADDTS,"" , new { @class = "text-danger" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.EDITWHO, "修改人", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.EDITWHO,"" , new { @class = "text-danger" })
+    </div>
+    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+        @Html.LabelFor(model => model.EDITTS, "修改时间", htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.EDITTS, new { htmlAttributes = new { @class = "easyui-datetimebox", tabindex = Num++, style = "width:100%" } })
+        @Html.ValidationMessageFor(model => model.EDITTS,"" , new { @class = "text-danger" })
+    </div>*@
+@*</div>*@
+
+<script type="text/javascript">
+    @{
+        var ArrEnum = AirOut.Web.Extensions.Common.GetEnumToDic("UseStatusEnum", "AirOut.Web.Models.AirOutEnumType").Select(n => new { ID = n.Value, TEXT = n.DisplayName });
+    }
+    var dataStatus = @Html.Raw(ArrEnum==null?"[]":Newtonsoft.Json.JsonConvert.SerializeObject(ArrEnum));
+    //渲染所有的combogrid控件
+    function initCombogrid(_FromCache) {
+        if(typeof _FromCache ==='undefined'||_FromCache==null)
+            _FromCache='';
+        var AddrEngdata = $("#AddressEng").data();
+        if(AddrEngdata){
+            AddrEngdata.textbox.options.inputEvents.keydown = function(event){
+                if (!event) {
+                    event = window.event;
+                }
+                var keyCode = (event.keyCode || event.which);
+                //回车事件
+                if (keyCode == 13) {
+                    var pos = getCursortPosition(this);
+                    if(pos == $(this).val().length && event.ctrlKey){
+                        textbox_keydown(this, event);
+                    }
+                }
+            };
+            var $tb = AddrEngdata.textbox.textbox.find(".textbox-text");
+            $tb.unbind("keydown").bind("keydown",AddrEngdata.textbox.options.inputEvents.keydown);
+        }
+        //状态
+        $('#Status').combogrid($.extend({},combogrid_DefaultSettings,{
+            remote:"local",
+            data: dataStatus
+        }));
+        //销售
+        $('#SallerId').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/Sallers/GetPagerSallers' + _FromCache,
+            columns: [[
+                { field: 'ID', title: 'ID', width: 30 },
+                { field: 'Code', title: '代码', width: 60 },
+                { field: 'TEXT', title: '名称', width: 120 },
+            ]],
+            onChange:function(newValue, oldValue){
+                var $cbdg = $(this);
+                var opts = $cbdg.combogrid('options');
+                var textField = opts.textField;
+                var Selted = $cbdg.combogrid('grid').datagrid('getSelected');
+                if(Selted){
+                    $("#SallerName").val(Selted[textField]);
+                }
+            }
+        }));
+        //集团代码
+        $('#EnterpriseGroupCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/Eai_Groups/GetPagerEai_Group' + _FromCache,
+            onChange:function(newValue, oldValue){
+                var $cbdg = $(this);
+                var opts = $cbdg.combogrid('options');
+                var textField = opts.textField;
+                var Selted = $cbdg.combogrid('grid').datagrid('getSelected');
+                if(Selted){
+                    $("#EnterpriseGroup").textbox('setValue',Selted[textField]);
+                }
+            }
+        }));
+        //关区代码
+        $('#CustomsCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/PARA_Customses/GetPARA_Customs' + _FromCache,
+        }));
+        //区域代码
+        $('#AreaCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/PARA_Areas/GetPagerPARA_Area' + _FromCache
+        }));
+        //币种
+        $("#Currency").combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/PARA_CURRs/GetPagerPARA_CURR' + _FromCache
+        }));
+        //国家代码
+        $('#CountryCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/PARA_Countries/GetPagerPARA_Country' + _FromCache
+        }));
+        //企业性质代码
+        $('#CopoKindCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/CopoKinds/GetPagerCopoKinds' + _FromCache
+        }));
+        //行业类型代码
+        $('#TradeTypeCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            url1: '/TradeTypes/GetPagerTradeTypes' + _FromCache
+        }));
+        //客户分类
+        $('#EnterpriseType').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=EnterpriseType'
+        }));
+        //开户币种
+        $('#Currency').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/PARA_CURRs/GetPagerPARA_CURR' + _FromCache
+        }));
+        //开票国家代码
+        $('#InvoiceCountryCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/PARA_Countries/GetPagerPARA_Country' + _FromCache
+        }));
+        //ECCAreaCode
+        $('#ECCAreaCode').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/PARA_Areas/GetPagerPARA_Area' + _FromCache
+        }));
+        //纳税人性质
+        $('#TaxPayerType').combogrid($.extend({},combogrid_DefaultSettings,{
+            required:true,
+            url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=TaxPayerType'
+        }));
+        //交货地点
+        $('#Delivery_Point').combogrid($.extend({},combogrid_DefaultSettings,{
+            //required:true,
+            url1: '/BD_DEFDOC_LISTS/GetPager_DEFDOC_DICT'+_FromCache+'?DOCCODE=Delivery_Point'
+        }));
+    }
+    $(function () {
+        initCombogrid("_FromCache");
+        var FromData = @Html.Raw(Model==null?"{}":Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        $("form").attr("id","form1");
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl('form1',null,false,FormNAMEData);
+    });
+</script>

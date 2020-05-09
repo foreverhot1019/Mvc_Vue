@@ -1,0 +1,43 @@
+/*status === 200 错误返回一般都是 json格式，除了500错误会是html（一般不会出现）
+  除了200 其他都是错误 如：400-badRequest,500-Server Error
+  200 可能也会报错：正常的数据验证错误，按照文档规范返回*/
+//获取Token
+fetch("/Token", {
+  method: "POST",
+  headers: {
+  	"Content-Type": "application/x-www-form-urlencoded",//必须是这个
+  },
+  body: 'client_id=test123'+//必须是某个字段
+        '&client_secret=testPSW789'+//必须是某个字段
+        '&UserName=Michael'+//可自定义
+        '&grant_type=client_credentials'+//必须是password
+        '&response_type=token'//必须是token
+}).then(function(res) {
+  console.log(res);//返回格式是JSON
+  return res.json();
+}).then(function(resJson){console.log(resJson)});
+
+//刷新Token
+fetch("/Token", {
+  method: "POST",
+  headers: {
+  	"Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: 'client_id=test123'+//必须是某个字段
+        '&client_secret=testPSW789'+//必须是某个字段
+        '&refresh_token=d9f23374-fe82-4aac-8f3f-88ed90a4e765'+//必须上次返回的acess_token中的refresh_token
+        '&grant_type=refresh_token'+//必须是refresh_token
+        '&response_type=token'//必须是token
+}).then(function(res) {
+  return res.json();
+}).then(function(resJson){console.log(resJson)});
+
+fetch("/api/values", {
+  headers: {
+      Authorization:"bearer 79KW1ZX0raroQeYA0trlT_XhNaZ_yuNt40BLPXtLpHjXYDEdlRK0TAV9Jy6SoHN1Q3H7694BaULPm_RejzGKLQcDkGaXPNbPE0i65p1iF3xjYUjOkayQYltcHNuT_OkyXoR0F4UhEuMLuhlworCz3kT9XxaeMKddj7RGdmd6g075brOdj-uVQq_cd1ou8Ie-h92zFVuWDBCeoARHwMfRaLIys3hkR5mbSsn8dHhvrvlOe89sR8BqOw67MjGrPbUh"
+      ,"Content-Type": "application/json",
+  }
+}).then(function(res) {
+  console.log(res);
+  return res.text();
+}).then(function(resJson){console.log(resJson)});

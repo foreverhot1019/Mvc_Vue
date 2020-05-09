@@ -1,0 +1,966 @@
+﻿@model IEnumerable<AirOut.Web.Models.CusBusInfo>
+@{
+    ViewBag.Title = "客商管理";
+    var Num = 1;
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script type="text/javascript" src="~/Scripts/jsext.js?date=2019012501"></script>
+<!--真实 下载进度条 -->
+<script async defer src="~/Scripts/DownLoadProgress.js"></script>
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+</script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">客商管理</a>
+            </li>
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <!--<div class="ibox-title">
+                    <h5>客商信息</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="table_data_tables.html#">Config option 1</a>
+                            </li>
+                            <li>
+                                <a href="table_data_tables.html#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>-->
+                <div class="ibox-content">
+                    <form id="searchform" method="post" style="padding-bottom:10px; width:auto">
+                        <div id="div_search" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="查询条件"
+                             data-options="collapsible:true">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label for="name" style="width:100px">业务伙伴代码:</label>
+                                <input id="EnterpriseIdQuery" name="EnterpriseIdQuery" tabindex="@(Num++)" data-options="prompt1:'业务伙伴代码'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label for="name" style="width:100px">业务伙伴简称:</label>
+                                <input id="EnterpriseShortNameQuery" name="EnterpriseShortNameQuery" tabindex="@(Num++)" data-options="prompt1:'业务伙伴简称'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">海关编码:</label>
+                                <input id="CIQIDQuery" name="CIQIDQuery" tabindex="@(Num++)" data-options="prompt1:'海关编码'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">业务伙伴中文名称:</label>
+                                <input id="CHINNAMEQuery" name="CHINNAMEQuery" tabindex="@(Num++)" data-options="prompt1:'业务伙伴中文名称'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">业务伙伴英文名称:</label>
+                                <input id="EngNameQuery" name="EngNameQuery" tabindex="@(Num++)" data-options="prompt1:'业务伙伴英文名称'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">建档人:</label>
+                                <input id="ADDWHOQuery" name="ADDWHOQuery" tabindex="@(Num++)" data-options="prompt1:'建档人'" style="width:*" class="easyui-textbox" type="text" />
+                            </div>
+                        </div>
+                    </form>
+
+                    <table id="cusbusinfo_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                           data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: true,
+							toolbar: '#cusbusinfo_toolbar',
+							url: '/CusBusInfos/GetData',
+							method: 'get',
+							onClickCell: onClickCell,
+                            onDblClickRow:onDblClickRow,
+							onSelect:onSelect,
+							pagination: 'true',
+                            onBeginEdit:onBeginEdit">
+                        <thead>
+                            <tr>
+                                <th data-options="field:'ck',checkbox:true"></th>
+                                @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+                                <th data-options="field:'EnterpriseId',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:true ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.EnterpriseId)</th>
+                                <th data-options="field:'EnterpriseShortName',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.EnterpriseShortName)</th>
+                                <th data-options="field:'EnterpriseName',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.EnterpriseName)</th>
+                                <th data-options="field:'CIQID',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CIQID)</th>
+                                <th data-options="field:'CHECKID',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CHECKID)</th>
+                                <th data-options="field:'CustomsCode',width:140,sortable:true,resizable:true,
+									formatter:joinformatter,
+                                    editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CustomsCode)</th>
+                                <th data-options="field:'CHNName',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CHNName)</th>
+                                <th data-options="field:'EngName',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.EngName)</th>
+                                <th data-options="field:'AddressCHN',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.AddressCHN)</th>
+                                <th data-options="field:'AddressEng',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.AddressEng)</th>
+                                <th data-options="field:'WebSite',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.WebSite)</th>
+                                <th data-options="field:'CopoKindCode',width:140,sortable:true,resizable:true,
+									formatter:joinformatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CopoKindCode)</th>
+                                <th data-options="field:'TradeTypeCode',width:140,sortable:true,resizable:true,
+									formatter:joinformatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.TradeTypeCode)</th>
+                                <th data-options="field:'AreaCode',width:140,sortable:true,resizable:true,
+									formatter:joinformatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.AreaCode)</th>
+                                <th data-options="field:'CountryCode',width:140,sortable:true,resizable:true,
+									formatter:joinformatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.CountryCode)</th>
+                                <th data-options="field:'Status',width:140,sortable:true,resizable:true
+                                    ,formatter:function(value,row){
+										if(value=='0') return '草稿';
+										if(value=='1') return '启用';
+										if(value=='-1') return '停用';
+									},
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.Status)</th>
+                             
+                            </tr>
+                        </thead>
+                    </table>
+                    <div id="cusbusinfo_toolbar" style="height:auto">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="searchf()">查询</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="clearfrom()">重置</a>
+                        @if (Html.IsAuthorize("Create"))
+                        {
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新建</a>
+                        }
+                        @*@if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }*@
+                        @if (Html.IsAuthorize("Edit"))
+                        {
+                            @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>*@
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                        }
+                        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-star',plain:true" onclick="enable()">启用</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-stop',plain:true" onclick="endenable()">停用</a>
+                        @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>*@
+                        @if (Html.IsAuthorize("Import"))
+                        {
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                            @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>*@
+                        }
+                    </div>
+                </div>
+                <!-- end ibox-content -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'CusBusInfo' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    //console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+                }
+            });
+        });
+
+        function importexcel() {
+            ////打开导入对话框
+            //$('#importwindow').window('open');
+        }
+        //点击启用按钮时，触发
+        function enable() {
+            $.messager.confirm('确认对话框', '您确认启用该客商！', function (r) {
+                if (r) {
+                    //var rows = $dg.datagrid('getSelections');
+                    var row = $dg.datagrid('getSelected');
+                    if (row.Status == "1") {
+                        $.messager.alert("提示对话框", "当前选中客商信息已为启用状态！", 'info'); return;
+                    }
+                    $dg.datagrid('beginEdit', editIndex);//开启当前行的编辑
+                    var ed = $dg.datagrid('getEditor', { index: editIndex, field: 'Status' });//获取当前行需要编辑的状态列
+                    $(ed.target).textbox('setValue', '1');//编辑状态列的字段
+                    $dg.datagrid('endEdit', editIndex);//关闭当前行
+                    accept();
+                }
+            });
+        }
+        //点击停用按钮时，触发
+        function endenable() {
+            $.messager.confirm('确认对话框', '您确认停用该客商！', function (r) {
+                if (r) {
+                    var row = $dg.datagrid('getSelected');
+                    if (row.Status == "-1") {
+                        $.messager.alert("提示对话框", "当前选中的信息已为停用状态！", "info");
+                    }
+                    $dg.datagrid('beginEdit', editIndex);
+                    var ed = $dg.datagrid("getEditor", { index: editIndex, field: 'Status' });
+                    $(ed.target).textbox("setValue", "-1");
+                    $dg.datagrid('endEdit', editIndex);
+                    accept()
+                }
+            });
+        }
+        //点击重置按钮时，触发，清空查询条件
+        function clearfrom() {
+            $('#searchform').form('clear');
+        }
+        //点击查询按钮时，触发
+        function searchf() {
+            setfilteropts();//设置查询条件
+            //var opts = $('#cusbusinfo_datagrid').datagrid('options');
+            //opts.url = '/CusBusInfos/GetData';
+            //opts.pageNumber = 1;
+            //var pager = $('#cusbusinfo_datagrid').datagrid('getPager');
+            //pager.pagination('refresh', {
+            //    pageNumber: 1
+            //});
+            $('#cusbusinfo_datagrid').datagrid('reload');
+        }
+        //设置查询条件
+        function setfilteropts() {
+            var EnterpriseId = $("#EnterpriseIdQuery").textbox("getValue");
+            var EnterpriseShortName = $("#EnterpriseShortNameQuery").textbox("getValue");
+            var CIQID = $("#CIQIDQuery").textbox("getValue");
+            var CHINNAME = $("#CHINNAMEQuery").textbox("getValue");
+            var EngName = $("#EngNameQuery").textbox("getValue");
+            var ADDWHO = $("#ADDWHOQuery").textbox("getValue");
+
+            var params = [];
+            var opts = $('#cusbusinfo_datagrid').datagrid('options');
+            if (!(typeof (EnterpriseId) === 'undefined' || EnterpriseId == null || EnterpriseId == "")) {
+                params.push({ "field": "EnterpriseId", "op": "equal", "value": EnterpriseId });
+                //opts.queryParams.EnterpriseId = EnterpriseId;
+            }
+            if (!(typeof (EnterpriseShortName) === 'undefined' || EnterpriseShortName == null || EnterpriseShortName == "")) {
+                params.push({ "field": "EnterpriseShortName", "op": "equal", "value": EnterpriseShortName });
+            }
+            if (!(typeof (CIQID) === 'undefined' || CIQID == null || CIQID == "")) {
+                params.push({ "field": "CIQID", "op": "equal", "value": CIQID });
+            }
+            if (!(typeof (CHINNAME) === 'undefined' || CHINNAME == null || CHINNAME == "")) {
+                params.push({ "field": "CHINNAME", "op": "equal", "value": CHINNAME });
+            }
+            if (!(typeof (EngName) === 'undefined' || EngName == null || EngName == "")) {
+                params.push({ "field": "EngName", "op": "equal", "value": EngName });
+            }
+            if (!(typeof (ADDWHO) === 'undefined' || ADDWHO == null || ADDWHO == "")) {
+                params.push({ "field": "ADDWHO", "op": "equal", "value": ADDWHO });
+            }
+            opts.queryParams = {
+                'filterRules': JSON.stringify(params)
+            };
+        }
+        //导出
+        function exportexcel() {
+            var opts = $dg.datagrid('options');
+            //var filterRules = JSON.stringify(opts.filterRules);
+            //$.messager.progress({ title: '正在执行导出！' });
+            //var formData = new FormData();
+            //formData.append('filterRules', filterRules);
+            //formData.append('sort', 'Id');
+            //formData.append('order', 'asc');
+            //$.postDownload('/CusBusInfos/ExportExcel', formData, function (fileName) {
+            //	$.messager.progress('close');
+            //});
+            //console.log("filterRules", opts.filterRules);
+            var formData = { filterRules: opts.filterRules, sort: opts.sortName, order: opts.sortOrder };
+            var url = '/CusBusInfos/ExportExcel';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: postdata,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function () {
+                    $.messager.progress('close');
+                }
+            });
+        }
+
+        var $dg = $('#cusbusinfo_datagrid');//声明客商信息表
+        var editIndex = undefined;//记录客商信息表中的当前数据行的行号
+        //刷新客商信息表
+        function reload() {
+            reject();//回滚所有变更
+            $dg.datagrid('reload');
+        }
+
+        //combogrid 设置信息（onBeginEdit时,使用）
+        var combogrid_Settings = {
+            'COUNTRY': {
+                required: true,
+                url: '/PARA_COUNTRYS/GetPagerPARA_COUNTRY',
+                method: 'get',
+                delay: 500,
+                multiple: false,
+                panelHeight: 'auto',
+                panelWidth: 205,
+                idField: 'COUNTRY_CO',
+                valueField: 'COUNTRY_CO',
+                textField: 'COUNTRY_NA',
+                pageSize: 10,//每页显示的记录条数，默认为10
+                pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                pagination: true,//是否分页
+                columns: [[
+					{ field: 'COUNTRY_CO', title: '代码', width: 53 },
+                    { field: 'COUNTRY_NA', title: '名称', width: 150 }
+                ]],
+                onLoadSuccess: function () {
+                    ondgLoadSuccess($dg, 'COUNTRY', rowIndex);
+                },
+                onChange: function (value) {
+                    var targetEditor = $dg.datagrid('getEditor', {
+                        field: 'COUNTRY',
+                        index: editIndex
+                    });
+                    if (targetEditor != null) {
+                        var Selted = $(targetEditor.target).combogrid('grid').datagrid('getSelected');
+                        if (Selted) {
+                            var datarow = $dg.datagrid('getData').rows[editIndex];
+                            if (!(typeof datarow === 'undefined' || datarow == null)) {
+                                datarow['COUNTRY' + 'NAME'] = Selted[$(targetEditor.target).combogrid('options').textField];
+                            }
+                        }
+                    }
+                },
+                keyHandler: {
+                    up: function (e) {
+                        combogrid_upKey(this, e);
+                    },
+                    down: function (e) {
+                        combogrid_downKey(this, e);
+                    },
+                    enter: function (e) {
+                        combogrid_enterKey(this, e, $dg, 'COUNTRY', rowIndex);
+                    },
+                    query: function (q) {
+                        combogrid_query(this, q, rowIndex, {});
+                    }
+                }
+            }
+        };
+
+        //开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+            var num = 0;
+            var regx = /^\/Date\([0-9]+(\)\/)$/g;
+            for (var i in rowData) {
+                if (regx.test(rowData[i])) {
+                    rowData[i] = datetimeformatter(rowData[i]);
+                }
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (!(typeof (OldVal) === 'undefined' || OldVal == null || OldVal == '')) {
+                                if (rowData[targetEditor.field]) {
+                                    OldVal = rowData[targetEditor.field];
+                                }
+                                $(targetEditor.target).combogrid('setValue', OldVal);
+                                var opts = $(targetEditor.target).combogrid('options');
+                                var url = opts.url;
+                                //设置查询参数
+                                var queryParams = {
+                                    page: 1,
+                                    rows: opts.pageSize,
+                                    q: OldVal
+                                };
+                                $(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                            }
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "numberbox":
+                            $(targetEditor.target).numberbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "datebox":
+                            $(targetEditor.target).datebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "datetimebox":
+                            $(targetEditor.target).datetimebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "checkbox":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "radio":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                    }
+                }
+            }
+        }
+        //结束编辑
+        function endEditing() {
+            if (editIndex == undefined)
+                return true;
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        //双击行
+        function onDblClickRow(index, row) {
+            var row = $dg.datagrid('getSelected');
+            $(location).attr('href', "/CusBusInfos/Edit?id=" + row.Id);
+        }
+        //单击单元格
+        function onClickCell(index, field) {
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("CusBusInfos", "Index", "Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                        @Html.Raw("return;\r\n");
+                    }
+                    //动态设置 编辑样式
+                    var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+                    if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+                        byteColumn.editor = {};
+                        byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+                        byteColumn.editor = {};
+                        var byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+                        byteColumn.editor = {
+                            type: 'textbox',
+                            options: {
+                                required: false,
+                                validType: 'length[0,20]'
+                            }
+                        };
+                        byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+                        byteColumn.editor = {
+                            type: 'datebox',
+                            options: {
+                                required: false
+                            }
+                        };
+                    }
+
+                    //$dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        //加载成功
+        function onLoadSuccess(rowdata) {
+            //行号自适应宽度
+            $(this).datagrid("fixRownumber");
+        }
+        //新增
+        function append() {
+            $(location).attr('href', "/CusBusInfos/Create");
+            //if (endEditing()) {
+            //var NewRow = {};
+            //var Columns = $dg.datagrid('getColumnFields');
+            //for (var column in Columns) {
+            //    NewRow[Columns[column]] = null;
+            //}
+            ////动态设置 编辑样式
+            //var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+            //if(!(typeof(byteColumn)==='undefined'||byteColumn==null||byteColumn=='')){
+            //	byteColumn.editor = {
+            //	    type: 'textbox',
+            //	    options: {
+            //	        required: false,
+            //	        validType: 'length[0,20]'
+            //	    }
+            //	};
+            //	byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+            //	byteColumn.editor = {
+            //	    type: 'datebox',
+            //	    options: {
+            //	        required: false
+            //	    }
+            //	};
+            //	byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+            //	byteColumn.editor = {};
+            //	byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+            //	byteColumn.editor = {};
+            //}
+            //$dg.datagrid('insertRow', { index: 0, row: NewRow });
+            //editIndex = 0 ;
+            //$dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            //}
+        }
+        //删除
+        function removeit() {
+            var Seltdata = $dg.datagrid('getSelections');
+            if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+                $dg.datagrid('cancelEdit', editIndex);
+                editIndex = undefined;
+            }
+            for (var i = Seltdata.length; i > 0; i--) {
+                var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+                //console.log(rowindex);
+                $dg.datagrid('deleteRow', rowindex);
+            }
+        }
+        //提交
+        function accept() {
+            //if (endEditing()) {
+            if ($dg.datagrid('getChanges').length) {
+                var inserted = $dg.datagrid('getChanges', "inserted");
+                var deleted = $dg.datagrid('getChanges', "deleted");
+                var updated = $dg.datagrid('getChanges', "updated");
+                var effectRow = new Object();
+                if (inserted.length) {
+                    effectRow.inserted = inserted;
+                }
+                if (deleted.length) {
+                    effectRow.deleted = deleted;
+                }
+                if (updated.length) {
+                    effectRow.updated = updated;
+                }
+                //console.log(JSON.stringify(effectRow));
+                var url = '/CusBusInfos/SaveData';
+                $.ajax({
+                    type: 'POST',
+                    url: url,//获取数据的函数
+                    async: true,//true 异步，false 同步
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                    beforeSend: function (xhr) {//发送请求前运行的函数
+                        $.messager.progress({
+                            title: '数据处理中',
+                            msg: '数据处理中，请等待...'
+                        });
+                        //验证重复提交时 请加上 这句
+                        AddAjaxActionGuidName(this);
+                    },
+                    success: function (response) {//查询成功,data为返回的数据
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dg.datagrid('acceptChanges');
+                            $dg.datagrid('reload');
+                        }
+                        else {
+                            var ErrMsgStr = '提交错误了！';
+                            if (!(typeof (response.ErrMsg) === 'undefined' || response.ErrMsg == null || response.ErrMsg == ''))
+                                ErrMsgStr = response.ErrMsg;
+                            $.messager.alert("错误", ErrMsgStr, 'error');
+                        }
+                    },
+                    error: function () {//查询失败
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                    },
+                    complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                        $.messager.progress('close');
+                    }
+                });
+            }
+            //$dg.datagrid('acceptChanges');
+            // }
+        }
+        //回滚
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        //获取变更
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            //$dg.datagrid('enableFilter',[
+            // 	{
+            // 		field: 'Status',
+            // 		type: 'combobox',
+            // 		options: {
+            // 			panelHeight: 'auto',
+            //             data: [
+            // 				{ value: '', text: 'All' },
+            // 				{ value: 'ENTS01', text: '草稿' },
+            // 				{ value: 'ENTS02', text: '提交' },
+            // 				{ value: 'ENTS03', text: '已合并' }
+            // 			],
+            //             onChange: function (value) {
+            //                 if (value == '') {
+            //                     $dg.datagrid('removeFilterRule', 'Status');
+            //                 } else {
+            //                     $dg.datagrid('addFilterRule', {
+            //                         field: 'Status',
+            //                         op: 'equal',
+            //                         value: value
+            //                     });
+            //                 }
+            // 				//自动添加 textbox 或 text的值
+            //                 //AutoAddFilterRule($dg);
+            //                 $dg.datagrid('doFilter');
+            // 			}
+            // 		}
+            // 	},
+            // 	{
+            //           field: 'ADDTS',
+            //           type: 'datebox',
+            //           options: {
+            //               onChange: function (value) {
+            //                   if (value == '') {
+            //                       $dg.datagrid('removeFilterRule', 'ADDTS');
+            //                   } else {
+            //                       $dg.datagrid('addFilterRule', {
+            //                           field: 'ADDTS',
+            //                           op: 'equal',
+            //                           value: value
+            //                       });
+            //                   }
+            // 				  //自动添加 textbox 或 text的值
+            //                   //AutoAddFilterRule($dg);
+            //                   $dg.datagrid('doFilter');
+            //               }
+            //           }
+            //     },
+            // 	{
+            //           field: 'EDITTS',
+            //           type: 'datebox',
+            //           options: {
+            //               onChange: function (value) {
+            //                   if (value == '') {
+            //                       $dg.datagrid('removeFilterRule', 'EDITTS');
+            //                   } else {
+            //                       $dg.datagrid('addFilterRule', {
+            //                           field: 'EDITTS',
+            //                           op: 'equal',
+            //                           value: value
+            //                       });
+            //                   }
+            // 				  //自动添加 textbox 或 text的值
+            //                   //AutoAddFilterRule($dg);
+            //                   $dg.datagrid('doFilter');
+            //               }
+            //           }
+            //     },
+            //     //{
+            //     //    field: 'UNIT',
+            //     //    type: 'combogrid',
+            //     //    options: {
+            //     //        url: '/PARA_UNITS/GetPagerPARA_UNIT',
+            //     //        method: 'get',
+            //     //        multiple: false,
+            //     //        panelHeight: 'auto',
+            //     //        panelWidth: 205,
+            //     //        idField: 'UNIT_CODE',
+            //     //        valueField: 'UNIT_CODE',
+            //     //        textField: 'UNIT_NAME',
+            //     //        pageSize: 10,//每页显示的记录条数，默认为10
+            //     //        pageList: [5, 10, 20],//可以设置每页记录条数的列表
+            //     //        pagination: true,//是否分页
+            //     //        columns: [[
+            //     //            { field: 'UNIT_CODE', title: '代码', width: 53 },
+            //     //            { field: 'UNIT_NAME', title: '名称', width: 150 }
+            //     //        ]],
+            //     //        keyHandler: {
+            //     //            up: function (e) {
+            //     //                combogrid_upKey(this, e);
+            //     //            },
+            //     //            down: function (e) {
+            //     //                combogrid_downKey(this, e);
+            //     //            },
+            //     //            enter: function (e) {
+            //     //                combogrid_enterKey(this, e, $dg, '', editIndex);
+            //     //            },
+            //     //            query: function (q) {
+            //     //                combogrid_query(this, q, editIndex, {});
+            //     //            }
+            //     //        },
+            //     //        onChange: function (value) {
+            //     //            if (value == '') {
+            //     //                $dg.datagrid('removeFilterRule', 'UNIT');
+            //     //            } else {
+            //     //                $dg.datagrid('addFilterRule', {
+            //     //                    field: 'UNIT',
+            //     //                    op: 'equal',
+            //     //                    value: value
+            //     //                });
+            //     //            }
+            //     //            //自动添加 textbox 或 text的值
+            //     //            AutoAddFilterRule($dg);
+            //     //            $dg.datagrid('doFilter');
+            //     //        }
+            //     //    }
+            //     //},
+            // ]);
+        });
+
+        //自动添加 textbox 或 text的值
+        function AutoAddFilterRule($dg_) {
+            var ColumnsFields = $dg_.datagrid('getColumnFields');
+            $.each(ColumnsFields, function (i, ColumnName) {
+                var input = $dg_.datagrid('getFilterComponent', ColumnName);
+                if (!(input.data("datebox") || input.data("datetimebox") || input.data("combobox") || input.data("checkbox") || input.data("combotree") || input.data("combogrid") || input.data("numberbox"))) {
+                    var rule = $dg_.datagrid('getFilterRule', ColumnName);
+                    var value = input.val();
+                    if (!(typeof (value) === 'undefined' || value == null || value == '')) {
+                        if ((rule && rule.value != value) || !rule) {
+                            $dg_.datagrid('addFilterRule', {
+                                field: ColumnName,
+                                op: 'equal',
+                                value: value
+                            });
+                        }
+                    } else {
+                        if (rule) {
+                            $dg_.datagrid('removeFilterRule', ColumnName);
+                        }
+                    }
+                }
+            });
+        }
+
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+        }
+
+        //自适应页面大小
+        function MyNavResize() {
+            var opts = $("#navbar-minimalize").NavResize('getOptions');
+            opts.Auto = false;
+            opts.OnNavResizefunc = function () {
+                //$("#edit_div_one").css('width', "100%");
+                //$("#edit_div_two").css('width', "100%");
+                //$("#OrderInfo").datagrid("resize", { width: "100%" });
+                //$("#OrderDetail").datagrid("resize", { width: "100%" });
+                //$("#ProductNameMerge").datagrid("resize", { width: "100%" });
+                //$("#Order_Head_panel").panel("resize", { width: "100%" });
+                //setTimeout(function () {
+                //    var paddigLeftRight = { "padding-left": "0px", "margin-left": "0px", "padding-right": "0px", "margin-right": "0px" };
+                //    $("#edit_div_one").css(paddigLeftRight);
+                //    $("#edit_div_two").css(paddigLeftRight);
+                //    $("#OrderInfo").css(paddigLeftRight);
+                //    $("#OrderDetail").css(paddigLeftRight);
+                //    $("#ProductNameMerge").css(paddigLeftRight);
+                //    $("#Order_Head_panel").css(paddigLeftRight);
+                //    SetbuttonssWidth();
+                //}, 100);
+            };
+        }
+    </script>
+}

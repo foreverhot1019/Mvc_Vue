@@ -1,0 +1,96 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = "页面错误";
+    string ActionUrl = "", ExpMessage = "", StackTrace = "";
+    if (Model != null)
+    {
+        ActionUrl = Model.ControllerName + "/" + Model.ActionName;
+        StackTrace = Model.Exception == null ? "" : Model.Exception.StackTrace;
+    }
+    ExpMessage = ViewBag.ExpMessage ?? (ViewBag.Message ?? "");
+}
+
+<div class="error-container">
+    <div class="well">
+        <h1 class="grey lighter smaller">
+            <span class="blue bigger-125">
+                <i class="ace-icon fa fa-random"></i>
+                500
+            </span>
+        </h1>
+
+        <hr>
+        <div class="space"></div>
+        <h4>@ActionUrl - @ExpMessage</h4>
+        <hr>
+        <h3 class="lighter smaller">
+            我们正在努力
+            <i class="ace-icon fa fa-wrench icon-animated-wrench bigger-125"></i>
+            它!
+        </h3>
+
+        <div>
+            <h4 class="lighter smaller">Meanwhile, try one of the following:</h4>
+
+            <ul class="list-unstyled spaced inline bigger-110 margin-15">
+                <li>
+                    <i class="ace-icon fa fa-hand-o-right blue"></i>
+                    Read the faq
+                </li>
+
+                <li>
+                    <i class="ace-icon fa fa-hand-o-right blue"></i>
+                    Give us more info on how this specific error occurred!
+                </li>
+            </ul>
+        </div>
+
+        <hr>
+        <div class="space"></div>
+
+        <div class="center error-desc">
+            <a href="javascript:history.back()" class="btn btn-grey">
+                <i class="ace-icon fa fa-arrow-left"></i>
+                Go Back
+            </a>
+
+            <a href="#" class="btn btn-primary">
+                <i class="ace-icon fa fa-home icon-home"></i>
+                <span class="badge">5</span>
+            </a>
+        </div>
+        <hr>
+        <div class="space"></div>
+        @if (!string.IsNullOrEmpty(StackTrace))
+        {
+            <p>
+                错误堆栈: @StackTrace
+            </p>
+        }
+    </div>
+</div>
+<script>
+    $(function ()
+    {
+        var CloseMaxTime = 10;
+        var interTime;
+        $("div.error-desc:eq(0)").find("span.badge:eq(0)").html(CloseMaxTime);
+        var timeoutTime = setTimeout(function ()
+        {
+            interTime = setInterval(function ()
+            {
+                CloseMaxTime--;
+                if (CloseMaxTime <= 0) {
+                    window.location = "/Home/Index";
+                    clearInterval(interTime);
+                } else {
+                    $("div.error-desc:eq(0)").find("span.badge:eq(0)").html(CloseMaxTime);
+                }
+            }, 1000);
+        }, 1000);
+    });
+    window.addEventListener('load', function ()
+    {
+        document.querySelector('#div_Loading').hidden = true;//必须得有，不然一直显示加载中。。。
+    }, false);
+</script>

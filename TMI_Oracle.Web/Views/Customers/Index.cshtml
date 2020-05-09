@@ -1,0 +1,1048 @@
+﻿@model IEnumerable<TMI.Web.Models.Customer>
+@{
+    ViewBag.Title = "客户信息";
+}
+<div id="app" v-cloak>
+    <!--搜索条件-->
+    <!--工具条-->
+    <el-row style="background-color: #eee; padding:10px 0px 0px 10px">
+        <el-col>
+            <el-form v-bind:inline="true" v-bind:model="filters.filterRules" size="mini" ref="tb_search">
+                <el-form-item v-for="field in ArrSearchField"
+                              v-if="!field.IsKey && field.SearchShow"
+                              v-bind:label-width="formLabelWidth"
+                              v-bind:label="field.DisplayName"
+                              v-bind:prop="field.Name"
+                              v-bind:rules="el_FormFieldRules(field,true)">
+                    <component v-if="!field.IsForeignKey" v-model="filters.filterRules[field.Name]"
+                               v-bind:is="el_inputType(field)"
+                               v-bind:prop="field.Name"
+                               v-bind:type="el_inputProtoType(field,true)"
+                               v-bind:precision="field.Precision"
+                               value-value-format="yyyy-MM-dd"
+                               range-separator="至"
+                               start-placeholder="日期起"
+                               end-placeholder="日期讫">
+                        <i slot="suffix" class="el-input__icon fa"
+                           v-show="field.Name.toLowerCase().indexOf('password')>=0"
+                           v-on:click="pswView(field)"
+                           v-bind:class="el_inputClass(field)"></i>
+                    </component>
+                    <el-select v-else v-model="filters.filterRules[field.Name]"
+                               reserve-keyword clearable
+                               v-bind:remote-method="q=>el_remoteMethod(q,field,'search')"
+                               v-bind:loading="el_selt.el_selt_loading">
+                        <template v-if="el_selt[field.Name+'_search']">
+                            <el-option v-for="item in el_selt[field.Name+'_search'].ArrOption"
+                                       v-bind:key="item.ID"
+                                       v-bind:label="item.TEXT"
+                                       v-bind:value="item.ID">
+                                @*<div class="row">
+                                        <div class="col-md-6">{{ item.TEXT }}</div>
+                                        <div class="col-md-6" style="float: right; color: #8492a6; font-size: 13px;">{{ item.ID }}</div>
+                                    </div>*@
+                            </el-option>
+                        </template>
+                    </el-select>
+                </el-form-item>
+                <br>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button type="primary" icon="el-icon-search" v-on:click="search" v-bind:loading="tbLoading">查询</el-button>
+                </el-form-item>
+                <el-form-item style="margin-bottom: 8px;">
+                    <el-button icon="el-icon-refresh" v-on:click="resetFilter('tb_search')" v-bind:disabled="tbLoading">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+    </el-row>
+    <!--按钮组-->
+    <el-row style="padding: 3px 10px 3px 10px;">
+        <el-col>
+            <el-button-group>
+                <el-button type="primary" icon="el-icon-plus" size="small" v-bind:disabled="!UserRoles.Create" v-on:click="handleAddRow">新增</el-button>
+                <el-button icon="el-icon-download" size="small" v-bind:disabled="!UserRoles.Export" v-on:click="ExportXls(tableData,'Excel导入配置')">导出</el-button>
+                <el-button icon="el-icon-upload" size="small" v-bind:disabled="!UserRoles.Import" v-on:click="ImportXls">导入</el-button>
+            </el-button-group>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col>
+            <el-table ref="Mytb" size="mini" style="width: 100%" max-height="500" row-key="Id" border stripe
+                      v-bind:default-sort="{prop:'Id',order:'descending'}"
+                      v-bind:data="tableData"
+                      v-loading="tbLoading"
+                      v-on:row-dblclick="handledblclick"
+                      v-on:selection-change="handleSelectionChange"
+                      v-on:sort-change="tbSortChange">
+                <el-table-column fixed type="selection" width="36"></el-table-column>
+                <template>
+                    @*<el-table-column show-overflow-tooltip
+                                         v-for="(field,index) in ArrField"
+                                         v-if="!field.IsKey && field.ListShow"
+                                         v-bind:width="field.Width_List"
+                                         v-bind:sortable="field.Sortable?'custom':false"
+                                         v-bind:prop="field.Name"
+                                         v-bind:label="field.DisplayName"
+                                         v-bind:formatter="formatter(field)">
+                        </el-table-column>*@
+                    @*<el-table-column show-overflow-tooltip prop="Id" label="Id" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'Id'})" width="120px"></el-table-column>*@
+                    <el-table-column show-overflow-tooltip prop="CustomerNo" label="客户编号" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'CustomerNo'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="NameChs" label="中文名" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'NameChs'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="NamePinYin" label="中文拼音" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'NamePinYin'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="NameEng" label="英文名" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'NameEng'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Sex" label="性别" sortable="custom" v-bind:formatter="formatter({Type: 'boolean', Name: 'Sex'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Birthday" label="出生年月" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'Birthday'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="ContactType" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ContactType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Contact" label="联系方式" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Contact'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="ActiveStatus" label="活跃状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'ActiveStatus', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="CustomerSource" label="客户来源" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerSource', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="CustomerLevel" label="等级" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerLevel', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="CustomerType" label="客户类型" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'CustomerType', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="ComponyName" label="公司名称" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ComponyName'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="ComponyId" label="公司" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'ComponyId', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="AirLineMember" label="航空公司会员卡" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'AirLineMember'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="OP" label="OP" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'OP'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Saller" label="销售" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Saller'})" width="150px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Status" label="使用状态" sortable="custom" v-bind:formatter="formatter({Type: 'enum', Name: 'Status', ForeignKeyGetListUrl: 'true'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="Remark" label="备注" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Remark'})" width="120px"></el-table-column>
+                    @*<el-table-column show-overflow-tooltip prop="OperatingPoint" label="操作点" sortable="custom" v-bind:formatter="formatter({Type: 'number', Name: 'OperatingPoint'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="ADDID" label="新增人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDID'})" width="120px"></el-table-column>*@
+                    <el-table-column show-overflow-tooltip prop="ADDWHO" label="新增时间" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'ADDWHO'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="ADDTS" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'ADDTS'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="EDITWHO" label="修改时间" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITWHO'})" width="120px"></el-table-column>
+                    <el-table-column show-overflow-tooltip prop="EDITTS" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'datetime', Name: 'EDITTS'})" width="120px"></el-table-column>
+                    @*<el-table-column show-overflow-tooltip prop="EDITID" label="修改人" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'EDITID'})" width="120px"></el-table-column>*@
+                    <el-table-column label="身份证信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="IdCard" label="身份证" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'IdCard'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="IdCardLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'IdCardLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="IdCardLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'IdCardLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="IdCardPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'IdCardPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.IdCardPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.IdCardPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">身份证-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="IdCardPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'IdCardPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.IdCardPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.IdCardPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">身份证-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="护照信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="Passpord" label="护照" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'Passpord'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="PasspordLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'PasspordLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="PasspordLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'PasspordLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="PasspordPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'PasspordPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.PasspordPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.PasspordPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">护照-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="PasspordPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'PasspordPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.PasspordPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.PasspordPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">护照-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="港澳通行证信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="HK_MacauPass" label="港澳通行证" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'HK_MacauPass'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HK_MacauPassLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'HK_MacauPassLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HK_MacauPassLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'HK_MacauPassLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HK_MacauPassPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'HK_MacauPassPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.HK_MacauPassPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.HK_MacauPassPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">港澳通行证-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HK_MacauPassPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'HK_MacauPassPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.HK_MacauPassPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.HK_MacauPassPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">港澳通行证-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="台湾通行证信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="TaiwanPass" label="台湾通行证" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'TaiwanPass'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TaiwanPassLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'TaiwanPassLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TaiwanPassLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'TaiwanPassLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TaiwanPassPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'TaiwanPassPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.TaiwanPassPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.TaiwanPassPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">台湾通行证-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TaiwanPassPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'TaiwanPassPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.TaiwanPassPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.TaiwanPassPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">台湾通行证-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="台胞证信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="TWIdCard" label="台胞证" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'TWIdCard'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TWIdCardLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'TWIdCardLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TWIdCardLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'TWIdCardLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TWIdCardPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'TWIdCardPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.TWIdCardPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.TWIdCardPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">台胞证-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="TWIdCardPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'TWIdCardPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.TWIdCardPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.TWIdCardPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">台胞证-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="回乡证信息" align="center">
+                        <el-table-column show-overflow-tooltip prop="HometownPass" label="回乡证" sortable="custom" v-bind:formatter="formatter({Type: 'string', Name: 'HometownPass'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HometownPassLimit_S" label="有效期起" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'HometownPassLimit_S'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HometownPassLimit_E" label="有效期讫" sortable="custom" v-bind:formatter="formatter({Type: 'date', Name: 'HometownPassLimit_E'})" width="120px"></el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HometownPassPhoto_A" label="正面照" v-bind:formatter="formatter({Type: 'string', Name: 'HometownPassPhoto_A'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.HometownPassPhoto_A)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.HometownPassPhoto_A}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">回乡证-正面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                        <el-table-column show-overflow-tooltip prop="HometownPassPhoto_B" label="反面照" v-bind:formatter="formatter({Type: 'string', Name: 'HometownPassPhoto_B'})" width="120px">
+                            <template slot-scope="scope" v-if="!ObjectIsEmpty(scope.row.HometownPassPhoto_B)">
+                                <el-popover trigger="hover" placement="top" width="50">
+                                    <img v-bind:src="`/FileUpload/GetImgMinByte?FileGuid=${scope.row.HometownPassPhoto_B}`" class="image">
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">回乡证-反面照</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>@*{ row, column, $index }*@
+                        </el-table-column>
+                    </el-table-column>
+                </template>
+                <el-table-column fixed="right" label="操作" width="47" v-if="UserRoles.Delete">
+                    <template slot-scope="sp">
+                        <el-tooltip content="删除" placement="top" effect="light">
+                            <el-button type="danger" size="mini" icon="el-icon-delete" circle v-bind:disabled="!UserRoles.Delete" v-on:click.native.prevent="deleteRow(sp.$index, sp.row)"></el-button>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!--工具条-->
+            <el-row style="padding-top: 10px;">
+                <el-col v-bind:span="8">
+                    <el-button type="danger" size="small" v-on:click="handledelSeltRow" v-bind:disabled="(UserRoles.Delete ? selctRows.length===0 : true)">批量删除</el-button>
+                </el-col>
+                <el-col v-bind:span="16">
+                    <el-pagination v-model="pagiNation" style="float:right;"
+                                   v-on:size-change="pageSizeChange"
+                                   v-on:current-change="pageCurrentChange"
+                                   v-on:prev-click="PrevPage"
+                                   v-on:next-click="NextPage"
+                                   v-bind:current-page="pagiNation.currentPage"
+                                   v-bind:page-sizes="pagiNation.pageSizes"
+                                   v-bind:page-size="pagiNation.pageSize"
+                                   v-bind:layout="pagiNation.layout"
+                                   v-bind:total="pagiNation.total">
+                    </el-pagination>
+                </el-col>
+            </el-row>
+        </el-col>
+    </el-row>
+    <!--弹出框-->
+    <el-dialog v-bind:title="dgTitle" ref="MyDialog" width="60%" center @*:fullscreen="true" rules="rules" *@
+               v-bind:visible.sync="centerDialogVisible"
+               v-loading="dlgLoading"
+               v-on:close="dlgClose"
+               v-bind:fullscreen="dlgfullscreen">
+        <div slot="title" v-on:dblclick="dlgfullscreen = !dlgfullscreen" style="cursor:move;">{{dgTitle}}</div>
+        @*:label-position="left/right/top"*@
+        <el-form ref="MyForm" v-bind:model="curr_rowdata" label-position="right" inline size="small">
+            基本信息<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户编号" prop="CustomerNo"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerNo',DisplayName:'客户编号',Required:true,Editable:false,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['CustomerNo']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="中文名" prop="NameChs"
+                          v-bind:rules="el_FormFieldRules({Name:'NameChs',DisplayName:'中文名',Required:true,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['NameChs']" v-bind:clearable="true" v-bind:style="{width:'178px'}" v-on:change="NameChsToPinYin" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="中文拼音" prop="NamePinYin"
+                          v-bind:rules="el_FormFieldRules({Name:'NamePinYin',DisplayName:'中文拼音',Required:true,Editable:true,MinLength:0,MaxLength:100})">
+                <el-input v-model="curr_rowdata['NamePinYin']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="英文名" prop="NameEng"
+                          v-bind:rules="el_FormFieldRules({Name:'NameEng',DisplayName:'英文名',Required:true,Editable:true,MinLength:0,MaxLength:100})">
+                <el-input v-model="curr_rowdata['NameEng']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="性别" prop="Sex"
+                          v-bind:rules="el_FormFieldRules({Name:'Sex',DisplayName:'性别',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-radio-group v-model="curr_rowdata['Sex']" v-bind:style="{width:'178px'}">
+                    <el-radio v-bind:label="true">男</el-radio>
+                    <el-radio v-bind:label="false">女</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="出生年月" prop="Birthday"
+                          v-bind:rules="el_FormFieldRules({Name:'Birthday',DisplayName:'出生年月',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker v-model="curr_rowdata['Birthday']" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="联系方式" prop="ContactType"
+                          v-bind:rules="el_FormFieldRules({Name:'ContactType',DisplayName:'联系方式',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ContactType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.ContactType_form">
+                        <el-option v-for="item in el_selt.ContactType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="联系方式" prop="Contact"
+                          v-bind:rules="el_FormFieldRules({Name:'Contact',DisplayName:'联系方式',Required:true,Editable:true,MinLength:0,MaxLength:100})">
+                <el-input v-model="curr_rowdata['Contact']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />详细信息<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="OP" prop="OP"
+                          v-bind:rules="el_FormFieldRules({Name:'OP',DisplayName:'OP',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['OP']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户类型" prop="CustomerType"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerType',DisplayName:'客户类型',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerType']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-on:change="CustomerTypeChange"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerType_form">
+                        <el-option v-for="item in el_selt.CustomerType_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-show="curr_rowdata['CustomerType']==2" v-bind:label-width="formLabelWidth" label="公司名称" prop="ComponyName"
+                          v-bind:rules="el_FormFieldRules({Name:'ComponyName',DisplayName:'公司名称',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['ComponyName']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-show="curr_rowdata['CustomerType']==2" v-bind:label-width="formLabelWidth" label="公司" prop="ComponyId"
+                          v-bind:rules="el_FormFieldRules({Name:'ComponyId',DisplayName:'公司',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ComponyId']"
+                           reserve-keyword clearable filterable remote
+                           v-bind:remote-method="q=>el_remoteMethod(q,{Name: 'ComponyId',ForeignKeyGetListUrl: '/Companies/GetData'},'form')"
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}"
+                           v-on:change="ComponyIdChange">
+                    <template v-if="el_selt.ComponyId_form">
+                        <el-option v-for="item in el_selt.ComponyId_form.ArrOption"
+                                   v-bind:key="item.Id"
+                                   v-bind:label="item.Name"
+                                   v-bind:value="item.Id">
+                            <div class="row">
+                                <div class="col-md-6">{{ item.CIQID }}</div>
+                                <div class="col-md-6" style="float: right; color: #8492a6; font-size: 13px;">{{ item.Name }}</div>
+                            </div>
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="航空公司会员卡" prop="AirLineMember"
+                          v-bind:rules="el_FormFieldRules({Name:'AirLineMember',DisplayName:'航空公司会员卡',Required:false,Editable:true,MinLength:0,MaxLength:100})">
+                <el-input v-model="curr_rowdata['AirLineMember']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="活跃状态" prop="ActiveStatus"
+                          v-bind:rules="el_FormFieldRules({Name:'ActiveStatus',DisplayName:'活跃状态',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['ActiveStatus']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.ActiveStatus_form">
+                        <el-option v-for="item in el_selt.ActiveStatus_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="销售" prop="Saller"
+                          v-bind:rules="el_FormFieldRules({Name:'Saller',DisplayName:'销售',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['Saller']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="等级" prop="CustomerLevel"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerLevel',DisplayName:'等级',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerLevel']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerLevel_form">
+                        <el-option v-for="item in el_selt.CustomerLevel_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="客户来源" prop="CustomerSource"
+                          v-bind:rules="el_FormFieldRules({Name:'CustomerSource',DisplayName:'客户来源',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                <el-select v-model="curr_rowdata['CustomerSource']"
+                           reserve-keyword clearable
+                           v-bind:loading="el_selt.el_selt_loading"
+                           v-bind:style="{width:'178px'}">
+                    <template v-if="el_selt.CustomerSource_form">
+                        <el-option v-for="item in el_selt.CustomerSource_form.ArrOption"
+                                   v-bind:key="item.ID|filterInt"
+                                   v-bind:label="item.TEXT"
+                                   v-bind:value="item.ID|filterInt">
+                        </el-option>
+                    </template>
+                </el-select>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="备注" prop="Remark"
+                          v-bind:rules="el_FormFieldRules({Name:'Remark',DisplayName:'备注',Required:false,Editable:true,MinLength:0,MaxLength:1000})">
+                <el-input type="textarea" v-model="curr_rowdata['Remark']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <!--身份证-->
+            <br />身份证<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="身份证" prop="IdCard"
+                          v-bind:rules="el_FormFieldRules({Name:'IdCard',DisplayName:'身份证',inputType:'text',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['IdCard']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="IdCardLimit_S"
+                          v-bind:rules="getFieldRules({Name:'IdCardLimit_S',DisplayName:'身份证有效期起',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="身份证有效期起"
+                                v-model="curr_rowdata['IdCardLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="IdCardLimit_E"
+                          v-bind:rules="getFieldRules({Name:'IdCardLimit_E',DisplayName:'身份证有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="身份证有效期讫"
+                                v-model="curr_rowdata['IdCardLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="IdCardPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'IdCardPhoto_A',DisplayName:'正面照',Required:false,Editable:true,MinLength:0,MaxLength:100})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('IdCardPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('IdCardPhoto_A',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('IdCardPhoto_A','正面照')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="IdCardPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'IdCardPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:100})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('IdCardPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('IdCardPhoto_B',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('IdCardPhoto_B','反面照')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <!--护照-->
+            <br />护照<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="护照" prop="Passpord"
+                          v-bind:rules="getFieldRules({Name:'Passpord',DisplayName:'护照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['Passpord']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="PasspordLimit_S"
+                          v-bind:rules="getFieldRules({Name:'PasspordLimit_S',DisplayName:'护照有效期起',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="护照有效期起"
+                                v-model="curr_rowdata['PasspordLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="PasspordLimit_E"
+                          v-bind:rules="getFieldRules({Name:'PasspordLimit_E',DisplayName:'护照有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="护照有效期讫"
+                                v-model="curr_rowdata['PasspordLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="PasspordPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'PasspordPhoto_A',DisplayName:'正面照',Required:false,Editable:true,MinLength:0,MaxLength:10})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('PasspordPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('PasspordPhoto_A',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="PasspordPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'PasspordPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:10})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('PasspordPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('PasspordPhoto_B',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <!--港澳通行证-->
+            <br />港澳通行证<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="港澳通行证" prop="HK_MacauPass"
+                          v-bind:rules="el_FormFieldRules({Name:'HK_MacauPass',DisplayName:'港澳通行证',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['HK_MacauPass']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="HK_MacauPassLimit_S"
+                          v-bind:rules="getFieldRules({Name:'HK_MacauPassLimit_S',DisplayName:'港澳通行证有效期起',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="港澳通行证有效期起"
+                                v-model="curr_rowdata['HK_MacauPassLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="HK_MacauPassLimit_E"
+                          v-bind:rules="getFieldRules({Name:'HK_MacauPassLimit_E',DisplayName:'港澳通行证有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="港澳通行证有效期讫"
+                                v-model="curr_rowdata['HK_MacauPassLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="HK_MacauPassPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'HK_MacauPassPhoto_A',DisplayName:'正面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('HK_MacauPassPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('HK_MacauPassPhoto_A',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="HK_MacauPassPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'HK_MacauPassPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('HK_MacauPassPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('HK_MacauPassPhoto_B',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <!--台湾通行证-->
+            <br />台湾通行证<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="台湾通行证" prop="TaiwanPass"
+                          v-bind:rules="el_FormFieldRules({Name:'TaiwanPass',DisplayName:'',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['TaiwanPass']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="TaiwanPassLimit_S"
+                          v-bind:rules="getFieldRules({Name:'TaiwanPassLimit_S',DisplayName:'台湾通行证有效期起',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="台湾通行证有效期起"
+                                v-model="curr_rowdata['TaiwanPassLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="TaiwanPassLimit_E"
+                          v-bind:rules="getFieldRules({Name:'TaiwanPassLimit_E',DisplayName:'台湾通行证有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="台湾通行证有效期讫"
+                                v-model="curr_rowdata['TaiwanPassLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="TaiwanPassPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'TaiwanPassPhoto_A',DisplayName:'正面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('TaiwanPassPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('TaiwanPassPhoto_A',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="TaiwanPassPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'TaiwanPassPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('TaiwanPassPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('TaiwanPassPhoto_B',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <!--台胞证-->
+            <br />台胞证<hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="台胞证" prop="TWIdCard"
+                          v-bind:rules="el_FormFieldRules({Name:'TWIdCard',DisplayName:'台胞证',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['TWIdCard']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="TWIdCardLimit_S"
+                          v-bind:rules="getFieldRules({Name:'TWIdCardLimit_S',DisplayName:'台胞证有效期起',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="台胞证有效期起"
+                                v-model="curr_rowdata['TWIdCardLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="TWIdCardLimit_E"
+                          v-bind:rules="getFieldRules({Name:'TWIdCardLimit_E',DisplayName:'台胞证有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="台胞证有效期讫"
+                                v-model="curr_rowdata['TWIdCardLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="TWIdCardPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'TWIdCardPhoto_A',DisplayName:'正面照',Required:false,Editable:false,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('TWIdCardPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('TWIdCardPhoto_A',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="TWIdCardPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'TWIdCardPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('TWIdCardPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('TWIdCardPhoto_B',res,file, fileList)}">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <!--回乡证-->
+            <br /><span>回乡证</span><hr />
+            <el-form-item v-bind:label-width="formLabelWidth" label="回乡证" prop="HometownPass"
+                          v-bind:rules="el_FormFieldRules({Name:'HometownPass',DisplayName:'回乡证',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-input v-model="curr_rowdata['HometownPass']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期起" prop="HometownPassLimit_S"
+                          v-bind:rules="getFieldRules({Name:'HometownPassLimit_S',DisplayName:'回乡证有效期起',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="回乡证有效期起"
+                                v-model="curr_rowdata['HometownPassLimit_S']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="有效期讫" prop="HometownPassLimit_E"
+                          v-bind:rules="getFieldRules({Name:'HometownPassLimit_E',DisplayName:'回乡证有效期讫',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-date-picker value-format="yyyy-MM-dd" type="date" placeholder="回乡证有效期讫"
+                                v-model="curr_rowdata['HometownPassLimit_E']"
+                                v-bind:style="{width:'178px'}" />
+            </el-form-item>
+            <br />
+            <el-form-item v-bind:label-width="formLabelWidth" label="正面照" prop="HometownPassPhoto_A"
+                          v-bind:rules="getFieldRules({Name:'HometownPassPhoto_A',DisplayName:'正面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                @*<el-input v-model="curr_rowdata['HometownPassPhoto_A']" prop="HometownPassPhoto_A" v-bind:clearable="true" v-bind:style="{width:'178px'}" />*@
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('HometownPassPhoto_A',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('HometownPassPhoto_A',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('HometownPassPhoto_A','正面照')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            <el-form-item v-bind:label-width="formLabelWidth" label="反面照" prop="HometownPassPhoto_B"
+                          v-bind:rules="getFieldRules({Name:'HometownPassPhoto_B',DisplayName:'反面照',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                <el-upload v-bind:action="tbUrl.AddFileAttach" list-type="picture" multiple="false"
+                           limit="1" accept=".jpg,.jpeg,.png,.bmp,.JPG,.JPEG,.PNG,.BMP"
+                           v-bind:on-preview="handlePreview"
+                           v-bind:on-remove="(file, fileList)=>{handleRemove('HometownPassPhoto_B',file, fileList)}"
+                           v-bind:on-success="(res,file,fileList)=>{handleOnSuccess('HometownPassPhoto_B',res,file, fileList)}"
+                           v-bind:file-list="FileAttach('HometownPassPhoto_B','反面照')">
+                    <el-button size="small" type="primary">上传</el-button>
+                    <div slot-scop="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-form-item>
+            @*<el-form-item v-bind:label-width="formLabelWidth" label="操作点" prop="OperatingPoint"
+                    v-bind:rules="el_FormFieldRules({Name:'OperatingPoint',DisplayName:'操作点',Required:true,Editable:true,MinLength:0,MaxLength:0})">
+                    <el-input v-model="curr_rowdata['OperatingPoint']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="新增人" prop="ADDID"
+                    v-bind:rules="el_FormFieldRules({Name:'ADDID',DisplayName:'新增人',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                    <el-input v-model="curr_rowdata['ADDID']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="新增人" prop="ADDWHO"
+                    v-bind:rules="el_FormFieldRules({Name:'ADDWHO',DisplayName:'新增人',Required:false,Editable:true,MinLength:0,MaxLength:20})">
+                    <el-input v-model="curr_rowdata['ADDWHO']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="新增时间" prop="ADDTS"
+                    v-bind:rules="el_FormFieldRules({Name:'ADDTS',DisplayName:'',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                    <el-input v-model="curr_rowdata['ADDTS']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="修改人" prop="EDITWHO"
+                    v-bind:rules="el_FormFieldRules({Name:'EDITWHO',DisplayName:'新增时间',Required:false,Editable:true,MinLength:0,MaxLength:20})">
+                    <el-input v-model="curr_rowdata['EDITWHO']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="修改时间" prop="EDITTS"
+                    v-bind:rules="el_FormFieldRules({Name:'EDITTS',DisplayName:'修改时间',Required:false,Editable:true,MinLength:0,MaxLength:0})">
+                    <el-input v-model="curr_rowdata['EDITTS']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>
+                <el-form-item v-bind:label-width="formLabelWidth" label="修改人" prop="EDITID"
+                    v-bind:rules="el_FormFieldRules({Name:'EDITID',DisplayName:'修改人',Required:false,Editable:true,MinLength:0,MaxLength:50})">
+                    <el-input v-model="curr_rowdata['EDITID']" v-bind:clearable="true" v-bind:style="{width:'178px'}" />
+                </el-form-item>*@
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button v-on:click="centerDialogVisible = false">取 消</el-button>
+            <el-button type="primary" v-bind:disabled="!UserRoles.Edit" v-on:click="dlgSubmit">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+
+@section Scripts {
+    <!--
+        import是异步加载的，<script>-type 必须是modual
+        import commonFiltes from "/Scripts/Vue/VueFilters.js
+
+        已通过requireJs 异步加载 Vue-ElementUI+Vue自定义扩展
+
+        dialogDrag:el-dialog拖动全屏扩展
+        formatter:字段格式化Vue.$formmatter
+        validtors:el-input 自定义验证Vue.$Validtors
+        VueFilters:vue全局filter v-bind:id="rawId | formatId" |前面字段后面过滤器 注：v-bind有效，v-Model 无效
+    -->
+    <script type="text/javascript">
+        const Edit = @Html.IsAuthorize("Edit").ToString().ToLower(),//编辑权限
+            Create = @Html.IsAuthorize("Create").ToString().ToLower(), //新增权限
+            Delete = @Html.IsAuthorize("Delete").ToString().ToLower(),//删除权限
+            Import = @Html.IsAuthorize("Import").ToString().ToLower(),//导入权限
+            Export = @Html.IsAuthorize("Export").ToString().ToLower();//导出权限
+        //自定义列数据
+        var CustomerFields = {
+            //"Currency":{
+            //    DisplayName: "授权币制",//显示名称
+            //    Editable: true, //可编辑
+            //    ForeignKeyGetListUrl: '/PARA_CURRs/GetPagerPARA_CURR_FromCache', //获取外键数据Url
+            //    FormOrder: 0, //Form排序
+            //    FormShow: true, //Form中展示
+            //    IsForeignKey: true, //外键
+            //    IsKey: false, //主键
+            //    ListOrder: 0, //列表排序
+            //    ListShow: true, //列表展示
+            //    MaxLength: 50, //最大长度
+            //    MinLength: 0, //最小长度
+            //    Name: "Currency", //名称
+            //    Precision: null, //Type为number时，可设置小数位
+            //    Required: false, //必填
+            //    SearchOrder: 0, //搜索排序
+            //    SearchShow: true, //搜索中展示
+            //    Sortable: true, //是否可排序
+            //    Type: "string", //"datetime/number/string/boolean";//类型
+            //    Width_List: "120", //列表-列宽度 <=0 默认*，>0 此宽度为准
+            //    Width_input: "178", //Form-input宽度 <=0 默认*，>0 此宽度为准
+            //    inputType: "text", //"password/datetime/text";//form中的input类型
+            //}
+        };
+        var BaseArrField = @Html.Raw(Html.RenderVue_ModelJson());
+        //设置自定义列
+        Object.keys(CustomerFields).forEach(function(item,index){
+            let OField= BaseArrField.ArrField.filter(function(val){
+                return val.Name == item;
+            });
+            if(OField.length>0){
+                OField = OField[0];
+                let CusField = CustomerFields[item];
+                Object.assign(OField,CusField);
+            }
+        });
+        if(BaseArrField.IsListOrder){
+            var ArrField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.ListOrder==b.ListOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.ListOrder-b.ListOrder;
+            });
+        }else
+            var ArrField =BaseArrField.ArrField;
+        if(BaseArrField.IsSearchOrder){
+            var ArrSearchField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.SearchOrder==b.SearchOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.SearchOrder-b.SearchOrder;
+            });
+        }else
+            var ArrSearchField =BaseArrField.ArrField;
+        if(BaseArrField.IsFormOrder){
+            var ArrFormField = BaseArrField.ArrField.sort(function(a,b){
+                if(a.FormOrder==b.FormOrder)
+                    return a.Name-b.Name;
+                else
+                    return a.FormOrder-b.FormOrder;
+            });
+        }else
+            var ArrFormField =BaseArrField.ArrField;
+        /*
+        自定义列数据 table-searchForm-editForm 通过此配置渲染；说明：
+        Name //名称
+        DisplayName //显示名称
+        Editable //可编辑
+        FormShow //Form中展示
+
+        Sortable //是否可排序
+        Width_List //列表-列宽度 <=0 默认*，>0 此宽度为准
+        Width_input //Form-input宽度 <=0 默认*，>0 此宽度为准
+        Type  //"datetime/number/string/boolean";//类型
+        Precision //Type为number时，可设置小数位
+        inputType  //"password/datetime/text";//form中的input类型
+        Required //必填
+        IsKey //主键
+        MaxLength //最大长度
+        MinLength //最小长度
+        SearchShow //搜索中展示
+        ListShow //列表展示
+        ListOrder //列表排序
+        SearchOrder //搜索排序
+        FormOrder //Form排序
+        IsForeignKey //外键
+        ForeignKeyGetListUrl //获取外键数据Url
+        */
+
+        //requireJs 按需加载 js
+        require(['vue', '_vue_resource','ELEMENT','IndexBaseMixin','Convert_Pinyin'],function(Vue,Vue_Resource,ELEMENT,myMixin,Convert_Pinyin){
+            Vue.use(ELEMENT);
+            Vue.use(Vue_Resource);
+            console.log(Vue.prototype,Vue.prototype.$Validtors);
+            var vue_tb = new Vue({
+                el: '#app',
+                directives:{},// 注册局部指令
+                filters: {//v-bind可以使用，v-model 无效
+                    filterInt:function(value){
+                        try{
+                            var i_val = parseInt(value);
+                            if(isNaN(i_val))
+                                return 0;
+                            else
+                                return i_val;
+                        }catch(e){
+                            return value;
+                        }
+                    },
+                },//数据过滤器
+                mixins: [myMixin],//混入相当于extend
+                computed: {//计算属性
+                    FileAttach:function(){
+                        return function(field,lable){
+                            var t_curr_rowdata =this.curr_rowdata;
+                            if(ObjectIsEmpty(t_curr_rowdata) || JSON.stringify(t_curr_rowdata)=='{}')
+                                return [];
+                            if(ObjectIsEmpty(t_curr_rowdata[field]))
+                            {
+                                return [];
+                            }else{
+                                return [{name:lable,url:'/FileUpload/GetImgMinByte?FileGuid='+t_curr_rowdata[field],response:{FileGuid:t_curr_rowdata[field]}}];
+                            }
+                        }
+                    }
+                },//计算属性
+                created: function () {
+                },//数据初始化，还未渲染dom,在此处设置的数据 不受响应
+                data:function(){//混入的data 会与此data 合并，相同名字会被此data覆盖
+                    return {
+                        tbUrl: {
+                            controller: '/Customers/',
+                            getdata: 'GetData',//获取数据 action
+                            batchSave: 'SaveData',//批量操作 action
+                            exportExcel: 'ExportExcel',//导出Excel action
+                            importExcel: '/FileUpload/Upload?modelType=Customers',//导入Excel action
+                            AddFileAttach:'/FileUpload/AddAttach',//新增附件 返回：FileGuid，FileAttachID
+                            DelFileAttach:'/FileUpload/DeleteAttach',//删除附件 参数：FileGuid，FileAttachID
+                        },
+                        dlgfullscreen:true,//弹出框全屏
+                        fileList:{},//文件上传列表
+                    }
+                },
+                methods:{
+                    //自定义方法会覆盖 混入的 methods
+                    handleRemove:function(field,file, fileList) {
+                        //console.log(file, fileList);
+                        if(file.response){
+                            let url = this.tbUrl.DelFileAttach;//'/FileUpload/DeleteAttach';
+                            let paramData = {FileGuid:file.response.FileGuid,FileAttachID:file.response.FileAttachID};
+                            this.$http.get(url, {
+                                params: paramData,
+                                headers: {//指示为 ajax请求
+                                    "X-Requested-With": "XMLHttpRequest"
+                                }
+                            }).then(function(success){//成功
+                                try{
+                                    var data = success.body;
+                                    var Success=true;
+                                    if(!ObjectIsEmpty(data.Success)){
+                                        Success = data.Success;
+                                    }else if(!ObjectIsEmpty(data.success)){
+                                        Success = data.success;
+                                    }
+                                    if(!Success){
+                                        var ErrMsg =data.ErrMsg;
+                                        if(ObjectIsEmpty(data.ErrMsg))
+                                            ErrMsg =data.errMsg;
+                                        if(ObjectIsEmpty(data.errMsg))
+                                            ErrMsg =data.errmsg;
+                                        if(ObjectIsEmpty(data.errmsg))
+                                            ErrMsg =data.err;
+                                        if(ObjectIsEmpty(data.err))
+                                            ErrMsg ='';
+                                        this.$message({
+                                            duration:0,//不自动关闭
+                                            showClose: true,
+                                            message: '删除附件，出现错误：'+ErrMsg,
+                                            type: 'error'
+                                        });
+                                    }else{
+                                        this.curr_rowdata[field] = '';//清空值
+                                        this.$message({
+                                            showClose: true,
+                                            message: '删除附件，成功：',
+                                            type: 'success'
+                                        });
+                                    }
+                                } catch (e) {
+                                    this.$message({
+                                        duration:0,//不自动关闭
+                                        showClose: true,
+                                        message: '删除附件，出现错误',
+                                        type: 'error'
+                                    });
+                                }
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                            },function(error){//错误
+                                this.el_selt.el_selt_loading = false;//加载完毕
+                                this.$message({
+                                    duration:0,//不自动关闭
+                                    showClose: true,
+                                    message: '获取数据出现错误',
+                                    type: 'error'
+                                });
+                            });
+                        }
+                    },//删除
+                    handlePreview:function(file) {
+                        //console.log(file);
+                    },//预览
+                    handleOnSuccess:function(field,res,file, fileList){
+                        this.$set(this.curr_rowdata,field,res.FileGuid);
+                        //console.log(this.curr_rowdata);
+                    },//上传成功
+                    NameChsToPinYin:function(val){
+                        if(!ObjectIsEmpty(val)){
+                            //获取全写拼音（调用js中方法）
+                            var fullName = Convert_Pinyin.getFullChars(val);
+                            ////获取简写拼音（调用js中方法）
+                            //var easyName = Convert_Pinyin.getCamelChars(val);
+                            this.$set(this.curr_rowdata,'NamePinYin',fullName);
+                        }
+                    },//中文名转拼音
+                    getFieldRules: function (filed,isSearchForm)
+                    {
+                        let Ofiled = Object.assign({},filed);
+                        //是否搜索form
+                        var t_isSearchForm = typeof(isSearchForm)
+                        if(t_isSearchForm==='undefined'||isSearchForm==null ||t_isSearchForm!=='boolean')
+                            isSearchForm=false;
+                        var fieldSufix = Ofiled.Name.substr(-7);
+                        let fieldId = Ofiled.Name.substr(0,Ofiled.Name.length-7);
+                        let val = this.curr_rowdata[fieldId];
+                        if(!ObjectIsEmpty(val)){
+                            switch(fieldSufix){
+                                case "Limit_S":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Limit_E":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Photo_A":
+                                    Ofiled.Required = true;
+                                    break;
+                                case "Photo_B":
+                                    Ofiled.Required = true;
+                                    break;
+                            };
+                        }
+                        var ArrRules = this.el_FormFieldRules(Ofiled,isSearchForm);//默认验证规则
+                        return ArrRules;
+                    },//获取数据
+                    CustomerTypeChange:function(value){
+                        if(ObjectIsEmpty(this.curr_rowdata.ComponyName))
+                            this.$set(this.curr_rowdata,'ComponyName','');
+                        if(ObjectIsEmpty(this.curr_rowdata.ComponyId))
+                            this.$set(this.curr_rowdata,'ComponyId','');
+                        if(value==1){
+                            this.curr_rowdata.ComponyName='';
+                            this.curr_rowdata.ComponyId=null;
+                        }else if(value==2){
+                            this.curr_rowdata.ComponyName=this.curr_rowdata_Original.ComponyName;
+                            this.curr_rowdata.ComponyId=this.curr_rowdata_Original.ComponyId;
+                        }
+                    },//客户类型变更
+                    ComponyIdChange:function(value){
+                        if(!ObjectIsEmpty(value)){
+                            var ArrOptionData = this.el_selt["ComponyId_form"];
+                            if(!(ObjectIsEmpty(ArrOptionData)||JSON.stringify(ArrOptionData)=="{}")){
+                                var ArrOption = ArrOptionData.ArrOption;
+                                if(!ObjectIsEmpty(ArrOption)){
+                                    var QOption= ArrOption.filter(function(item){return item.Id == value});
+                                    if(QOption.length>0){
+                                        var OOption = QOption[0];
+                                        this.$set(this.curr_rowdata,'ComponyName',OOption.Name);
+                                    }
+                                }
+                            }
+                        }else{
+                            this.$set(this.curr_rowdata,'ComponyName','');
+                        }
+                    },//公司变更
+                },
+            });
+        });
+    </script>
+}

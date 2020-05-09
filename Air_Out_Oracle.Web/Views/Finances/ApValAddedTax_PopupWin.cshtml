@@ -1,0 +1,255 @@
+﻿@model AirOut.Web.Models.ApValAddedTax
+@{
+    int Num = 0;
+    var NumStr = ViewData["Num"] ?? "";
+    int.TryParse(NumStr.ToString(), out Num);
+}
+<div id="ApValAddedTax_PopupWin" class="easyui-dialog" title="应付 增值税" style="width:630px; height:430px; background:#fafafa;"
+     data-options="iconCls:'icon-ok',shadow: true,model:true,cache:false,
+     onBeforeClose:function(){
+        try{
+            //dg_reload();
+            if(!(typeof(keydownEvent)==='undefined'||keydownEvent==null))
+                $(document).unbind('keydown',keydownEvent);
+        }
+        catch(e){
+            return false;
+        }
+     },
+     buttons: [{
+         text:'保存(Q)',
+         iconCls:'icon-ok',
+         handler:function(){
+             Form_Submit();
+             return false;
+         }
+     },{
+         text:'关闭(C)',
+         iconCls:'icon-remove',
+         handler:function(){
+            $('#ApValAddedTax_PopupWin').window('close');
+            return false;
+         }
+     }]">
+    <div id="div_ApValAddedTax" class="row" style="width:600px; margin:auto; ">
+        <div class="col-lg-12 col-md-12 col-sm-12" style="margin:auto;">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <form id="formApValAddedTax" class="form-horizontal">
+                @Html.HiddenFor(model => model.Ops_M_OrdId)
+                @Html.HiddenFor(model => model.MBL)
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Sumbmit_No, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Sumbmit_No, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    &nbsp;
+                    <div class="col-md-8" style="height:28px;">
+                        &nbsp;
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_Account2, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_Account2, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Money_Code, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Money_Code, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                @Html.HiddenFor(model => model.Bill_Object_Id)
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_Object_Name, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_Object_Name, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.UnifiedSocialCreditCode, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.UnifiedSocialCreditCode, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.BankName, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.BankName, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.InvoiceAddress, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.InvoiceAddress, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.BankAccount, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.BankAccount, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]'", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_Amount, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_Amount, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_TaxAmount, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_TaxAmount, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill_AmountTaxTotal, htmlAttributes: new { @class = "col-md-4 control-label " })
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Bill_AmountTaxTotal, new { htmlAttributes = new { @class = "easyui-numberbox", data_options = "required:true,min:0,precision:2,validType:'length[0,50]'", @readonly = "readonly", tabindex = Num++, style = "width:100%" } })
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "col-md-2 control-label " })
+                    <div class="col-md-10" style="margin-left:-5px;">
+                        @Html.EditorFor(model => model.BankAccount, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true,validType:'length[0,50]',multiline:true,value:'" + Html.Raw(Model == null ? "" : Model.Remark.Replace("\n", "\\n").Replace("\r", "\\r")) + "'", @Value = "", tabindex = Num++, style = "width:100%;height:80px" } })
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script id="ApValAddedTax_PopupWin_js">
+    const TopDiv ='#ApValAddedTax_PopupWin';//最外层div，防止id名相同
+    function InitApValAddedTax_PopupWinFuc() {
+        //console.log('InitAddEdit_PopupWinFuc---------------');
+        initEasyUIControl('div_ApValAddedTax');
+        initPageWin();
+        AddkeydownListen();//设置 键盘监控事件
+        if($("div.validation-summary-errors.text-danger li",TopDiv).css('display')!='none'){
+            $(TopDiv).window("panel").find("div.dialog-button a").attr("disabled","disabled").css("pointer-events","none");
+        }
+    }
+    //初始化页面
+    function initPageWin() {
+        initCombogrid('_FromCache');
+        var FromData = "{}";
+        var FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+        FormNAMEData = $.extend(FromData,FormNAMEData);
+        //设置ComboGrid真实url(为了不页面进入后 不立即加载数据，优化页面载入速度)
+        //resetCombogridUrl(obj, VirtualUrlName, IsReLoad, data, isSimplePager)
+        //表单名称，虚拟url名称，是否刷新数据，ComboGrid-Text值
+        resetCombogridUrl(TopDiv, null, true, FormNAMEData);
+    }
+    //初始化页面Combogrid
+    function initCombogrid(_FromCache) {
+        if (typeof _FromCache === 'undefined' || _FromCache == null)
+            _FromCache = '';
+        ////币种
+        //var $Money_Code =$('#Money_Code',TopDiv);
+        //if($Money_Code.length>0){
+        //    $Money_Code.combogrid($.extend({}, dg_combo_coSettings, {
+        //        required: true,
+        //        textField:"Id",
+        //        url1: '/PARA_Currs/GetPagerPARA_CURR'+_FromCache
+        //    }));
+        //    //币种 keyup事件 小写转大写
+        //    $Money_Code.combogrid("textbox").bind('keyup',function(event){
+        //        var keyCode = event.which || event.keycode;
+        //        //console.log(keyCode);
+        //        if(keyCode!=229)//输入法占位符
+        //            this.value = this.value.toUpperCase();
+        //    });
+        //}
+    }
+    //刷新 父界面 datagrid
+    function dg_reload(){
+        var $dgHead = $("table.easyui-datagrid:not([id$='_dtl_datagrid'])");
+        if($dgHead.length>0)
+            $dgHead.datagrid('reload');
+    }
+    //提交数据
+    function Form_Submit() {
+        var formHead = $($('#formApValAddedTax', TopDiv)[0]);
+        var IsValid = formHead.form('enableValidation').form('validate');
+        if (!IsValid){
+            return false;
+        }
+        var fromhedddata = getFormSerializeJson(formHead);
+        var url = "/Finances/SaveApValAddedTax_PopupWin";
+        var ArrChecked = $dg.datagrid("getChecked");
+        if(typeof ArrChecked==='undefined'||ArrChecked == null||ArrChecked.length==1){
+            $.messager.alert("警告","只能选择一条数据，才能操作");
+            return false;
+        }
+        $.messager.progress({
+            text: '数据处理中......'
+        });
+        var postdata = {};
+        postdata["OApValAddedTax"]= fromhedddata;
+        $.ajax({
+            type: "POST",
+            datatype: "json",//接收的数据类型
+            contentType: "application/json; charset=utf-8",//告诉服务端 发送的数据类型
+            async: true,
+            data: JSON.stringify(postdata),
+            url: url,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data) {
+                    if (data.Success) {
+                        $(TopDiv).window('close');
+                        $dg.datagrid("reload");
+                    } else{
+                        $.messager.alert('警告', data.ErrMsg);
+                    }
+                }
+                else{
+                    $.messager.alert('警告', '未知错误');
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $.messager.alert('警告', '数据处理中,出现网络错误');
+            }
+        });
+    }
+    //监控 键盘事件
+    function AddkeydownListen(){
+        //监控 键盘事件
+        $(document).bind("keydown",keydownEvent);
+    }
+    var keydownEvent =function (event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        var keyCode = e.which || e.keyCode;
+        console.log(e,keyCode);
+        if(e.altKey){
+            PressCtrl=true;
+            //C	67 关闭
+            if (keyCode == 67) {
+                $(TopDiv).window('close');
+                //阻止默认浏览器动作(W3C)
+                if ( e && e.preventDefault )
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+            //Q	81 保存
+            if (keyCode == 81) {
+                var $a = $(TopDiv).window("panel").find("div.dialog-button span.l-btn-icon.icon-ok").parent().parent();
+                if(!$a.attr("disabled"))
+                    $a.click();
+                //阻止默认浏览器动作(W3C)
+                if (e && e.preventDefault)
+                    e.preventDefault();
+                    //IE中阻止函数器默认动作的方式
+                else
+                    window.event.returnValue = false;
+                return false;
+            }
+        }
+    }
+</script>

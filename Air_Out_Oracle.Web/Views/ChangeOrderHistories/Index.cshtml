@@ -1,0 +1,392 @@
+﻿@model IEnumerable<AirOut.Web.Models.ChangeOrderHistory>
+
+@{
+    ViewBag.Title = "操作历史记录";
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script async defer type="text/javascript" src="~/Scripts/EasyUIDataGrid_ControlNext.js"></script>
+<!--真实 下载进度条 -->
+<script async defer src="~/Scripts/DownLoadProgress.js"></script>
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+</script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            @*<li>
+                <a href="#">ChangeOrderHistories</a>
+            </li>*@
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>操作历史记录</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <!--
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="table_data_tables.html#">Config option 1</a>
+                            </li>
+                            <li>
+                                <a href="table_data_tables.html#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                        -->
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="changeorderhistory_datagrid" class="easyui-datagrid" title="ChangeOrderHistory" style="width:auto;height:auto"
+                               data-options="
+                            rownumbers:true,
+                            checkOnSelect:true,
+                            selectOnCheck:true,
+                            idField:'Id',
+                            sortName:'Id',
+                            sortOrder:'desc',
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#changeorderhistory_toolbar',
+                            url: '/ChangeOrderHistories/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            onSelect:onSelect,
+                            pagination: 'true',
+                            onLoadSuccess:onLoadSuccess">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+
+                                    <th data-options="field:'Key_Id',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Key_Id)</th>
+
+                                    <th data-options="field:'TableName',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.TableName)</th>
+
+                                    <th data-options="field:'ChangeType',width:120,editor:{type:'combobox',options:{required:true,data:@(ViewData["EnumChangeType"]??"[]") ,validType:'length[0,50]'  }  }  ,sortable:true,resizable:true, formatter:EnumChangeTypeformatter">@Html.DisplayNameFor(model => model.ChangeType)</th>
+
+                                    <th data-options="field:'InsertNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.InsertNum)</th>
+
+                                    <th data-options="field:'UpdateNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.UpdateNum)</th>
+
+                                    <th data-options="field:'DeleteNum',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.DeleteNum)</th>
+
+                                    <th data-options="field:'Content',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,200]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Content)</th>
+
+                                    <th data-options="field:'ADDID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDID)</th>
+
+                                    <th data-options="field:'ADDWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.ADDWHO)</th>
+
+                                    <th data-options="field:'ADDTS',width:160,align:'right',editor:{type:'datebox',options:{required:false    }  },sortable:true,resizable:true  ,formatter:dateformatter">@Html.DisplayNameFor(model => model.ADDTS)</th>
+
+                                    <th data-options="field:'EDITWHO',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITWHO)</th>
+
+                                    <th data-options="field:'EDITTS',width:160,align:'right',editor:{type:'datebox',options:{required:false    }  },sortable:true,resizable:true  ,formatter:dateformatter">@Html.DisplayNameFor(model => model.EDITTS)</th>
+
+                                    <th data-options="field:'EDITID',width:140,editor:{type:'textbox',options:{required:false ,validType:'length[0,50]'  }  } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.EDITID)</th>
+
+                                    <th data-options="field:'OperatingPoint',width:100,align:'right',editor:{type:'numberbox',options:{required:true  ,precision:0 } } ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.OperatingPoint)</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="changeorderhistory_toolbar" style="height:auto">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新增</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            @if (Html.IsAuthorize("Edit"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            @if (Html.IsAuthorize("Import"))
+                            {
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- end ibox-content -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var EnumChangeTypeJson = @Html.Raw(ViewData["EnumChangeType"]??"[]");
+
+        function EnumChangeTypeformatter(value, row,index) {
+            try {
+                //AUDITSTATUS(0未审批/1提交审批/2审批不通过/3审批通过/4...)
+                if (typeof value === 'undefined')
+                    return value;
+                if (value == null)
+                    return value;
+                else {
+                    for(var i in EnumChangeTypeJson)
+                    {
+                        if(EnumChangeTypeJson[i].value == value){
+                            return EnumChangeTypeJson[i].text;
+                        }
+                    }
+                }
+            }
+            catch (e) {
+                return value;
+            }
+        }
+
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileTypeExts': '*.xlsx',
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'ChangeOrderHistory' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    //console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                }
+            });
+        });
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        function exportexcel() {
+            var filterRules = JSON.stringify($dg.datagrid('options').filterRules);
+            //console.log(filterRules);
+            $.messager.progress({ title: '正在执行导出！' });
+            var formData = new FormData();
+            formData.append('filterRules', filterRules);
+            formData.append('sort', 'Id');
+            formData.append('order', 'asc');
+            $.postDownload('/ChangeOrderHistories/ExportExcel', formData, function (fileName) {
+                $.messager.progress('close');
+                //console.log(fileName);
+            });
+        }
+
+        var $dg = $('#changeorderhistory_datagrid');
+        var editIndex = undefined;
+        function reload() {
+            $dg.datagrid('reload');
+        }
+
+        //加载成功
+        function onLoadSuccess(rowdata) {
+            //行号自适应宽度
+            $(this).datagrid("fixRownumber");
+        }
+
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function onClickCell(index, field) {
+            return;//不让编辑
+            var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    $dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+
+        function append() {
+            if (endEditing()) {
+                var NewRow = {};
+                var Columns = $dg.datagrid('getColumnFields');
+                for (var column in Columns) {
+                    NewRow[Columns[column]] = null;
+                }
+                //$dg.datagrid('appendRow', { Status: 0 });
+                //editIndex = $dg.datagrid('getRows').length - 1;
+                $dg.datagrid('insertRow', { index: 0, row: NewRow });
+                editIndex = 0;
+                $dg.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+            }
+        }
+
+        function removeit() {
+            if (editIndex == undefined) { return }
+            $dg.datagrid('cancelEdit', editIndex).datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.post("/ChangeOrderHistories/SaveData", effectRow, function (response) {
+                        //console.log(response);
+                        if (response.Success) {
+                            $.messager.alert("提示", "提交成功！");
+                            $dg.datagrid('acceptChanges');
+                            $dg.datagrid('reload');
+                        }
+                    }, "JSON").error(function (response) {
+                        //console.log(response);
+                        $.messager.alert("错误", "提交错误了！", 'error');
+                        //$dg.datagrid('reload');
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'ADDTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'ADDTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'ADDTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                },
+                {
+                    field: 'EDITTS',
+                    type: 'datebox',
+                    options: {
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'EDITTS');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'EDITTS',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                }
+            ]);
+        });
+
+        //-----------------------------------------------------
+        //datagrid onSelect
+        //-----------------------------------------------------
+        function onSelect(index, row) {
+            //console.log(index, row);
+        }
+
+    </script>
+}
+

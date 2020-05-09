@@ -1,0 +1,17 @@
+﻿@model AirOut.Web.Models.OPS_M_Order
+@{
+    Layout = null;
+    var i = ViewBag.i;
+    var tabindex = ViewBag.tabindex;
+    var oPS_H_Order = ViewBag.oPS_H_Order;
+    var hbl_picture = ViewBag.hbl_picture; ;
+
+}
+
+@Html.Partial("OPS_H_Edit", Model, new ViewDataDictionary { { "i", i }, { "hbl_picture", hbl_picture }, { "tabindex", tabindex } });
+
+@{
+    <script type="text/javascript">
+        FormNAMEData = @Html.Raw(ViewData["FormNAME"] ?? "{}");
+    </script>
+}

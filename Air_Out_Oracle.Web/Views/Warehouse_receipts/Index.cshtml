@@ -1,0 +1,1435 @@
+﻿@model IEnumerable<AirOut.Web.Models.Warehouse_receipt>
+@{
+    ViewBag.Title = "仓库接单";
+	var Num = 1;
+}
+<!--DataGrid 回车Editor下一个 和 为控件添加 Key事件 -->
+<script src="~/Scripts/jsext.js?date=2019013001"></script>
+<!--真实 下载进度条 -->
+<script async defer src="~/Scripts/DownLoadProgress.js"></script>
+<script type="text/javascript">
+    //表单唯一值，防止重复提交
+    var ActionGuidName = '@(ViewData["ActionGuidName"]??"")';
+    var ActionGuid = '@(ViewData["ActionGuidName"] == null ? "" : (ViewData[ViewData["ActionGuidName"].ToString()] ?? ""))';
+</script>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>@ViewBag.Title</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a href="#">空运出口</a>
+            </li>
+            <li class="active">
+                <strong>@ViewBag.Title</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+	<div class="row">
+	    <div class="col-lg-12">
+	        <div class="ibox float-e-margins">
+	            <div class="ibox-title">
+	                <h5>仓库接单</h5>
+	                <div class="ibox-tools">
+	                    <a class="collapse-link">
+	                        <i class="fa fa-chevron-up"></i>
+	                    </a>
+						<!--
+	                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	                        <i class="fa fa-wrench"></i>
+	                    </a>
+	                    <ul class="dropdown-menu dropdown-user">
+	                        <li>
+	                            <a href="table_data_tables.html#">Config option 1</a>
+	                        </li>
+	                        <li>
+	                            <a href="table_data_tables.html#">Config option 2</a>
+	                        </li>
+	                    </ul>
+	                    <a class="close-link">
+	                        <i class="fa fa-times"></i>
+	                    </a>
+						-->
+	                </div>
+	            </div>
+	            <div class="ibox-content">
+	                <form id="searchform" method="post" style="padding-bottom:10px; width:auto">
+                        <div id="div_search" style="padding-top:5px; padding-bottom:3px; width:auto;" class="easyui-panel" title="查询条件"
+                             data-options="collapsible:true">
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px;">进仓编号:</label>
+                                <input id="Entry_Id_Query" name="Entry_Id_Query" tabindex="@(Num++)" data-options="prompt1:'进仓编号'" style="width:170px" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">总单号:</label>
+                                <input id="MBL_Query" name="MBL_Query" tabindex="@(Num++)" data-options="prompt1:'总单号'" style="width:170px" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">业务编号:</label>
+                                <input id="HBL_Query" name="HBL_Query" tabindex="@(Num++)" data-options="prompt1:'分单号'" style="width:170px" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">客户提回:</label>
+                                <input id="Is_CustomerReturn_Query" name="Is_CustomerReturn_Query" tabindex="@(Num++)" data-options="prompt1:'客户提回'" style="width:170px" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">航班日期:</label>
+                                <input id="_Flight_Date_Want" name="_Flight_Date_Want" tabindex="@(Num++)" data-options="prompt1:'航班日期'" style="width:170px" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">至:</label>
+                                <input id="Flight_Date_Want_" name="Flight_Date_Want_" tabindex="@(Num++)" data-options="prompt1:'至'" style="width:170px" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">作废:</label>
+                                <input id="Status_Query" name="Status_Query" tabindex="@(Num++)" data-options="prompt1:'作废'" style="width:170px" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">入库日期:</label>
+                                <input id="_In_Date" name="_In_Date" tabindex="@(Num++)" data-options="prompt1:'航班日期'" style="width:170px" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">至:</label>
+                                <input id="In_Date_" name="In_Date_" tabindex="@(Num++)" data-options="prompt1:'至'" style="width:170px" class="easyui-datebox" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">是否绑定:</label>
+                                <input id="Is_Binding_Query" name="Is_Binding_Query" tabindex="@(Num++)" data-options="prompt1:'是否绑定'" style="width:170px" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">委托方:</label>
+                                <input id="Consign_Code_CK_Query" name="Consign_Code_CK_Query" tabindex="@(Num++)" data-options="prompt1:'委托方'" style="width:170px" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px">目的港:</label>
+                                <input id="End_Port_Query" name="End_Port_Query" tabindex="@(Num++)" data-options="prompt1:'目的港'" style="width:170px" class="easyui-combogrid" type="text" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="name" style="width:100px;">仓库编号:</label>
+                                <input id="Warehouse_Id_Query" name="Warehouse_Id_Query" tabindex="@(Num++)" data-options="prompt1:'仓库编号'" style="width:170px" class="easyui-textbox" type="text" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <hr />
+                            </div>
+                            <div class="form-group col-md-4">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <button id="btn-search" class="btn btn-primary">
+                                    @*<i class="fa fa-search"></i>*@
+                                    搜索
+                                </button>
+                                <button id="btn-reset" class="btn btn-default">
+                                    <i class="fa fa-reset"></i>
+                                    重置
+                                </button>
+                            </div>
+                            <div class="form-group col-md-4">
+                            </div>
+                        </div>
+                    </form>
+					<div class="table-responsive">
+                        <table id="warehouse_receipt_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                               data-options="
+							rownumbers:true,
+							checkOnSelect:true,
+							selectOnCheck:true,
+							idField:'Id',
+							sortName:'Id',
+							sortOrder:'desc',
+							remoteFilter: true,
+							singleSelect: false,
+							toolbar: '#warehouse_receipt_toolbar',
+							method: 'get',
+							onClickCell: onClickCell,
+                            onDblClickRow:onDblClickRow,
+							onSelect:onSelect,
+							pagination: 'true',
+                            onBeginEdit:onBeginEdit">
+                            <thead frozen="true">
+                                <tr>
+                                    <th data-options="field:'ck',checkbox:true"></th>
+                                    @*<th data-options="field:'Id',width:80 ,sortable:true,resizable:true ">@Html.DisplayNameFor(model => model.Id)</th>*@
+                                    <th data-options="field:'Warehouse_Id',width:140,sortable:true,resizable:true,
+									    editor:{
+										    type:'textbox',
+										    options:{
+											    required:true ,validType:'length[0,20]'
+										    }
+								    }">@Html.DisplayNameFor(model => model.Warehouse_Id)</th>
+                                    <th data-options="field:'Entry_Id',width:140,sortable:true,resizable:true,
+									    editor:{
+										    type:'textbox',
+										    options:{
+											    required:true ,validType:'length[0,20]'
+										    }
+								    }">@Html.DisplayNameFor(model => model.Entry_Id)</th>
+                                    <th data-options="field:'In_Date',width:100,align:'right',sortable:true,resizable:true,
+									    formatter:dateformatter,
+									    editor:{
+										    type:'datebox',
+										    options:{
+											    required:false
+										    }
+								    }">@Html.DisplayNameFor(model => model.In_Date)</th>
+                                    <th data-options="field:'In_Time',width:60,align:'right',sortable:true,resizable:true,
+									    editor:{
+										    type:'textbox',
+										    options:{
+											    required:false
+										    }
+								    }">@Html.DisplayNameFor(model => model.In_Time)</th>
+                                </tr>
+                            </thead>
+                            <thead>
+                                <tr>
+                                <th data-options="field:'Pieces_CK',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Pieces_CK)</th>
+                                <th data-options="field:'Weight_CK',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Weight_CK)</th>
+                                <th data-options="field:'Volume_CK',width:110,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false,
+                                            precision:3
+										}
+								}">@Html.DisplayNameFor(model => model.Volume_CK)/立方米</th>
+                                    <th data-options="field:'CHARGE_WEIGHT_CK',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.CHARGE_WEIGHT_CK)</th>
+                                <th data-options="field:'Bulk_Weight_CK',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Bulk_Weight_CK)</th>
+                                    <th data-options="field:'PackingName',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.Packing)</th>                       
+                                <th data-options="field:'Remark',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,500]'
+										}
+								}">@Html.DisplayNameFor(model => model.Remark)</th>
+                                <th data-options="field:'HBL',width:140,sortable:true,resizable:true,
+                                    formatter:Operation_IDFormatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.HBL)</th>
+                                <th data-options="field:'Warehouse_CodeName',width:140,sortable:true,resizable:true,
+                                    editor:{
+                                        type:'combogrid',
+                                        options:{
+                                            idField: 'ID',
+                                            valueField: 'ID',
+                                            textField: 'TEXT',
+                                            method:'remote',
+                                            url: '/Warehouse_receipts/GetCodeItem?CodeType=WAREHOUSE',
+                                            required:false
+                                        }
+                                }">@Html.DisplayNameFor(model => model.Warehouse_Code)</th>
+
+                                <th data-options="field:'Damaged_Num',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Damaged_Num)</th>
+                                    <th data-options="field:'Dampness_Num',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Dampness_Num)</th>
+                                    <th data-options="field:'Deformation_Num',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Deformation_Num)</th>
+                                    <th data-options="field:'Damaged_Num',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Damaged_Num)</th>
+                                    <th data-options="field:'Damaged_Num',width:100,align:'right',sortable:true,resizable:true,
+									editor:{
+										type:'numberbox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Damaged_Num)</th>
+                                <th data-options="field:'Closure_Remark',width:140,sortable:true,resizable:true,
+                                    editor:{
+                                        type:'textbox',
+                                        options:{
+                                            required:false ,validType:'length[0,500]'
+                                        }
+                                }">随货文件</th>                                    
+                                <th data-options="field:'Warehouse_Remark',width:140,sortable:true,resizable:true,
+                                    editor:{
+                                        type:'textbox',
+                                        options:{
+                                            required:false ,validType:'length[0,500]'
+                                        }
+                                }">一体化</th>
+
+                                @*<th data-options="field:'Damaged_CK',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Damaged_CK)</th>
+                                <th data-options="field:'Dampness_CK',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Dampness_CK)</th>
+                                <th data-options="field:'Deformation',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Deformation)</th>
+                                <th data-options="field:'Is_GF',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Is_GF)</th>
+                                <th data-options="field:'Is_QG',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Is_QG)</th>*@
+
+                                <th data-options="field:'Consign_Code_CK',width:140,sortable:true,resizable:true,
+                                    formatter:joinformatter,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.Consign_Code_CK)</th>
+                                <th data-options="field:'MBL',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.MBL)</th>
+                                <th data-options="field:'Flight_Date_Want',width:160,align:'right',sortable:true,resizable:true,
+									formatter:datetimeformatter,
+									editor:{
+										type:'datebox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Flight_Date_Want)</th>
+                                <th data-options="field:'FLIGHT_No',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.FLIGHT_No)</th>
+                                <th data-options="field:'End_Port',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,50]'
+										}
+								}">@Html.DisplayNameFor(model => model.End_Port)</th>
+                                <th data-options="field:'Out_Date',width:160,align:'right',sortable:true,resizable:true,
+									formatter:datetimeformatter,
+									editor:{
+										type:'datebox',
+										options:{
+											required:false
+										}
+								}">@Html.DisplayNameFor(model => model.Out_Date)</th>
+                                <th data-options="field:'CH_Name_CK',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,500]'
+										}
+								}">@Html.DisplayNameFor(model => model.CH_Name_CK)</th>
+                                <th data-options="field:'Is_CustomerReturn',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Is_CustomerReturn)</th>
+                                <th data-options="field:'Is_MyReturn',width:120,
+                                    formatter:isorNoformatter,
+									editor: {
+										type:'combobox',
+										options:{
+										panelHeight: 'auto',
+										data: [
+											{ value: '1', text: 'true' },
+											{ value: '0', text: 'false' }
+										],
+										required:false
+									}
+								}">@Html.DisplayNameFor(model => model.Is_MyReturn)</th>
+                                <th data-options="field:'Truck_Id',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.Truck_Id)</th>
+                                <th data-options="field:'Driver',width:140,sortable:true,resizable:true,
+									editor:{
+										type:'textbox',
+										options:{
+											required:false ,validType:'length[0,20]'
+										}
+								}">@Html.DisplayNameFor(model => model.Driver)</th>
+                            </tr>
+                        </thead>
+                    </table>
+					<div id="warehouse_receipt_toolbar" style="height:auto">
+						@if (Html.IsAuthorize("Create"))
+						{
+						    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="append()">新建</a>
+						}
+						@if (Html.IsAuthorize("Edit"))
+						{
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="declareInvalid()">作废</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-print',plain:true" onclick="printCoverUpWarehouseReceipt('index')">打印进仓单</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportPDFWarehouseReceipt('index')">导出进仓单PDF</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportbatchexcel()">导出批量进仓单E</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportbilofladingPDF()">导出放货单PDF</a>
+						}
+					</div>
+				</div>
+				    <!-- end ibox-content -->
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
+<div id="receiptywindow" class="easyui-window" title="空运出口" data-options="cache:false,modal:true,collapsible:false,resizable:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:70%;height:70%;padding:10px;">
+
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入"   data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+</div>
+    <script type="text/javascript">
+        $(function () {
+            initbindcombogriddata_H_index();
+            //读取用户 设置的 列宽与顺序（formatter-func方法Json转换后 会丢失）
+            var dg_id = $dg.attr('id');
+            var opts = $dg.datagrid('options');
+            var ArrFieldNoWidth = getdg_FieldNoWidth(dg_id);//获取 上次设置的 列宽和顺序
+            if (!ObjectIsEmpty(ArrFieldNoWidth)) {
+                var ArrFormatterCell = opts.columns[0].filter(function (item) {
+                    if (!ObjectIsEmpty(item.formatter))
+                        return true;
+                    else
+                        return false;
+                });
+                $.each(ArrFieldNoWidth, function () {
+                    for (var i in ArrFormatterCell) {
+                        var item = ArrFormatterCell[i];
+                        if (this.field == item.field)
+                            this.formatter = item.formatter;
+                    }
+                });
+                //设置 用户上次设置的 列宽和顺序
+                opts.columns[0] = ArrFieldNoWidth;
+                //初始化datagrid，以便列宽和顺序 生效
+                $dg.datagrid();
+            }
+            //设置列可移动
+            $dg.datagrid("columnMoving");
+            searchf();
+
+        });
+        //给业务编号列，加超链接
+        function Operation_IDFormatter(value, row, index) {
+            if (value != null) {
+                return '<a style="color:blue" href="/OPS_M_Orders/Edit?id=-1&Operation_Id=' + value + '">' + value + '</a>';
+            }
+        }
+        //
+        function initbindcombogriddata_H_index() {
+            //客户提回
+            $("#Is_CustomerReturn_Query").combogrid($.extend({}, combogrid_DefaultSettings, {
+                mode: 'local',
+                panelWidth: 170,
+                pagination: false,
+                value:false,
+                columns: [[
+                    //{ field: 'ID', title: '代码', width: 80 },
+                    { field: 'TEXT', title: '名称', width: 160 }
+                ]],
+                data: [
+                    { ID: "false", TEXT: "否" },
+                    { ID: "true", TEXT: "是" }
+                ]
+            }));
+            //作废
+            $("#Status_Query").combogrid($.extend({}, combogrid_DefaultSettings, {
+                mode: 'local',
+                panelWidth: 170,
+                pagination: false,
+                value: 0,
+                columns: [[
+                    //{ field: 'ID', title: '代码', width: 80 },
+                    { field: 'TEXT', title: '名称', width: 160 }
+                ]],
+                data: [
+                    { ID: "0", TEXT: "否" },
+                    { ID: "1", TEXT: "是" }
+                ]
+            }));
+            //是否绑定
+            $("#Is_Binding_Query").combogrid($.extend({}, combogrid_DefaultSettings, {
+                mode: 'local',
+                panelWidth: 170,
+                pagination: false,
+                value: false,
+                columns: [[
+                    //{ field: 'ID', title: '代码', width: 80 },
+                    { field: 'TEXT', title: '名称', width: 160 }
+                ]],
+                data: [
+                    { ID: "false", TEXT: "否" },
+                    { ID: "true", TEXT: "是" }
+                ]
+            }));
+		    //委托方
+            $("#Consign_Code_CK_Query").combogrid($.extend({}, combogrid_DefaultSettings, {
+                idField: 'ID',
+                valueField: 'ID',
+                textField: 'IDTEXT',
+                url: '/OPS_EntrustmentInfors/GetCusBusInf'
+            }));
+		    //启运港
+            $("#End_Port_Query").combogrid($.extend({}, combogrid_DefaultSettings, {
+                textField: 'IDTEXT',
+                url: '/OPS_EntrustmentInfors/GetPARA_AIRPorts'
+            }));
+        }
+        //数组话Id号
+        function getSelectDatagrid(rows) {
+            var ids = [];
+            for (var i = 0; i < rows.length; i++) {
+                ids.push(rows[i].Id);
+            }
+            return ids;
+        }
+        //数组话进仓编号号
+        function getSelectEntry_IdDatagrid(rows) {
+            var ids = [];
+            for (var i = 0; i < rows.length; i++) {
+                ids.push(rows[i].Warehouse_Id);
+            }
+            return ids;
+        }
+        //作废
+        function declareInvalid() {
+            if ($("#Is_Binding").val() == "True") {
+                $.messager.alert("提示", "仓库接单信息已经绑定，不能作废！");
+                return;
+            }
+            var rows = $dg.datagrid('getSelections');
+            if (rows.length == 0) {
+                $.messager.alert("提示", "请选择需要作废的接单信息！");
+                return false;
+            }
+            $.messager.confirm('确认对话框', '您确认作废接单信息！', function (r) {
+                if (r) {
+                    var ids = getSelectDatagrid(rows);
+                    if (ids.length > 0) {
+                        SaveDeclareInvalid(ids, "invalid");
+                    } else {
+                        $.messager.alert("提示", "选中的接单信息不符合作废所需的状态！", "error");
+                    }
+                }
+            });
+        }
+        //批量作废
+        function SaveDeclareInvalid(ids, type) {
+            var IDS = JSON.stringify(ids);
+            var url = '/Warehouse_receipts/SaveDeclareInvalid?ids=' + ids + '&type=' + type;
+            $.ajax({
+                type: 'POST',
+                url: url,//获取数据的函数
+                async: true,//true 异步，false 同步
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function (xhr) {//发送请求前运行的函数
+                    //console.log('beforeSend');
+                    $.messager.progress({
+                        title: '数据处理中',
+                        msg: '数据处理中，请等待...'
+                    });
+                    AddAjaxActionGuidName(this);
+                },
+                success: function (data) {//查询成功,data为返回的数据
+                    if (data.Success) {
+                        $.messager.alert("提示", data.ErrMsg, "info");
+                        reload();
+                        $dg.datagrid('clearSelections');
+                    }
+                    else {
+                        var ErrMsgStr = '提交错误了！';
+                        if (!(typeof (data.ErrMsg) === 'undefined' || data.ErrMsg == null || data.ErrMsg == ''))
+                            ErrMsgStr = data.ErrMsg;
+                        $.messager.alert("错误", ErrMsgStr, 'error');
+                    }
+                },
+                error: function () {//查询失败
+                    $.messager.alert("错误", "提交错误了！", 'error');
+                },
+                complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                    $.messager.progress('close');
+                }
+            });
+        }
+        //打印进仓单
+        function printCoverUpWarehouseReceipt(val) {
+            var ids = [];
+            if (val == "index") {
+                var rows = $dg.datagrid('getSelections');
+                //console.log("row:", rows);
+                if (rows.length == 0) {
+                    $.messager.alert("提示", "请选择需要导出的进仓单信息！");
+                    return false;
+                }
+                ids = getSelectEntry_IdDatagrid(rows);
+            } else{
+                var $Warehouse_Id = $("#Warehouse_Id", "#div_Warehouse_receipts").textbox("getValue");
+                if (!(typeof ($Warehouse_Id) === 'undefined' || $Warehouse_Id == null || $Warehouse_Id == "")){
+                    ids.push($Warehouse_Id);
+                } else {
+                    $.messager.alert("提示", "请选择需要新建的仓库接单信息！");
+                    return false;
+                }
+            }
+            if (ids.length > 0) {
+                CoverUpWarehouseReceipt(ids);
+            } else {
+                $.messager.alert("提示", "选中的接单信息不符合导出的进仓单所需的状态！", "error");
+            }
+        }
+        //执行打印进仓单
+        function CoverUpWarehouseReceipt(ids) {
+            var IDS = JSON.stringify(ids);
+            var formData = { filterRules: ids, typeName: "打印进仓单" };
+            var url = '/Warehouse_receipts/PrintCoverUpWarehouseReceipt';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: formData,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function (data) {
+                    //console.log("data", data);
+                    $.messager.progress('close');
+                }
+            });
+        }
+        //导出进仓单PDF
+        function exportPDFWarehouseReceipt(val) {
+            var ids = [];
+            if (val == "index") {
+                var rows = $dg.datagrid('getSelections');
+                //console.log("row:", rows);
+                if (rows.length == 0) {
+                    $.messager.alert("提示", "请选择需要导出的进仓单信息！");
+                    return false;
+                }
+                ids = getSelectEntry_IdDatagrid(rows);
+            } else {
+                var $Warehouse_Id = $("#Warehouse_Id", "#div_Warehouse_receipts").textbox("getValue");
+                if (!(typeof ($Warehouse_Id) === 'undefined' || $Warehouse_Id == null || $Warehouse_Id == "")) {
+                    ids.push($Warehouse_Id);
+                } else {
+                    $.messager.alert("提示", "请选择需要新建的仓库接单信息！");
+                    return false;
+                }
+            }
+            if (ids.length > 0) {
+                exportPDFWarehouseReceiptlistPDF(ids);
+            } else {
+                $.messager.alert("提示", "选中的接单信息不符合导出的进仓单所需的状态！", "error");
+            }
+        }
+        //执行导出进仓单PDF
+        function exportPDFWarehouseReceiptlistPDF(ids) {
+            var IDS = JSON.stringify(ids);
+            var formData = { filterRules: ids, typeName: "导出进仓单" };
+            var url = '/Warehouse_receipts/exportPDFWarehouseReceiptlistPDF';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: formData,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function (data) {
+                    //console.log("data", data);
+                    $.messager.progress('close');
+                }
+            });
+        }
+        //导出进仓单EXCEL
+        function exportbatchexcel() {
+            var rows = $dg.datagrid('getSelections');
+            //console.log("row:", rows);
+            if (rows.length == 0) {
+                $.messager.alert("提示", "请选择需要导出的进仓单信息！");
+                return false;
+            }
+            var ids = getSelectEntry_IdDatagrid(rows);
+            if (ids.length > 0) {
+                exportbatchlistexcel(ids);
+            } else {
+                $.messager.alert("提示", "选中的接单信息不符合作废所需的状态！", "error");
+            }
+        }
+        //执行导出进仓单EXCEL
+        function exportbatchlistexcel(ids) {
+            var IDS = JSON.stringify(ids);
+            var formData = { filterRules: ids, typeName: "进仓单" };
+            var url = '/Warehouse_receipts/ExportBatchExcel';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: formData,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function (data) {
+                    //console.log("data", data);
+                    $.messager.progress('close');
+                }
+            });
+        }
+        //导出飞力达空运放货单 PDF
+        function exportbilofladingPDF() {
+            var rows = $dg.datagrid('getSelections');
+            if (rows.length == 0) {
+                $.messager.alert("提示", "请选择需要导出的放货单信息！");
+                return false;
+            }
+            var ids = getSelectEntry_IdDatagrid(rows);
+            if (ids.length > 0) {
+                exportbilofladinlistgPDF(ids);
+            } else {
+                $.messager.alert("提示", "选中的接单信息不符合导出的放货单所需的状态！", "error");
+            }
+        }
+        //执行导出飞力达空运放货单 PDF
+        function exportbilofladinlistgPDF(ids) {
+            var IDS = JSON.stringify(ids);
+            var formData = { filterRules: ids, typeName: "放货单" };
+            var url = '/Warehouse_receipts/ExportBilOfLadinPDF';
+            $.DownLoadProgress({
+                url: url,         //下载文件的url
+                method: 'Post',   //链接打开方式
+                data: formData,         //要发送的数据
+                downLoadInfo: '下载文件', //下载界面文字
+                closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+                callbackFuc: function (data) {
+                    //console.log("data", data);
+                    $.messager.progress('close');
+                }
+            });
+        }
+        //导入
+        function importexcel() {
+			$('#importwindow').window('open');
+        }
+        //导出
+		function exportexcel() {
+			var opts = $dg.datagrid('options');
+			var formData = { filterRules: opts.filterRules,sort:opts.sortName,order:opts.sortOrder };
+			var url = '/Warehouse_receipts/ExportExcel';
+			$.DownLoadProgress({
+			    url: url,         //下载文件的url
+			    method: 'Post',   //链接打开方式
+			    data: postdata,         //要发送的数据
+			    downLoadInfo: '下载文件', //下载界面文字
+			    closeDelay: 2000, //自动关闭时间(毫秒) 0则立马关闭
+			    callbackFuc: function () {
+			        $.messager.progress('close');
+			    }
+			});
+		}
+
+        var $dg = $('#warehouse_receipt_datagrid');
+        var editIndex = undefined;
+
+        //查询条件重置按钮 点击事件
+        $("#btn-reset").click(function (e) {
+            e.preventDefault();
+            clearfrom();
+        });
+        //点击重置按钮时，触发，清空查询条件
+        function clearfrom() {
+            $('#searchform').form('reset');
+        }
+        //
+        $("#btn-search").click(function (e) {
+            e.preventDefault();
+            searchf();
+        });
+        //点击查询按钮时，触发
+        function searchf() {
+            //清除datagrid中选中的记录
+            $dg.datagrid("clearChecked");
+            $dg.datagrid("clearSelections");
+
+            setfilteropts();//设置查询条件
+            var opts = $dg.datagrid('options');
+            opts.url = '/Warehouse_receipts/GetData';
+            opts.pageNumber = 1;
+            var pager = $dg.datagrid('getPager');
+            pager.pagination('refresh', {
+                pageNumber: 1
+            });
+            reload();
+        }
+        //设置查询条件
+        function setfilteropts() {
+            var Entry_Id = $("#Entry_Id_Query").textbox("getValue");
+            var MBL = $("#MBL_Query").textbox("getValue");
+            var HBL = $("#HBL_Query").textbox("getValue");
+            var Is_CustomerReturn = $("#Is_CustomerReturn_Query").combogrid("getValue");
+            var _Flight_Date_Want = $("#_Flight_Date_Want").textbox("getValue");
+            var Flight_Date_Want_ = $("#Flight_Date_Want_").textbox("getValue");
+            var Status = $("#Status_Query").combogrid("getValue");
+            var _In_Date = $("#_In_Date").datebox("getValue");
+            var In_Date_ = $("#In_Date_").datebox("getValue");
+            var Consign_Code_CK = $("#Consign_Code_CK_Query").combogrid("getValue");
+            var End_Port = $("#End_Port_Query").combogrid("getValue");
+            var Is_Binding = $("#Is_Binding_Query").combogrid("getValue");
+            var Warehouse_Id = $("#Warehouse_Id_Query").textbox("getValue");
+            
+            var params = [];
+            var opts = $dg.datagrid('options');
+
+            if (!(typeof (Entry_Id) === 'undefined' || Entry_Id == null || Entry_Id == "")) {
+                params.push({ "field": "Entry_Id", "op": "equal", "value": Entry_Id });
+            }
+            if (!(typeof (MBL) === 'undefined' || MBL == null || MBL == "")) {
+                params.push({ "field": "MBL", "op": "equal", "value": MBL });
+            }
+            if (!(typeof (HBL) === 'undefined' || HBL == null || HBL == "")) {
+                params.push({ "field": "HBL", "op": "equal", "value": HBL });
+            }
+            if (!(typeof (Is_CustomerReturn) === 'undefined' || Is_CustomerReturn == null || Is_CustomerReturn == "")) {
+                params.push({ "field": "Is_CustomerReturn", "op": "equal", "value": Is_CustomerReturn });
+            }
+            if (!(typeof (_Flight_Date_Want) === 'undefined' || _Flight_Date_Want == null || _Flight_Date_Want == "")) {
+                params.push({ "field": "_Flight_Date_Want", "op": "equal", "value": _Flight_Date_Want });
+            }
+            if (!(typeof (Flight_Date_Want_) === 'undefined' || Flight_Date_Want_ == null || Flight_Date_Want_ == "")) {
+                params.push({ "field": "Flight_Date_Want_", "op": "equal", "value": Flight_Date_Want_ });
+            }
+            if (!(typeof (Status) === 'undefined' || Status == null || Status == "")) {
+                params.push({ "field": "Status", "op": "equal", "value": Status });
+            }
+            if (!(typeof (_In_Date) === 'undefined' || _In_Date == null || _In_Date == "")) {
+                params.push({ "field": "_In_Date", "op": "equal", "value": _In_Date });
+            }
+            if (!(typeof (In_Date_) === 'undefined' || In_Date_ == null || In_Date_ == "")) {
+                params.push({ "field": "In_Date_", "op": "equal", "value": In_Date_ });
+            }
+            if (!(typeof (Consign_Code_CK) === 'undefined' || Consign_Code_CK == null || Consign_Code_CK == "")) {
+                params.push({ "field": "Consign_Code_CK", "op": "equal", "value": Consign_Code_CK });
+            }
+            if (!(typeof (End_Port) === 'undefined' || End_Port == null || End_Port == "")) {
+                params.push({ "field": "End_Port", "op": "equal", "value": End_Port });
+            }
+            if (!(typeof (Is_Binding) === 'undefined' || Is_Binding == null || Is_Binding == "")) {
+                params.push({ "field": "Is_Binding", "op": "equal", "value": Is_Binding });
+            }
+            if (!(typeof (Warehouse_Id) === 'undefined' || Warehouse_Id == null || Warehouse_Id == "")) {
+                params.push({ "field": "Warehouse_Id", "op": "equal", "value": Warehouse_Id });
+            }
+
+            opts.queryParams = {
+                'filterRules': JSON.stringify(params)
+            };
+
+        }
+        //
+		function reload() {
+		    reject();//回滚所有变更
+
+		    //清除datagrid中选中的记录
+		    $dg.datagrid("clearChecked");
+		    $dg.datagrid("clearSelections");
+
+            $dg.datagrid('reload');
+        }
+        //
+		function isorNoformatter(value, row, index) {
+		    try {
+		        if (typeof value === 'undefined')
+		            return value;
+		        if (value == null)
+		            return '否';
+		        if (value == '0' || value == "draft")
+		            return '否';
+		        else {
+		            return '是';
+		        }
+		    }
+		    catch (e) {
+		        return value;
+		    }
+		}
+		//combogrid 设置信息（onBeginEdit时,使用）
+        var combogrid_Settings = {
+			'COUNTRY': {
+				required: true,
+                url: '/PARA_COUNTRYS/GetPagerPARA_COUNTRY',
+                method: 'get',
+                delay: 500,
+                multiple: false,
+                panelHeight: 'auto',
+                panelWidth: 205,
+                idField: 'COUNTRY_CO',
+                valueField: 'COUNTRY_CO',
+                textField: 'COUNTRY_NA',
+                pageSize: 10,//每页显示的记录条数，默认为10
+                pageList: [5, 10, 20],//可以设置每页记录条数的列表
+                pagination: true,//是否分页
+                columns: [[
+					{ field: 'COUNTRY_CO', title: '代码', width: 53 },
+                    { field: 'COUNTRY_NA', title: '名称', width: 150 }
+                ]],
+                onLoadSuccess: function () {
+					ondgLoadSuccess($dg, 'COUNTRY', rowIndex);
+                },
+                onChange: function(value){
+				    var targetEditor = $dg.datagrid('getEditor', {
+				        field: 'COUNTRY',
+				        index: editIndex
+				    });
+				    if (targetEditor != null) {
+				        var Selted = $(targetEditor.target).combogrid('grid').datagrid('getSelected');
+				        if (Selted) {
+				            var datarow = $dg.datagrid('getData').rows[editIndex];
+				            if (!(typeof datarow === 'undefined' || datarow == null)) {
+				                datarow['COUNTRY'+'NAME'] = Selted[$(targetEditor.target).combogrid('options').textField];
+				            }
+				        }
+				    }
+				},
+				keyHandler: {
+			        up: function (e) {
+			            combogrid_upKey(this, e);
+			        },
+			        down: function (e) {
+			            combogrid_downKey(this, e);
+			        },
+			        enter: function (e) {
+			            combogrid_enterKey(this, e, $dg, 'COUNTRY', rowIndex);
+			        },
+			        query: function (q) {
+			            combogrid_query(this, q, rowIndex, {});
+			        }
+			    }
+			}
+		};
+		//开始编辑行时，赋值 联动数据
+        function onBeginEdit(rowIndex, rowData) {
+			var num = 0;
+			var regx = /^\/Date\([0-9]+(\)\/)$/g;
+            for (var i in rowData) {
+			    if (regx.test(rowData[i])) {
+			        rowData[i] = datetimeformatter(rowData[i]);
+			    }
+                var targetEditor = $dg.datagrid('getEditor', {
+                    field: i,
+                    index: rowIndex
+                });
+                //console.log("targetEditor", i, targetEditor);
+                if (targetEditor) {
+                    num++;
+                    if (num == 1 && $(targetEditor.target).val() == '') {
+                        $(targetEditor.target).parent().children("span:eq(0)").children("input:eq(0)").focus();
+                    }
+
+                    var OldVal = targetEditor.oldHtml;
+                    switch (targetEditor.type.toLowerCase()) {
+                        case "combogrid":
+                            //console.log(targetEditor);
+                            var combogrid_Setting = combogrid_Settings[targetEditor.field];
+                            if (combogrid_Setting) {
+                                $(targetEditor.target).combogrid(combogrid_Setting);
+                            }
+                            if (!(typeof(OldVal) === 'undefined'|| OldVal == null || OldVal == '')) {
+								if (rowData[targetEditor.field]) {
+								    OldVal = rowData[targetEditor.field];
+								}
+								$(targetEditor.target).combogrid('setValue', OldVal);
+								var opts = $(targetEditor.target).combogrid('options');
+								var url = opts.url;
+								//设置查询参数
+								var queryParams = {
+								    page: 1,
+								    rows: opts.pageSize,
+								    q: OldVal
+								};
+								$(targetEditor.target).combogrid('grid').datagrid('load', queryParams);
+                            }
+                            break;
+                        case "combobox":
+                            var opts = $(targetEditor.target).combobox({
+                                inputEvents: $.extend({}, $.fn.combobox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        combobox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "textbox":
+                            $(targetEditor.target).textbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "numberbox":
+                            $(targetEditor.target).numberbox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            break;
+                        case "datebox":
+                            $(targetEditor.target).datebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "datetimebox":
+                            $(targetEditor.target).datetimebox({
+                                inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                                    keydown: function (event) {
+                                        Listtextbox_keydown(this, event, $dg, rowIndex);
+                                    }
+                                })
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "checkbox":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                        case "radio":
+                            $(targetEditor.target).keydown(function (e) {
+                                chk_rdo_keydown(this, e, $dg, rowIndex);
+                            });
+                            setTargetVal(targetEditor, OldVal);
+                            break;
+                    }
+                }
+            }
+        }
+        //
+        function endEditing() {
+            if (editIndex == undefined)  
+				return true; 
+            if ($dg.datagrid('validateRow', editIndex)) {
+				$dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        //双击当前行，打开编辑窗口V
+        function onDblClickRow(index, row) {
+            //$(location).attr('href', "/Warehouse_receipts/Edit?id=" + row.Id);
+            var url = "/Warehouse_receipts/EditWindow?id=" + row.Id;
+            openwindows(url);
+        }
+        //
+        function openwindows(url) {
+            $Win = $("#receiptywindow");
+            $Win.data().panel.options.href = url;
+            $Win.data().panel.options.onLoad = function () {
+                initEasyUIControl();
+                searchfdetail();
+                var $Entry_Id = $("#Entry_Id");
+                var data = $Entry_Id.data();
+                //$Entry_Id.textbox({
+                //    inputEvents: $.extend({}, $.fn.textbox.defaults.inputEvents, {
+                //        keydown: function (event) {
+                //            textbox_keydown(this, event);
+                //            console.log("dddd", $("#Entry_Id").textbox("getValue"));
+                //            bindingops(event);
+                //        }
+                //    })
+                //});
+                var Entry_Id = $Entry_Id.textbox("textbox")
+                Entry_Id.on('blur', function (event) {
+                    bindingops(event);
+                });
+                var Max = 20, Num = 1;
+                var intervalrw = setInterval(function () {
+                    Num++;
+                    try {
+                        if (Max <= Num)
+                        {
+                            clearInterval(intervalrw);
+                            $.messager.alert('提示', '数据加载错误！');
+                        }
+                        var $ArrTxtNoRemark = $("input[name='Remark'].textbox-value", "#receiptywindow");
+                        if ($ArrTxtNoRemark.length == 1) {
+                            //加载 弹出框
+                            InitEditWin();
+                            clearInterval(intervalrw);
+                        }
+                    } catch (e) {
+                        console.log(e);
+                        clearInterval(intervalrw);
+                    }
+                }, 50);
+            }
+            $Win.data().panel.options.onBeforeClose = function () {
+                reload();
+            }
+            $Win.window("open");
+        }
+        //datagrid 创建列头右键菜单，选择显示或隐藏列
+        var createGridHeaderContextMenu = function (e, field) {
+            e.preventDefault();
+            var grid = $(this);/* grid本身 */
+            var headerContextMenu = this.headerContextMenu;/* grid上的列头菜单对象 */
+            var okCls = 'tree-checkbox1';// 选中
+            var emptyCls = 'tree-checkbox0';// 取消
+            if (!headerContextMenu) {
+                var tmenu = $('<div style="width:100px;"></div>').appendTo('body');
+                var fields = grid.datagrid('getColumnFields');
+                for (var i = 0; i < fields.length; i++) {
+                    var fildOption = grid.datagrid('getColumnOption', fields[i]);
+                    if (!fildOption.hidden) {
+                        $('<div iconCls="' + okCls + '" field="' + fields[i] + '"/>')
+                                .html(fildOption.title).appendTo(tmenu);
+                    } else {
+                        $('<div iconCls="' + emptyCls + '" field="' + fields[i] + '"/>')
+                                .html(fildOption.title).appendTo(tmenu);
+                    }
+                }
+                headerContextMenu = this.headerContextMenu = tmenu.menu({
+                    onClick: function (item) {
+                        var field = $(item.target).attr('field');
+                        if (item.iconCls == okCls) {
+                            grid.datagrid('hideColumn', field);
+                            $(this).menu('setIcon', {
+                                target: item.target,
+                                iconCls: emptyCls
+                            });
+                        } else {
+                            grid.datagrid('showColumn', field);
+                            $(this).menu('setIcon', {
+                                target: item.target,
+                                iconCls: okCls
+                            });
+                        }
+                    }
+                });
+            }
+            headerContextMenu.menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        };
+        $.fn.datagrid.defaults.onHeaderContextMenu = createGridHeaderContextMenu;//右键菜单
+        //
+        function onClickCell(index, field) {
+			var _operates = ["_operate1", "_operate2", "_operate3", "ck"]
+            if ($.inArray(field, _operates) >= 0) {
+                return;
+            }
+            if (editIndex != index) {
+                if (endEditing()) {
+                    @if (!Html.IsAuthorize("Warehouse_receipts", "Index", "Edit"))
+                    {
+                        @Html.Raw("$.messager.alert('提示', '您没有编辑权限！');");
+                        @Html.Raw("return;\r\n");
+                    }
+					//动态设置 编辑样式
+                    var byteColumn = $dg.datagrid('getColumnOption', 'ADDWHO');
+                    if (!(typeof (byteColumn) === 'undefined' || byteColumn == null || byteColumn == '')) {
+						byteColumn.editor = {};
+						byteColumn = $dg.datagrid('getColumnOption', 'ADDTS');
+						byteColumn.editor = {};
+						var byteColumn = $dg.datagrid('getColumnOption', 'EDITWHO');
+						byteColumn.editor = {
+						    type: 'textbox',
+						    options: {
+						        required: false,
+						        validType: 'length[0,20]'
+						    }
+						};
+						byteColumn = $dg.datagrid('getColumnOption', 'EDITTS');
+						byteColumn.editor = {
+						    type: 'datebox',
+						    options: {
+						        required: false
+						    }
+						};
+					}
+
+                    //$dg.datagrid('selectRow', index).datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+		//加载成功
+		function onLoadSuccess(rowdata) {
+		    //行号自适应宽度
+		    $(this).datagrid("fixRownumber");
+		}
+        //新建仓库接单
+		function append() {
+		    var url = "/Warehouse_receipts/CreateWindow";
+		    openwindows(url);
+        }
+        //
+        function removeit() {
+			var Seltdata = $dg.datagrid('getSelections');
+            if (!(typeof editIndex === 'undefined' || editIndex == null || isNaN(editIndex))) {
+			    $dg.datagrid('cancelEdit', editIndex);
+			    editIndex = undefined;
+			}
+			for (var i = Seltdata.length; i > 0; i--) {
+			    var rowindex = $dg.datagrid('getRowIndex', Seltdata[i - 1]);
+			    //console.log(rowindex);
+			    $dg.datagrid('deleteRow', rowindex);
+			}
+        }
+        //
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+					var url = '/Warehouse_receipts/SaveData';
+					$.ajax({
+                        type: 'POST',
+                        url: url,//获取数据的函数
+                        async: true,//true 异步，false 同步
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(effectRow),//查询条件JSON.stringify()
+                        beforeSend: function (xhr) {//发送请求前运行的函数
+                            $.messager.progress({
+                                title: '数据处理中',
+                                msg: '数据处理中，请等待...'
+                            });
+                            //验证重复提交时 请加上 这句
+                            AddAjaxActionGuidName(this);
+                        },
+                        success: function (response) {//查询成功,data为返回的数据
+                            if (response.Success) {
+                                $.messager.alert("提示", "提交成功！");
+                                $dg.datagrid('acceptChanges');
+                                reload();
+                            }
+                            else {
+								var ErrMsgStr = '提交错误了！';
+                                if (!(typeof (response.ErrMsg) === 'undefined' || response.ErrMsg == null || response.ErrMsg == ''))
+									ErrMsgStr = response.ErrMsg;
+                                $.messager.alert("错误", ErrMsgStr, 'error');
+                            }
+                        },
+                        error: function () {//查询失败
+                            $.messager.alert("错误", "提交错误了！", 'error');
+                        },
+                        complete: function (xhr, status) {//请求完成时运行的函数（在请求成功或失败之后均调用，即在 success 和 error 函数之后）。
+                            $.messager.progress('close');
+                        }
+                    });
+                }
+                //$dg.datagrid('acceptChanges');
+            }
+        }
+        //
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        //
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+        //自动添加 textbox 或 text的值18036406402
+        function AutoAddFilterRule($dg_) {
+            var ColumnsFields = $dg_.datagrid('getColumnFields');
+            $.each(ColumnsFields, function (i, ColumnName) {
+		        var input = $dg_.datagrid('getFilterComponent', ColumnName);
+                if (!(input.data("datebox") || input.data("datetimebox") || input.data("combobox") || input.data("checkbox") || input.data("combotree") || input.data("combogrid") || input.data("numberbox"))) {
+                    var rule = $dg_.datagrid('getFilterRule', ColumnName);
+		            var value = input.val();
+                    if (!(typeof (value) === 'undefined' || value == null || value == '')) {
+		                if ((rule && rule.value != value) || !rule) {
+		                    $dg_.datagrid('addFilterRule', {
+		                        field: ColumnName,
+		                        op: 'equal',
+		                        value: value
+		                    });
+		                }
+		            } else {
+		                if (rule) {
+		                    $dg_.datagrid('removeFilterRule', ColumnName);
+		                }
+		            }
+		        }
+		    });
+		}
+		
+		//-----------------------------------------------------
+		//datagrid onSelect
+		//-----------------------------------------------------
+		function onSelect(index, row) {
+            //console.log(index, row);
+        }
+ 		
+		//自适应页面大小
+		function MyNavResize() {
+		    var opts = $("#navbar-minimalize").NavResize('getOptions');
+		    opts.Auto = false;
+		    opts.OnNavResizefunc = function () {
+		        //$("#edit_div_one").css('width', "100%");
+		        //$("#edit_div_two").css('width', "100%");
+		        //$("#OrderInfo").datagrid("resize", { width: "100%" });
+		        //$("#OrderDetail").datagrid("resize", { width: "100%" });
+		        //$("#ProductNameMerge").datagrid("resize", { width: "100%" });
+		        //$("#Order_Head_panel").panel("resize", { width: "100%" });
+		        //setTimeout(function () {
+		        //    var paddigLeftRight = { "padding-left": "0px", "margin-left": "0px", "padding-right": "0px", "margin-right": "0px" };
+		        //    $("#edit_div_one").css(paddigLeftRight);
+		        //    $("#edit_div_two").css(paddigLeftRight);
+		        //    $("#OrderInfo").css(paddigLeftRight);
+		        //    $("#OrderDetail").css(paddigLeftRight);
+		        //    $("#ProductNameMerge").css(paddigLeftRight);
+		        //    $("#Order_Head_panel").css(paddigLeftRight);
+		        //    SetbuttonssWidth();
+		        //}, 100);
+		    };
+		}
+	 </script>

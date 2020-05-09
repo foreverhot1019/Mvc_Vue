@@ -1,0 +1,370 @@
+﻿@using CCBWebApi.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "登录";
+    Layout = null;
+    System.Net.IPHostEntry OIPHost;
+    string WebHostStr = "";
+    int WebHostIndex = -1;
+    string WebSiteName = "飞力达快贷";
+    OIPHost = HttpContext.Current.Cache["WebHostStr"] == null ? null : (System.Net.IPHostEntry)Cache["WebHostStr"];
+    WebHostStr = OIPHost == null ? "" : (OIPHost.AddressList.Any() ? OIPHost.AddressList.Select(x => x.ToString()).OrderBy(x => x).FirstOrDefault() : "");
+    WebHostIndex = WebHostStr.LastIndexOf('.');
+}
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title>登录 - @WebSiteName</title>
+
+    <meta name="description" content="User login page" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="/AceAssets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/fonts/font-awesome-4.7.0/css/font-awesome.min.css" />
+
+    <!-- text fonts -->
+    <link rel="stylesheet" href="/AceAssets/css/fonts.googleapis.com.css" />
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="/AceAssets/css/ace.min.css" />    
+    <!-- ace settings handler -->
+    <script src="/AceAssets/js/ace-extra.min.js"></script>
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/AceAssets/css/ace-part2.min.css" />
+    <![endif]-->
+    <link rel="stylesheet" href="/AceAssets/css/ace-rtl.min.css" />
+
+    <!--[if lte IE 9]>
+      <link rel="stylesheet" href="/AceAssets/css/ace-ie.min.css" />
+    <![endif]-->
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="/AceAssets/js/html5shiv.min.js"></script>
+    <script src="/AceAssets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="login-layout light-login">
+    <div class="main-container">
+        <div class="main-content">
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <div class="login-container">
+                        <div class="center">
+                            <h1>
+                                <i class="ace-icon fa fa-suitcase green"></i>
+                                <span class="red">飞力达</span>
+                                <span class="grey" id="id-text2">建行快贷</span>
+                            </h1>
+                            <h4 class="blue" id="id-company-text">&copy; 苏州普罗腾有限公司</h4>
+                        </div>
+                        <div class="space-6"></div>
+                        <div class="position-relative">
+                            <div id="login-box" class="login-box visible widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h4 class="header blue lighter bigger">
+                                            <i class="ace-icon fa fa-coffee green"></i>
+                                            请输入你的信息
+                                        </h4>
+                                        <div class="space-6"></div>
+                                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "login" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            @*<form>*@
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*<input type="text" class="form-control" placeholder="用户名" />*@
+                                                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "用户名" })
+                                                        <i class="ace-icon fa fa-user"></i>
+                                                    </span>
+                                                    @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @*<input type="password" class="form-control" placeholder="密码" />*@
+                                                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "密码" })
+                                                        <i class="ace-icon fa fa-lock"></i>
+                                                    </span>
+                                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                                </label>
+                                                <label class="block clearfix" id="lblOP">
+                                                    <span class="block input-icon input-icon-right">
+                                                        @Html.DropDownListFor(m => m.OP, new SelectList(ViewBag.OpList, "Id", "Name"), new { @class = "form-control", placeholder = "操作点选择" })
+                                                        <i class="ace-icon fa fa-circle"></i>
+                                                    </span>
+                                                    @Html.ValidationMessageFor(model => model.OP, "", new { @class = "text-danger" })
+                                                </label>
+                                                <div class="space"></div>
+                                                <div class="clearfix">
+                                                    <label class="inline">
+                                                        <input type="checkbox" class="ace" />
+                                                        <span class="lbl"> 记住</span>
+                                                    </label>
+                                                    <button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
+                                                        <i class="ace-icon fa fa-key"></i>
+                                                        <span class="bigger-110">登录</span>
+                                                    </button>
+                                                </div>
+                                                <div class="space-4"></div>
+                                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            </fieldset>
+                                            @*</form>*@
+                                        }
+                                        <div class="social-or-login center">
+                                            <span class="bigger-110">其他登录方式</span>
+                                        </div>
+
+                                        <div class="space-6"></div>
+
+                                        <div class="social-login center">
+                                            <a class="btn btn-primary">
+                                                <i class="ace-icon fa fa-facebook"></i>
+                                            </a>
+
+                                            <a class="btn btn-info">
+                                                <i class="ace-icon fa fa-twitter"></i>
+                                            </a>
+
+                                            <a class="btn btn-danger">
+                                                <i class="ace-icon fa fa-google-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div><!-- /.widget-main -->
+
+                                    <div class="toolbar clearfix">
+                                        <div>
+                                            <a href="#" data-target="#forgot-box" class="forgot-password-link">
+                                                <i class="ace-icon fa fa-arrow-left"></i>
+                                                忘记密码
+                                            </a>
+                                        </div>
+
+                                        <div>
+                                            <a href="#" data-target="#signup-box" class="user-signup-link">
+                                                我要注册
+                                                <i class="ace-icon fa fa-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.login-box -->
+                            <!-- .forgot-box -->
+                            <div id="forgot-box" class="forgot-box widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h4 class="header red lighter bigger">
+                                            <i class="ace-icon fa fa-key"></i>
+                                            找回 密码
+                                        </h4>
+
+                                        <div class="space-6"></div>
+                                        <p>
+                                            <!--Enter your email and to receive instructions-->
+                                            输入你的邮箱地址来接收说明
+                                        </p>
+
+                                        <form>
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="email" class="form-control" placeholder="Email" />
+                                                        <i class="ace-icon fa fa-envelope"></i>
+                                                    </span>
+                                                </label>
+
+                                                <div class="clearfix">
+                                                    <button type="button" class="width-35 pull-right btn btn-sm btn-danger">
+                                                        <i class="ace-icon fa fa-lightbulb-o"></i>
+                                                        <span class="bigger-110">发送!</span>
+                                                    </button>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </div><!-- /.widget-main -->
+
+                                    <div class="toolbar center">
+                                        <a href="#" data-target="#login-box" class="back-to-login-link">
+                                            返回登录
+                                            <i class="ace-icon fa fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.forgot-box -->
+                            <!-- .signup-box -->
+                            <div id="signup-box" class="signup-box widget-box no-border">
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <h4 class="header green lighter bigger">
+                                            <i class="ace-icon fa fa-users blue"></i>
+                                            新用户注册
+                                        </h4>
+                                        <div class="space-6"></div>
+                                        <p>输入你的帐户信息: </p>
+                                        <form>
+                                            <fieldset>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="email" class="form-control" placeholder="Email" />
+                                                        <i class="ace-icon fa fa-envelope"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="text" class="form-control" placeholder="用户名" />
+                                                        <i class="ace-icon fa fa-user"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="password" class="form-control" placeholder="密码" />
+                                                        <i class="ace-icon fa fa-lock"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block clearfix">
+                                                    <span class="block input-icon input-icon-right">
+                                                        <input type="password" class="form-control" placeholder="确认密码" />
+                                                        <i class="ace-icon fa fa-retweet"></i>
+                                                    </span>
+                                                </label>
+                                                <label class="block">
+                                                    <input type="checkbox" class="ace" />
+                                                    <span class="lbl">
+                                                        我 同意
+                                                        <a href="#">用户协议</a>
+                                                    </span>
+                                                </label>
+                                                <div class="space-24"></div>
+                                                <div class="clearfix">
+                                                    <button type="reset" class="width-30 pull-left btn btn-sm">
+                                                        <i class="ace-icon fa fa-refresh"></i>
+                                                        <span class="bigger-110">重置</span>
+                                                    </button>
+                                                    <button type="button" class="width-65 pull-right btn btn-sm btn-success">
+                                                        <span class="bigger-110">注册</span>
+                                                        <i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+                                                    </button>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                    <div class="toolbar center">
+                                        <a href="#" data-target="#login-box" class="back-to-login-link">
+                                            <i class="ace-icon fa fa-arrow-left"></i>
+                                            返回登录
+                                        </a>
+                                    </div>
+                                </div><!-- /.widget-body -->
+                            </div><!-- /.signup-box -->
+                        </div><!-- /.position-relative -->
+                        <div class="navbar-fixed-top align-right">
+                            <br />
+                            &nbsp;
+                            <a id="btn-login-light" href="#">Light</a>
+                            &nbsp;
+                            <span class="blue">/</span>
+                            &nbsp;
+                            <a id="btn-login-blur" href="#">Blur</a>
+                            &nbsp;
+                            <span class="blue">/</span>
+                            &nbsp;
+                            <a id="btn-login-dark" href="#">Dark</a>
+                            &nbsp; &nbsp; &nbsp;
+                        </div>
+                    </div>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.main-content -->
+    </div><!-- /.main-container -->
+    <!-- basic scripts -->
+    <!--[if !IE]> -->
+    <script src="~/Scripts/js/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script src="/AceAssets/js/jquery-1.11.3.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script src='/AceAssets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+
+    <!-- inline scripts related to this page -->
+    <script type="text/javascript">
+        jQuery(function ($)
+        {
+            $(document).on('click', '.toolbar a[data-target]', function (e)
+            {
+                e.preventDefault();
+                var target = $(this).data('target');
+                $('.widget-box.visible').removeClass('visible');//hide others
+                $(target).addClass('visible');//show target
+            });
+        });
+        //you don't need this, just used for changing background
+        jQuery(function ($)
+        {
+            $('#btn-login-light').on('click', function (e)
+            {
+                ace.data.set('loginStyle', 'light');
+                $('body').attr('class', 'login-layout light-login');
+                $('#id-text2').attr('class', 'grey');
+                $('#id-company-text').attr('class', 'blue');
+                e.preventDefault();
+            });
+            $('#btn-login-blur').on('click', function (e)
+            {
+                ace.data.set('loginStyle', 'blur');
+                $('body').attr('class', 'login-layout blur-login');
+                $('#id-text2').attr('class', 'white');
+                $('#id-company-text').attr('class', 'light-blue');
+                e.preventDefault();
+            });
+            $('#btn-login-dark').on('click', function (e)
+            {
+                ace.data.set('loginStyle', 'dark');
+                $('body').attr('class', 'login-layout');
+                $('#id-text2').attr('class', 'white');
+                $('#id-company-text').attr('class', 'blue');
+                e.preventDefault();
+            });
+            var loginStyle = ace.data.get('loginStyle');
+            if(!(typeof(loginStyle)==='undefined'||loginStyle==null||loginStyle==''))
+            {
+                switch (loginStyle) {
+                    case 'blur':
+                        $('#btn-login-blur').trigger('click');
+                        break;
+                    case 'dark':
+                        $('#btn-login-dark').trigger('click');
+                        break;
+                }
+            } else
+                ace.data.set('loginStyle', 'light');
+        });
+        //登录
+        var LastUserName = '';//最后一次登录名
+        var MaxSameNum = 3;//最大相同次数后 重新 获取
+        var SameNum = 1;//记录相同次数
+        //页面加载结束时
+        $(document).ready(function ()
+        {
+            var $UserName = $("#UserName");
+            //隐藏操作点
+            $("select[id='OP'] option:first").attr('selected', 'selected');
+            $("#lblOP,#OP,#lblOP i").css({ "display": "none" });
+        });
+        //提交
+        $('form').submit(function ()
+        {
+            if (!$('form').valid())
+                return false;
+        });
+    </script>
+</body>
+</html>

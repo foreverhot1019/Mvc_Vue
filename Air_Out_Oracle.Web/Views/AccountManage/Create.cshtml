@@ -1,0 +1,120 @@
+﻿
+@using AirOut.Web.Models
+
+@model RegisterViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<script src="~/Scripts/jsext.js?date=2019013001"></script>
+
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Category
+                <small>Create</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-home"></i>  @Html.ActionLink("Home", "Index", "Home")
+                </li>
+                 <li>
+                    <i class="fa fa-folder-open"></i>  @Html.ActionLink("Users", "Index", "AccountManage")
+                </li>
+                <li class="active">
+                    <i class="fa fa-file"></i> Create
+                </li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.row -->
+     <div class="row">
+        <div class="col-lg-12">
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Category</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <fieldset>
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserName, "登录名",htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "easyui-textbox" ,data_options = "required:true, validType:'length[0,100]'" } })
+                    @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserNameDesc, "姓名", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.UserNameDesc, new { htmlAttributes = new { @class = "easyui-textbox" } })
+                    @Html.ValidationMessageFor(model => model.UserNameDesc, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, "邮箱", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "easyui-textbox" ,data_options = "required:true, validType:'length[0,100]'" } })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Password, "密码", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "easyui-textbox", data_options = "required:true, validType:'length[6,100]'" } })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>  
+            <div class="form-group">
+                @Html.LabelFor(model => model.Department, "部门", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.Department, new { htmlAttributes = new { @class = "easyui-combogrid" } })
+                    @Html.ValidationMessageFor(model => model.Department, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.PhoneNumber, "联系电话", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "easyui-textbox" } })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.IsJDServ, "接单人", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.IsJDServ, new { htmlAttributes = new { @class = "easyui-checkbox" } })
+                    @Html.ValidationMessageFor(model => model.IsJDServ, "", new { @class = "text-danger" })
+                </div>
+            </div>
+                 
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" class="btn btn-default" value="Create" />
+                </div>
+            </div>
+        </fieldset>
+         
+    </div>
+}
+
+ </div>
+</div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+
+        $("#Department").combogrid($.extend({}, combogrid_DefaultSettings, {
+        textField: 'IDTEXT',
+        url: '/CusBusInfos/GetPagerCusBusInfos_FromCache',
+    }));
+
+    </script>
+}

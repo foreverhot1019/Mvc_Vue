@@ -1,0 +1,355 @@
+﻿@using AirOut.Web.Models
+
+@model IEnumerable<DataTableImportMapping>
+
+@{
+    ViewBag.Title = "Excel导入配置";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        @*<h2>@ViewBag.Title</h2>*@
+        <ol class="breadcrumb">
+            <li>
+                <a href="@Url.Action("Index", "Home")">主页</a>
+            </li>
+            <li>
+                <a>系统管理</a>
+            </li>
+            <li class="active">
+                <strong>Excel导入配置</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Excel导入配置</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        @*<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 1</a>
+                                </li>
+                                <li>
+                                    <a href="table_data_tables.html#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>*@
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="datatableimportmappings_datagrid" class="easyui-datagrid" title="" style="width:auto;height:auto"
+                            data-options="
+                            idField:'Id',
+                            sortName:'Id',
+                            sortorder:'asc',
+                            rownumbers:true,
+                            remoteFilter: true,
+                            singleSelect: true,
+                            toolbar: '#datatableimportmappings_toolbar',
+                            url: '/DataTableImportMappings/GetData',
+                            method: 'get',
+                            onClickCell: onClickCell,
+                            pagination: 'true',
+                            pageSize:20">
+                            <thead>
+                                <tr>
+                                    @*<th data-options="field:'ck',checkbox:true"></th>*@
+                                    <th data-options="field:'Id',width:80">@Html.DisplayNameFor(model => model.Id)</th>
+
+                                    <th data-options="field:'EntitySetName',width:140 ">@Html.DisplayNameFor(model => model.EntitySetName)</th>
+
+                                    <th data-options="field:'FieldName',width:140  ">@Html.DisplayNameFor(model => model.FieldName)</th>
+
+                                    <th data-options="field:'TypeName',width:140 ">@Html.DisplayNameFor(model => model.TypeName)</th>
+
+                                    <th data-options="field:'IsRequired',width:140 ">@Html.DisplayNameFor(model => model.IsRequired)</th>
+
+                                    <th data-options="field:'DefaultValue',width:140 ,editor:{type:'textbox',options:{required:false} }">@Html.DisplayNameFor(model => model.DefaultValue)</th>
+
+                                    <th data-options="field:'SourceFieldName',width:140,editor:{type:'textbox',options:{required:false} } ">@Html.DisplayNameFor(model => model.SourceFieldName)</th>
+
+                                    <th data-options="field:'IsEnabled',width:120,editor: {type:'combobox',options:{panelHeight: 'auto',data: [ { value: 'true', text: 'true' },{ value: 'false', text: 'false' } ],required:true}}">@Html.DisplayNameFor(model => model.IsEnabled)</th>
+
+                                    <th data-options="field:'RegularExpression',width:140,editor:{type:'textbox',options:{required:false} } ">@Html.DisplayNameFor(model => model.RegularExpression)</th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div id="datatableimportmappings_toolbar" style="height:auto">
+                            <input class="easyui-combobox" name="entities" id="entities"
+                            data-options="
+                            url:'/DataTableImportMappings/GetAllEntites',
+                            method:'get',
+                            valueField:'Name',
+                            textField:'Value',
+                            panelHeight:'auto',
+                            onChange:onChange_Entities
+                            ">
+                            @if (Html.IsAuthorize("Create"))
+                            {
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-plus',plain:true" onclick="generate()">生成</a>
+                            }
+                            @if (Html.IsAuthorize("Delete"))
+                            {
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit()">删除</a>
+                            }
+                            @if (Html.IsAuthorize("Edit"))
+                            {
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept()">保存</a>
+                            }
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject()">取消</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true" onclick="reload()">刷新</a>
+                            @*@if (Html.IsAuthorize("Import"))
+                                {
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-paperclip',plain:true" onclick="importexcel()">EXCEL 导入</a>
+                                }
+                                @if (Html.IsAuthorize("Export"))
+                                {
+                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-download-alt',plain:true" onclick="exportexcel()">导出 Excel</a>
+                                }*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="importwindow" class="easyui-window" title="Excel 导入" data-options="modal:true,collapsible:false,minimizable:false,maximizable:false,closed:true,iconCls:'icon-paperclip'" style="width:500px;height:260px;padding:10px;">
+    <p><input type="file" name="file_upload" id="file_upload" /></p>
+    <div id="alert1" class="alert alert-success">
+        <button class="close" data-dismiss="alert" type="button">&times;</button>上传成功，开始执行导入。
+    </div>
+    <div id="alert2" class="alert alert-info">
+        <button class="close" data-dismiss="alert" type="button">&times;</button>正在执行导入程序，请耐心等待。
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#file_upload").uploadifive({
+                'height': 30,
+                'fileTypeDesc': 'Excel 2010 Files',
+                'fileType': ["application/excel", "application/vnd.ms-excel", "application/x-excel", "application/x-msexcel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+                'uploadScript': '/FileUpload/Upload',
+                'buttonText': '选择EXCEL',
+                'multi': true,
+                'displayData': 'speed',
+                'formData': { 'modelType': 'Company' },
+                'width': 120,
+                'successTimeout': 100000,
+                'onFallback': function () {
+                    $.messager.alert('导入错误', '导入错误，请重试！<br>', 'error');
+                    $('#file_upload').uploadifive('clearQueue')
+                },
+                'onSelect': function (queue) {
+                    $.messager.progress({
+                        title: '执行导入',
+                        msg: '请等待...'
+                    });
+                },
+                'onUploadComplete': function (file, data) {
+                    $.messager.progress('close');
+                    var data = $.parseJSON(data);
+                    console.log(data);
+                    if (data.success == false) {
+                        $.messager.alert('导入错误', '导入错误，请修改后再倒入！<br>' + data.message, 'error');
+                        $("#file_upload").uploadifive('clearQueue')
+                    } else {
+                        $.messager.alert('导入完成', '导入完成！<br>', 'info');
+                        $dg.datagrid('reload');
+                        $('#importwindow').window('close');
+                    }
+                    return true;
+                    //alert('The file ' + file.name + ' was successfully uploaded with a response of ' + response + ':' + data);
+                }
+            });
+        });
+
+        var $dg = $('#datatableimportmappings_datagrid');
+        var editIndex = undefined;
+
+        function generate() {
+            var entityname = $('#entities').combobox('getValue');
+            if (entityname.length > 0) {
+                $.messager.progress({ title: '正在处理请耐心等待！' });
+                $.post('/DataTableImportMappings/Generate', { entityname: entityname }, function (data, textStatus, jqXHR) {
+                    //console.log(data);
+                    $.messager.progress('close');
+                    $.messager.alert("提示", "生成完成！", 'info', function () {
+                        $dg.datagrid('reload');
+                    });
+                });
+            }
+        }
+
+        function onChange_Entities(value) {
+            var EntitySetNametarget = $dg.datagrid("getFilterComponent", "EntitySetName");
+            EntitySetNametarget.combobox("setValue", value);
+        }
+
+        function importexcel() {
+            $('#importwindow').window('open');
+        }
+
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if ($dg.datagrid('validateRow', editIndex)) {
+                $dg.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function onClickCell(index, field) {
+            if (editIndex != index) {
+                if (endEditing()) {
+                    $dg.datagrid('selectRow', index)
+                            .datagrid('beginEdit', index);
+                    var ed = $dg.datagrid('getEditor', { index: index, field: field });
+                    if (ed) {
+                        ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                    }
+                    editIndex = index;
+                } else {
+                    $dg.datagrid('selectRow', editIndex);
+                }
+            }
+        }
+        function append() {
+            if (endEditing()) {
+                $dg.datagrid('appendRow', { status: 'P' });
+                editIndex = $dg.datagrid('getRows').length - 1;
+                $dg.datagrid('selectRow', editIndex)
+                        .datagrid('beginEdit', editIndex);
+            }
+        }
+        function removeit() {
+            if (editIndex == undefined) { return }
+            $dg.datagrid('cancelEdit', editIndex)
+                    .datagrid('deleteRow', editIndex);
+            editIndex = undefined;
+        }
+        function accept() {
+            if (endEditing()) {
+                if ($dg.datagrid('getChanges').length) {
+                    var inserted = $dg.datagrid('getChanges', "inserted");
+                    var deleted = $dg.datagrid('getChanges', "deleted");
+                    var updated = $dg.datagrid('getChanges', "updated");
+                    var effectRow = new Object();
+                    if (inserted.length) {
+                        effectRow.inserted = inserted;
+                    }
+                    if (deleted.length) {
+                        effectRow.deleted = deleted;
+                    }
+                    if (updated.length) {
+                        effectRow.updated = updated;
+                    }
+                    //console.log(JSON.stringify(effectRow));
+                    $.ajax({
+                        type: 'POST',
+                        url: '/DataTableImportMappings/SaveData',//获取数据的函数
+                        async: true,//使用同步的方式,true为异步方式
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(effectRow),
+                        beforeSend: function () {//回发前
+                        },
+                        error: function () {//查询失败
+                            $.messager.alert("错误", "提交错误了！", 'error');
+                        },
+                        success: function (data) {//查询成功,data为返回的数据
+                            if (data.Success) {
+                                $.messager.alert("提示", "提交成功！");
+                                $dg.datagrid('acceptChanges');
+                                $dg.datagrid('reload');
+                            }
+                        },
+                        complete: function () {//执行以后
+                            //console.log('complete');
+                        }
+                    });
+
+                }
+
+                $dg.datagrid('acceptChanges');
+            }
+        }
+        function reject() {
+            $dg.datagrid('rejectChanges');
+            editIndex = undefined;
+        }
+        function reload() {
+            $dg.datagrid('reload');
+        }
+        function getChanges() {
+            var rows = $dg.datagrid('getChanges');
+            alert(rows.length + ' rows are changed!');
+        }
+
+        $(function () {
+            $dg.datagrid('enableFilter', [
+                {
+                    field: 'EntitySetName',
+                    type: 'combobox',
+                    options: {
+                        panelHeight: 'auto',
+                        url: '/DataTableImportMappings/GetAllEntites',
+                        method: 'get',
+                        valueField: 'Name',
+                        textField: 'Value',
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'EntitySetName');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'EntitySetName',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                },
+                {
+                    field: 'IsEnabled',
+                    type: 'combobox',
+                    options: {
+                        panelHeight: 'auto',
+                        data: [{ value: '', text: 'All' }, { value: 'true', text: 'true' }, { value: 'false', text: 'false' }],
+                        onChange: function (value) {
+                            if (value == '') {
+                                $dg.datagrid('removeFilterRule', 'IsEnabled');
+                            } else {
+                                $dg.datagrid('addFilterRule', {
+                                    field: 'IsEnabled',
+                                    op: 'equal',
+                                    value: value
+                                });
+                            }
+                            $dg.datagrid('doFilter');
+                        }
+                    }
+                }
+            ]);
+        })
+    </script>
+}
+

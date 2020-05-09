@@ -1,0 +1,271 @@
+﻿﻿
+
+
+
+
+@model TMI.Web.Models.BD_DEFDOC
+
+
+ @*@Html.HiddenFor(model => model.ROWID)*@
+
+
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DOCCODE,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.DOCCODE, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.DOCCODE,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DOCNAME,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.DOCNAME, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.DOCNAME,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.REMARK,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.REMARK, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.REMARK,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADDWHO,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.ADDWHO, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.ADDWHO,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADDTS,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.ADDTS, "Date" ,new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.ADDTS,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EDITWHO,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.EDITWHO, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.EDITWHO,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EDITTS,   htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                                @Html.EditorFor(model => model.EDITTS, "Date" ,new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.EDITTS,"" , new { @class = "text-danger" })
+            </div>
+        </div>
+
+		   
+
+ 
+
+
+     <!-- details tabs -->
+    <div class="tabs-container">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+								<li class="active"><a data-toggle="tab" href="#tab-bd_defdoc_list"> BD_DEFDOC_LIST</a></li>
+								        
+			 
+   
+		 </ul>
+		 <!-- Tab panes -->
+         <div class="tab-content">
+		  		  <div id="tab-bd_defdoc_list" class="tab-pane active">
+
+            <div class="panel-body">
+
+                <div class="table-responsive">
+				<table id="bd_defdoc_list_datagrid" class="easyui-datagrid" title="BD_DEFDOC_LIST DataGrid" style="width:auto;height:400px"
+                       data-options="
+                            rownumbers:true,
+                            iconCls: 'fa fa-list',
+                            remoteFilter: false,
+                            singleSelect: true,
+                            toolbar: '#bd_defdoc_list_toolbar',
+                            method: 'get',
+                            onClickCell: bd_defdoc_list_onClickCell,
+                            pagination: 'true'
+                    " >
+                    <thead>
+                        <tr>
+						@*<th data-options="field:'ck',checkbox:true"></th>*@
+				        
+														<th data-options="field:'ROWID',width:80"> 行号 </th>
+											
+														<th data-options="field:'DOCID',width:100,
+												formatter:function(value,row){
+													return row.BD_DEFDOCDOCCODE;
+												},
+												editor:{
+													type:'combobox',
+													options:{
+														valueField:'ROWID',
+														textField:'DOCCODE',
+														method:'get',
+														url:'/BD_DEFDOCs/GetBD_DEFDOC',
+														required:false
+														}
+												}"> 主档ROWID </th>
+
+           
+											
+						
+															<th data-options="field:'LISTCODE',width:140,editor:{type:'textbox',options:{required:false} } "> 代码</th>
+							
+											
+						
+															<th data-options="field:'LISTNAME',width:140,editor:{type:'textbox',options:{required:false} } "> 名称</th>
+							
+											
+						
+															<th data-options="field:'REMARK',width:140,editor:{type:'textbox',options:{required:false} } "> 说明</th>
+							
+											
+						
+															<th data-options="field:'STATUS',width:140,editor:{type:'textbox',options:{required:false} } "> 状态</th>
+							
+											
+						
+															<th data-options="field:'ADDWHO',width:140,editor:{type:'textbox',options:{required:false} } "> 建立者</th>
+							
+											
+						
+															<th data-options="field:'ADDTS',width:160,align:'right',editor:{type:'datebox',options:{required:true}} ,formatter:dateformatter"> 建立日期</th>
+							
+											
+						
+															<th data-options="field:'EDITWHO',width:140,editor:{type:'textbox',options:{required:false} } "> 修改者</th>
+							
+											
+						
+															<th data-options="field:'EDITTS',width:160,align:'right',editor:{type:'datebox',options:{required:true}} ,formatter:dateformatter"> 修改日期</th>
+							
+											
+						
+															<th data-options="field:'R_CODE',width:140,editor:{type:'textbox',options:{required:false} } "> 关联类别</th>
+							
+											
+						
+															<th data-options="field:'ENAME',width:140,editor:{type:'textbox',options:{required:false} } "> 英文名称</th>
+							
+											                           
+                        </tr>
+                    </thead>
+                </table>
+
+				<div id="bd_defdoc_list_toolbar" style="height:auto">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="bd_defdoc_list_append()">Append</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="bd_defdoc_list_removeit()">Remove</a>
+                    @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="bd_defdoc_list_accept()">Accept</a>*@
+                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="bd_defdoc_list_reject()">Reject</a>
+                    @*<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true" onclick="bd_defdoc_list_getChanges()">GetChanges</a>*@
+                </div>
+
+                </div>
+            </div>
+
+		  	</div>
+	</div>
+	</div>
+<!--end details tabs -->
+ 
+
+ <script type="text/javascript">
+	
+	    
+	var bd_defdoc_listeditIndex = undefined;
+    function bd_defdoc_list_endEditing() {
+        if ( bd_defdoc_listeditIndex == undefined) { return true }
+        if ($bd_defdoc_listdatagrid.datagrid('validateRow', bd_defdoc_listeditIndex)) {
+			            var ed = $bd_defdoc_listdatagrid.datagrid('getEditor', { index: bd_defdoc_listeditIndex, field: 'BD_DEFDOCROWID' });
+            var BD_DEFDOCDOCCODE = $(ed.target).combobox('getText');
+            var BD_DEFDOCROWID = $(ed.target).combobox('getValue');
+          
+            $bd_defdoc_listdatagrid.datagrid('getRows')[bd_defdoc_listeditIndex]['BD_DEFDOCDOCCODE'] = BD_DEFDOCDOCCODE;
+            $bd_defdoc_listdatagrid.datagrid('getRows')[bd_defdoc_listeditIndex]['BD_DEFDOCROWID'] = BD_DEFDOCROWID;
+            
+            
+						$bd_defdoc_listdatagrid.datagrid('endEdit', bd_defdoc_listeditIndex);
+            bd_defdoc_listeditIndex = undefined;
+
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function bd_defdoc_list_onClickCell(index, field) {
+        if (bd_defdoc_listeditIndex != index) {
+            if (bd_defdoc_list_endEditing()) {
+                $bd_defdoc_listdatagrid.datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                var ed = $bd_defdoc_listdatagrid.datagrid('getEditor', { index: index, field: field });
+                if (ed) {
+                    ($(ed.target).data('textbox') ? $(ed.target).textbox('textbox') : $(ed.target)).focus();
+                }
+                bd_defdoc_listeditIndex  = index;
+            } else {
+                $bd_defdoc_listdatagrid.datagrid('selectRow', bd_defdoc_listeditIndex);
+            }
+        }
+    }
+    function bd_defdoc_list_append() {
+        if (bd_defdoc_list_endEditing()) {
+            $bd_defdoc_listdatagrid.datagrid('appendRow', { Status:0   });
+            bd_defdoc_listeditIndex = $bd_defdoc_listdatagrid.datagrid('getRows').length - 1;
+            $bd_defdoc_listdatagrid.datagrid('selectRow', bd_defdoc_listeditIndex )
+                    .datagrid('beginEdit', bd_defdoc_listeditIndex);
+        }
+    }
+    function bd_defdoc_list_removeit() {
+        if (bd_defdoc_listeditIndex  == undefined) { return }
+        $bd_defdoc_listdatagrid.datagrid('cancelEdit', bd_defdoc_listeditIndex )
+                .datagrid('deleteRow', bd_defdoc_listeditIndex );
+        bd_defdoc_listeditIndex = undefined;
+    }
+   
+    function bd_defdoc_list_reject() {
+        $bd_defdoc_listdatagrid.datagrid('rejectChanges');
+        bd_defdoc_listeditIndex  = undefined;
+    }
+    function bd_defdoc_list_getChanges() {
+        var rows = $bd_defdoc_listdatagrid.datagrid('getChanges');
+        alert(rows.length + ' rows are changed!');
+    }
+
+
+	  
+	$(function () {
+	
+		$.get('/BD_DEFDOCs/GetBD_DEFDOC_LISTByDOCID/' + @Model.Id,function(data){
+            //console.log(data);
+            $bd_defdoc_listdatagrid.datagrid('loadData',data);
+        
+        })
+
+
+	
+	});
+</script>
+
+
+

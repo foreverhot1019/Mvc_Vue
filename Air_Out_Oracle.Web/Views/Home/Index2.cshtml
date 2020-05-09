@@ -1,0 +1,374 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My EasyUi Demo</title>
+    <meta charset="UTF-8" />
+    <link href="~/Scripts/easyui/themes/material/easyui.css" rel="stylesheet" />
+    <link href="~/Scripts/easyui/themes/icon.css" rel="stylesheet" />
+    <script src="~/Scripts/easyui/jquery.min.js"></script>
+    <script src="~/Scripts/easyui/jquery.easyui.min.js"></script>
+    
+</head>
+<body>
+    <div style="margin-left: auto;margin-right: auto;width:1150px">
+        <div class="easyui-panel" style="margin-left: auto;margin-right: auto;">
+
+            <div id="账册报关信息" class="easyui-panel" title="账册报关信息" style="width:100%;height:120px;padding:10px;"
+                 data-options="collapsible:true">
+                <form id="账册报关信息">
+                    <table cellpadding="5">
+                        <tr>
+                            <td style="width:80px">账册选择:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">报关行:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">合同协议号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">OPS业务编号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">核查方式:</td>
+                            <td style="width:170px">
+                                <div>
+                                    <input type="radio" name="radioZV" value="手动"><span>手动</span>
+                                    <input type="radio" name="radioZV" value="自动"><span>自动</span>
+                                </div>
+                            </td>
+                            <td style="width:80px">报关状态:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">口岸状态:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+
+
+                    </table>
+                </form>
+            </div>
+
+            <div id="一线接单" class="easyui-panel" title="一线接单" style="width:100%;height:400px;padding:10px;"
+                 data-options="collapsible:true">
+                <form id="一线接单" style="margin-left: auto;margin-right: auto;">
+                    <table cellpadding="5">
+                        <tr>
+                            <td style="width:80px">报关模式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">进出口标志志:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">关务流水号:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">收出货单号:</td>
+                            <td style="width:170px">
+                                <input style="width:100%" class="easyui-searchbox" data-options="prompt:''"></input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">接单时间:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">件数:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">毛重:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">净重:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">包装种类:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">总金额:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">币制:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">出入库方式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">发货人:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">收货人:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">物权人:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">提/送货地址:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">进出口岸:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">付款条件:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">通关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">商检核销单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">报关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">作业单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">贸易方式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">接单客服:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">月结周期:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">接单关务:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">操作关务:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">清单统一编号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:250px" colspan="2">
+                                <div>
+                                    <input type="checkbox" name="checkboxZV" value="仅报关"><span>仅报关</span>
+                                    <input type="checkbox" name="checkboxZV" value="急货"><span>急货</span>
+                                    <input type="checkbox" name="checkboxZV" value="退运"><span>退运</span>
+                                </div>
+                            </td>
+                            <td style="width:80px">预计送货周期:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">实际送货周期:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">通关时间:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">承运车号:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">承运车队:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">成交方式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">备注:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:250px" colspan="2">
+                                <div>
+                                    <input type="checkbox" name="checkboxZV" value="商检"><span>商检</span>
+                                    <input type="checkbox" name="checkboxZV" value="商检结果单"><span>商检结果单</span>
+                                    <input type="checkbox" name="checkboxZV" value="商检鉴定"><span>商检鉴定</span>
+                                </div>
+                            </td>
+                            <td style="width:80px">报关周期:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+
+
+                    </table>
+                </form>
+            </div>
+
+            <div id="报关单表头信息" class="easyui-panel" title="报关单表头信息" style="width:100%;height:190px;padding:10px;"
+                 data-options="collapsible:true">
+                <form id="报关单表头信息">
+                    <table cellpadding="5">
+                        <tr>
+                            <td style="width:80px">进出口日期:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">运输方式:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">运输工具名称:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">征免性质:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">征税比例:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">许可征号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">起运国(地区):</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">装货港:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">境内目的地:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">批准文号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">运费:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">保费:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">杂费:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">集装箱号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">随附单证:</td>
+                            <td style="width:170px" colspan="3"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+            <div id="货运信息" class="easyui-panel" title="货运信息" style="width:100%;height:160px;padding:10px;"
+                 data-options="collapsible:true">
+                <form id="货运信息">
+                    <table cellpadding="5">
+                        <tr>
+                            <td style="width:80px">总单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">分单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">航次号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">开航日期:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">货代:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">报关方式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">转关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">企业报关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">委外报关行:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+            <table class="easyui-datagrid" title="接单明细-料号" style="height:120px"
+                   data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
+                <thead>
+                    <tr>
+                        <th data-options="field:'itemid',width:80">收出货单号</th>
+                        <th data-options="field:'itemid',width:80">料号</th>
+                        <th data-options="field:'itemid',width:80">收货人</th>
+                        <th data-options="field:'itemid',width:80">收货人料号</th>
+                        <th data-options="field:'itemid',width:80">POLINE</th>
+                        <th data-options="field:'itemid',width:80">项号</th>
+                        <th data-options="field:'itemid',width:80">收货单项号</th>
+                        <th data-options="field:'itemid',width:80">品名</th>
+                        <th data-options="field:'itemid',width:80">规格型号</th>
+                        <th data-options="field:'itemid',width:80">数量</th>
+                        <th data-options="field:'itemid',width:80">单价</th>
+                        <th data-options="field:'itemid',width:80">总价</th>
+                        <th data-options="field:'itemid',width:80">币制</th>
+                        <th data-options="field:'itemid',width:80">原产国</th>
+                        <th data-options="field:'itemid',width:80">净重</th>
+                        <th data-options="field:'itemid',width:80">毛重</th>
+                        <th data-options="field:'itemid',width:80">进出标志</th>
+                        <th data-options="field:'itemid',width:80">货主代码</th>
+                        <th data-options="field:'itemid',width:80">货主料号</th>
+                        <th data-options="field:'itemid',width:80"></th>
+                    </tr>
+                </thead>
+            </table>
+
+            <div id="接单明细-品名" class="easyui-panel" title="接单明细-品名" style="width:100%;height:160px;padding:10px;"
+                 data-options="collapsible:true">
+                <form id="接单明细-品名">
+                    <table cellpadding="5">
+                        <tr>
+                            <td style="width:80px">总单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">分单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">航次号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">开航日期:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">货代:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">报关方式:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                            <td style="width:80px">转关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                            <td style="width:80px">企业报关单号:</td>
+                            <td style="width:170px"><input style="width:100%" class="easyui-textbox" type="text" name="name"></input></td>
+                        </tr>
+                        <tr>
+                            <td style="width:80px">委外报关行:</td>
+                            <td style="width:170px">
+                                <select style="width:100%" class="easyui-combobox" name="language"><option value="下拉值1">下拉值1</option><option value="下拉值2">下拉值2</option></select>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+        </div>
+</body>
+</html>

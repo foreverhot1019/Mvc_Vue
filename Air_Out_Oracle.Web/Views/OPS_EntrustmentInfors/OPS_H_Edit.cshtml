@@ -1,0 +1,294 @@
+﻿﻿@model AirOut.Web.Models.OPS_EntrustmentInfor
+@{
+    //控件排序
+    var Num = 97;
+    var item = ViewBag.h_order;
+    var AirTime = ViewBag.AirTime;
+}
+
+<div class="form-group col-lg-12 col-md-12 col-sm-12">
+    <div id="div_HBL" style="padding-top:5px; padding-bottom:3px; width:100%" class="easyui-panel" title=""
+         data-options="collapsible:true">
+
+        <div class="form-group col-md-12">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <input type="hidden" value="@item.Id" id="Id" />
+                <input type="checkbox" id="BL" style="width:8%" />
+                @Html.LabelFor(model => model.MBL, "总单号", htmlAttributes: new { @class = "control-label ", style = "width:15%" })
+                @Html.EditorFor(model => model.MBL, new { htmlAttributes = new { @class = "easyui-textbox", tabindex = Num++, style = "width:75%" } })
+                @*@Html.ValidationMessageFor(model => model.MBL,"" , new { @class = "text-danger" })*@
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                @Html.LabelFor(model => model.Airways_Code, "航空公司", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+                @Html.EditorFor(model => model.Airways_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:80%" } })
+                @*@Html.ValidationMessageFor(model => model.Airways_Code,"" , new { @class = "text-danger" })*@
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                @Html.LabelFor(model => model.FWD_Code, "国外代理", htmlAttributes: new { @class = "control-label ", style = "width:20%" })
+                @Html.EditorFor(model => model.FWD_Code, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:70%" } })
+                @*@Html.ValidationMessageFor(model => model.FWD_Code,"" , new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            <a href="#">发货人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Shipper_H" tabindex=@(Num++) value="@item.Shipper_H" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            <a href="#">收货人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Consignee_H" tabindex=@(Num++) value="@item.Consignee_H" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            <a href="#">通知人:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Notify_Part_H" tabindex=@(Num++) value="@item.Notify_Part_H" style="width:100%">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <input type="checkbox" id="is_Depart" style="width:9%" />
+            @Html.LabelFor(model => model.Depart_Port, "启用港", htmlAttributes: new { @class = "control-label ", style = "width:15%" })
+            @Html.EditorFor(model => model.Depart_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:74%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.End_Port, "目的港", htmlAttributes: new { @class = "control-label ", style = "width:25%" })
+            @Html.EditorFor(model => model.End_Port, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:74%" } })
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.FLIGHT_No, "航班号/EDT", htmlAttributes: new { @class = "control-label ", style = "width:19%" })
+            @Html.EditorFor(model => model.FLIGHT_No, new { htmlAttributes = new { @class = "easyui-combogrid", tabindex = Num++, style = "width:40%" } })
+            <input id="Flight_No2" name="Flight_No2" disabled="disabled" value="@AirTime" tabindex=Num++ class="easyui-textbox" type="text" style="width:39%">
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            @Html.LabelFor(model => model.Flight_Date_Want, "航班日期", htmlAttributes: new { @class = "control-label ", style = "width:25%" })
+            @Html.EditorFor(model => model.Flight_Date_Want, new { htmlAttributes = new { @class = "easyui-datebox", tabindex = Num++, style = "width:74%" } })
+            @*@Html.ValidationMessageFor(model => model.Flight_Date_Want,"" , new { @class = "text-danger" })*@
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">币种:</label>
+            <input id="Currency_H" name="Currency_H" value="@item.Currency_H" data-options="prompt1:'币种'" tabindex=@(Num++) style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">成交条款:</label>
+            <input id="Bragainon_Article_H" name="Bragainon_Article_H" value="@item.Bragainon_Article_H" tabindex=@(Num++) data-options="prompt1:'成交条款'" style="width:79%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">付款方式:</label>
+            <input id="Pay_Mode_H" name="Pay_Mode_H" value="@item.Pay_Mode_H" tabindex=@(Num++) data-options="prompt1:'付款方式'" style="width:74%" class="easyui-combogrid" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">运费P/C:</label>
+            <input id="Carriage_H" name="Carriage_H" value="@item.Carriage_H" tabindex=@(Num++) data-options="prompt1:'运费P/C'" style="width:9%" class="easyui-textbox" type="text" />
+            <input id="Carriage_H2" name="Carriage_H2" disabled="disabled" data-options="prompt1:'运费P/C'" style="width:64%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">杂费/C:</label>
+            <input id="Incidental_Expenses_H" name="Incidental_Expenses_H" tabindex=@(Num++) value="@item.Incidental_Expenses_H" data-options="prompt1:'杂费/C'" style="width:9%" class="easyui-textbox" type="text" />
+            <input id="Incidental_Expenses_H2" name="Incidental_Expenses_H2" disabled="disabled" data-options="prompt1:'杂费/C'" style="width:69%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">申明价值（运输）:</label>
+            <input id="Declare_Value_Trans_H" name="Declare_Value_Trans_H" tabindex=@(Num++) value="@item.Declare_Value_Trans_H" data-options="prompt1:'申明价值（运输）'" style="width:74%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:25%">申明价值（海关）:</label>
+            <input id="Declare_Value_Ciq_H" name="Declare_Value_Ciq_H" tabindex=@(Num++) value="@item.Declare_Value_Ciq_H" data-options="prompt1:'申明价值（海关）'" style="width:74%" class="easyui-textbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">保险额度:</label>
+            <input id="Risk_H" name="Risk_H" value="@item.Risk_H" tabindex=@(Num++) data-options="prompt1:'保险额度'" style="width:79%" class="easyui-textbox" type="text" />
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">唛头:</label>*@
+            <a href="#">唛头:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="Marks_H" tabindex=@(Num++) value="@item.Marks_H" style="width:100%;height:60px;">
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6">
+            @*<label for="name" style="width:20%">主单英文货名:</label>*@
+            <a href="#">主单英文货名:</a>
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="EN_Name_H" tabindex=@(Num++) value="@item.EN_Name_H" style="width:100%;height:29px;">
+            <input class="easyui-textbox textbox-f" data-options="multiline:true" id="EN_Name_H2" tabindex=@(Num++) value="" style="width:100%;height:29px;">
+        </div>
+
+        <div class="form-group col-md-12">
+            <hr />
+        </div>
+
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">件数:</label>
+            <input id="Pieces_H" name="Pieces_H" value="@item.Pieces_H" data-options="prompt1:'件数'" tabindex=@(Num++) style="width:79%" class="easyui-numberbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">毛重:</label>
+            <input id="Weight_H" name="Weight_H" value="@item.Weight_H" data-options="prompt1:'毛重'" tabindex=@(Num++) style="width:79%" class="easyui-numberbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">体积:</label>
+            <input id="Volume_H" name="Volume_H" value="@item.Volume_H" data-options="prompt1:'体积'" tabindex=@(Num++) style="width:79%" class="easyui-numberbox" type="text" />
+        </div>
+        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+            <label for="name" style="width:20%">计费重量:</label>
+            <input id="Charge_Weight_H" name="Charge_Weight_H" value="@item.Charge_Weight_H" tabindex=@(Num++) data-options="prompt1:'计费重量'" style="width:79%" class="easyui-numberbox" type="text" />
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        is_BL_H();
+        $("#BL", "#fdxx").on('click', function () {
+            is_BL_H();
+        });
+
+        //加载时绑定combogrid数据源
+        initbindcombogriddata_H()
+     });
+     //判断，是否有 总单号
+     function is_BL_H() {
+         if ($("#BL", "#fdxx").get(0).checked) {
+             $("#MBL", "#fdxx").textbox("enable");
+         } else {
+             $("#MBL", "#fdxx").textbox("disable");
+         }
+     }
+
+
+     //加载时绑定combogrid数据源
+     function initbindcombogriddata_H() {
+
+         //航空公司
+         $("#Airways_Code", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetCusBusInf',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+
+         //国外代理
+         $("#FWD_Code", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetCusBusInf',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+         //启运港
+         $("#Depart_Port", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetPARA_AIRPorts',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+         //目的港
+         $("#End_Port", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetPARA_AIRPorts',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+         //币种
+         $("#Currency_H", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetPARA_CURR',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+
+         //航班号
+         $("#FLIGHT_No", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'TEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetPARA_AirLine',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]],
+             onChange: function () {
+                 var data = $("#FLIGHT_No", "#fdxx").combogrid("grid").datagrid("getSelected");
+                 if (data != null) {//费用代码存在时，自动填写费用名称
+                     $("#Flight_No2").textbox("setValue", data.Time);
+                 } else {//清空费用名称
+                     $("#Flight_No2").textbox("setValue", "");
+                 }
+             }
+         });
+         //成交条款
+         $("#Bragainon_Article_H", "#fdxx").combogrid({
+             panelHeight: 'auto',
+             mode: 'remote',
+             idField: 'ID',
+             valueField: 'ID',
+             textField: 'IDTEXT',
+             pageSize: 10,
+             pageList: [5, 10, 20],
+             pagination: true,
+             url: '/OPS_EntrustmentInfors/GetDealArticle',
+             columns: [[
+                 { field: 'ID', title: '代码', width: 100 },
+                 { field: 'TEXT', title: '名称', width: 130 }
+             ]]
+         });
+     }
+ </script>
