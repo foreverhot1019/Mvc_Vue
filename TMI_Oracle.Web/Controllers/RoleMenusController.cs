@@ -679,7 +679,7 @@ namespace TMI.Web.Controllers
                     {
                         RoleMenuRep.Delete(item.Id);
                         ArrdelRoleMenu.Add(item);
-                        ///记录变更的权限
+                        //记录变更的权限
                         ArrChgRoleId.Add(item.RoleId);
                     }
                 }
@@ -693,7 +693,7 @@ namespace TMI.Web.Controllers
                         item.Id = IdNum++;
                         RoleMenuRep.Insert(item);
                         ArrdelRoleMenu.Add(item);
-                        ///记录变更的权限
+                        //记录变更的权限
                         ArrChgRoleId.Add(item.RoleId);
                     }
                 }
@@ -716,7 +716,7 @@ namespace TMI.Web.Controllers
                     {
                         RoleMenuActionRep.Delete(item.Id);
                         ArrdelRoleMenuAction.Add(item);
-                        ///记录变更的权限
+                        //记录变更的权限
                         ArrChgRoleId.Add(item.RoleId);
                     }
                 }
@@ -730,7 +730,7 @@ namespace TMI.Web.Controllers
                         item.Id = IdNum++;
                         RoleMenuActionRep.Insert(item);
                         ArraddRoleMenuAction.Add(item);
-                        ///记录变更的权限
+                        //记录变更的权限
                         ArrChgRoleId.Add(item.RoleId);
                     }
                 }

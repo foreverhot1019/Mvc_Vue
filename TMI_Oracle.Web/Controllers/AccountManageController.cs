@@ -269,10 +269,11 @@ namespace TMI.Web.Controllers
                         {
                             user.PasswordHash = SignInManager.UserManager.PasswordHasher.HashPassword(updated.Password);
                         }
+                        //更新安全票据
+                        //UserManager.UpdateSecurityStampAsync(user.Id);
+                        user.SecurityStamp = Guid.NewGuid().ToString();
                         AppDbContext.Entry(user).State = System.Data.Entity.EntityState.Modified;
                         ArrUser.Add(user);
-                        //更新安全票据
-                        UserManager.UpdateSecurityStampAsync(user.Id);
                         //var user = new ApplicationUser { UserName = updated.UserName, Email = updated.Email, LockoutEnabled = updated.LockoutEnabled, UserNameDesc = updated.UserNameDesc };
                         //string PasswordHasher = "";
                         //if (!string.IsNullOrEmpty(updated.Password))
