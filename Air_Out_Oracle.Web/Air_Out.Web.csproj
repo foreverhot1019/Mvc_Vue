@@ -745,12 +745,9 @@
     <Compile Include="Utility\MailClient.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\AirOut.Web.mdf" />
-    <Content Include="App_Data\AirOut.Web_log.ldf">
-      <DependentUpon>AirOut.Web.mdf</DependentUpon>
-    </Content>
     <Content Include="App_Data\BillFormula.xml" />
     <Content Include="App_Data\Interop.MODI.dll" />
+    <Content Include="App_Data\OracleConnection.mdf" />
     <Content Include="App_Data\Sap.Data.Hana.v4.5.dll" />
     <Content Include="App_Data\sapnco.dll" />
     <Content Include="App_Data\sapnco_utils.dll" />

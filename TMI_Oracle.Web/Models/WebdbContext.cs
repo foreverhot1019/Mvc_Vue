@@ -815,7 +815,7 @@ namespace TMI.Web.Models
         {
             //AddInterceptor(new StringTrimmerInterceptor());
             ////或者注册在Global.asax中的Application_Start 
-            //DbInterception.Add(new EFIntercepterLogging());
+            DbInterception.Add(new EFIntercepterLogging());
         }
     }
 
